@@ -27,7 +27,10 @@ System umożliwi pracownikom warsztatu rejestrację wykonanych prac serwisowych 
 -   Generowanie faktury VAT i imiennych z napraw,
 -   Automatyczna archiwizacja napraw.
 
-Przewidywana struktura aplikacji to SPA (Single-Page-Application) z systemem autoryzacji użytkownika, gdzie w zależności od uprawnień będzie miał dostęp do odpowiednich funkcjonalności. Backend zarządzający logiką operacji wewnątrz aplikacji. W architekturze zostanie zaimplementowana baza danych klientów, pojazdów, czynności serwisowych ze szczegółami i kosztorysami, faktur.
+### Przewidywana struktura aplikacji będzie się składać z: 
+-   Frontend SPA (Single-Page-Application) z systemem autoryzacji użytkownika, gdzie w zależności od uprawnień będzie miał dostęp do odpowiednich funkcjonalności. 
+-   Backend zarządzający logiką operacji wewnątrz aplikacji. 
+-   Baza danych klientów, pojazdów, czynności serwisowych ze szczegółami i kosztorysami, faktur.
 
 
 ## Podpięcie IDE do repozytorium
