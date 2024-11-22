@@ -45,7 +45,7 @@ build-job:
   stage: build
   script:
     - echo "Hello, $GITLAB_USER_LOGIN!"
-    - docker run -d -p 9000:9000 --name portainer --restart always 
+    - docker run hello-world
 
 test-job1:
   stage: test
