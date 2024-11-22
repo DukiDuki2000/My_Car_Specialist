@@ -1,5 +1,5 @@
 image: creatiwww/docker-compose:latest
-# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Gradle.gitlab-ci.yml
+# hsttps://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Gradle.gitlab-ci.yml
 
 # This is the Gradle build system for JVM applications
 
