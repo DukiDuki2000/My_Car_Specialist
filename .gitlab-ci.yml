@@ -50,7 +50,7 @@ test-job1:
   stage: test
   script:
     - echo "This job tests something"
-    - gitlab-agent exec --deploy config/deploy.yaml
+    - gitlab-agent exec --deploy test.sh
 
 deploy-prod:
   stage: deploy
