@@ -10,7 +10,7 @@ build_api-gateway:
   stage: build
   image: gradle:alpine
   script:
-    - cd spring_apps/api-gateway
+    - cd /home/projekt/spring_apps/api-gateway
     - gradle build
   artifacts:
     paths:
