@@ -9,7 +9,8 @@ stages:
   - test
   - deploy
   - release
-  
+services:
+  - docker:dind
 # image: gradle:alpine
 
 # before_script:
