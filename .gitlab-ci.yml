@@ -22,7 +22,8 @@ build-job:
     - echo "Running a local script..."
     - chmod +x /home/projekt/test.sh
     - /home/projekt/test.sh
-
+  only:
+    - main
 
 test-job1:
   stage: test
