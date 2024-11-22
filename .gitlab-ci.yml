@@ -1,4 +1,4 @@
-image: creatiwww/docker-compose:latest
+
 # hsttps://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Gradle.gitlab-ci.yml
 
 # This is the Gradle build system for JVM applications
@@ -13,40 +13,16 @@ services:
   - docker:dind
 # image: gradle:alpine
 
-# before_script:
-#   - GRADLE_USER_HOME="$(pwd)/.gradle"
-#   - export GRADLE_USER_HOME
 
-# build:
-#   stage: build
-#   script: gradle --build-cache assemble
-#   cache:
-#     key: "$CI_COMMIT_REF_NAME"
-#     policy: push
-#     paths:
-#       - build
-#       - .gradle
-
-# test:
-#   stage: test
-#   script: gradle check
-#   cache:
-#     key: "$CI_COMMIT_REF_NAME"
-#     policy: pull
-#     paths:
-#       - build
-#       - .gradle
-
-# deploy:
-#   stage: deploy
-#   script: echo "Define your deployment script!"
-#   environment: production
 
 build-job:
   stage: build
   script:
     - echo "Hello, $GITLAB_USER_LOGIN!"
-    - docker run hello-world
+    - echo "Running a local script..."
+    - chmod +x /home/projekt/test.sh
+    - /home/projekt/test.sh
+
 
 test-job1:
   stage: test
