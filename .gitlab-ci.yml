@@ -1,17 +1,120 @@
 
-# hstsstps://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Gradle.gitlab-ci.yml
-
-# This is the Gradle build system for JVM applications
-
-
 stages:
   - build
   - test
   - deploy
   - release
-services:
-  - docker:dind
-# image: gradle:alpine
+
+
+build_api-gateway:
+  stage: build
+  image: gradle:alpine
+  script:
+    - cd spring_apps/api-gateway
+    - gradle build
+  artifacts:
+    paths:
+      - api-gateway/target/*.jar
+    expire_in: 1 day
+  only:
+    - main
+
+
+
+build_discovery-service:
+  stage: build
+  image: gradle:alpine
+  script:
+    - cd spring_apps/discovery-service
+    - gradle build
+  artifacts:
+    paths:
+      - discovery-service/target/*.jar
+    expire_in: 1 day
+  only:
+    - main
+
+build_user-service:
+  stage: build
+  image: gradle:alpine
+  script:
+    - cd spring_apps/user-service
+    - gradle build
+  artifacts:
+    paths:
+      - user-service/target/*.jar
+    expire_in: 1 day
+  only:
+    - main
+
+build_garage-service:
+  stage: build
+  image: gradle:alpine
+  script:
+    - cd spring_apps/garage-service
+    - gradle build
+  artifacts:
+    paths:
+      - garage-service/target/*.jar
+    expire_in: 1 day
+  only:
+    - main
+
+build_vechicle-service:
+  stage: build
+  image: gradle:alpine
+  script:
+    - cd spring_apps/vechicle-service
+    - gradle build
+  artifacts:
+    paths:
+      - vechicle-service/target/*.jar
+    expire_in: 1 day
+  only:
+    - main
+
+
+build_notification-service:
+  stage: build
+  image: gradle:alpine
+  script:
+    - cd spring_apps/notification-service
+    - gradle build
+  artifacts:
+    paths:
+      - notification-service/target/*.jar
+    expire_in: 1 day
+  only:
+    - main
+
+build_recommendation-service:
+  stage: build
+  image: gradle:alpine
+  script:
+    - cd spring_apps/recommendation-service
+    - gradle build
+  artifacts:
+    paths:
+      - recommendation-service/target/*.jar
+    expire_in: 1 day
+  only:
+    - main
+
+test-all-services:
+  stage: test
+  image: gradle:alpine
+  script:
+    - gradle --versione
+    - gradle test -p spring_apps/api-gateway
+    - gradle test -p spring_apps/discovery-service
+    - gradle test -p spring_apps/user-service
+    - gradle test -p spring_apps/garage-service
+    - gradle test -p spring_apps/vechicle-service
+    - gradle test -p spring_apps/notification-service
+    - gradle test -p spring_apps/recommendation-service
+  only:
+    - main
+
 
 
 
@@ -25,28 +128,28 @@ build-job:
   only:
     - main
 
-test-job1:
-  stage: test
-  script:
-    - echo "This job tests something"
+# test-job1:
+#   stage: test
+#   script:
+#     - echo "This job tests something"
 
-deploy-prod:
-  stage: deploy
-  script:
-    - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
-  environment: production
-release_job:
-  stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest              # Run this job when a tag is created
-  script:
-    - echo "running release_job"
-    - commit_message=$(git log -1 --pretty=%B)
-    - tag_name=$(date +'%Y-%m-%d-%H-%M-%S')-"$(echo "$commit_message" | tr -s ' ' '-')"
-    - release-cli create --description "Release created automatically for $CI_COMMIT_REF_NAME" --tag-name "$tag_name"
-  # release:                               # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
-  #   tag_name: "$tag_name"
-  #   description: '$CI_COMMIT_TAG'
-  only:
-    - tags
+# deploy-prod:
+#   stage: deploy
+#   script:
+#     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
+#   environment: production
+# release_job:
+#   stage: release
+#   image: registry.gitlab.com/gitlab-org/release-cli:latest              # Run this job when a tag is created
+#   script:
+#     - echo "running release_job"
+#     - commit_message=$(git log -1 --pretty=%B)
+#     - tag_name=$(date +'%Y-%m-%d-%H-%M-%S')-"$(echo "$commit_message" | tr -s ' ' '-')"
+#     - release-cli create --description "Release created automatically for $CI_COMMIT_REF_NAME" --tag-name "$tag_name"
+#   # release:                               # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
+#   #   tag_name: "$tag_name"
+#   #   description: '$CI_COMMIT_TAG'
+#   only:
+#     - tags
 
 
