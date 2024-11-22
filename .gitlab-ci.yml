@@ -62,7 +62,7 @@ release_job:
   script:
     - echo "running release_job"
     - commit_message=$(git log -1 --pretty=%B)
-    - tag_name=$(date +'%Y-%m-%d-%H-%M-%S')-"$commit_message"
+    - tag_name=$(date +'%Y-%m-%d-%H-%M-%S')-"$(echo "$commit_message" | tr -s ' ' '-')"
     - release-cli create --description "Release created automatically for $CI_COMMIT_REF_NAME" --tag-name "$tag_name"
   # release:                               # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
   #   tag_name: "$tag_name"
