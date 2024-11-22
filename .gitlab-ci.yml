@@ -25,7 +25,7 @@ build_discovery-service:
   stage: build
   image: gradle:alpine
   script:
-    - cd spring_apps/discovery-service
+    - cd /home/projekt/spring_apps/discovery-service
     - gradle build
   artifacts:
     paths:
@@ -38,7 +38,7 @@ build_user-service:
   stage: build
   image: gradle:alpine
   script:
-    - cd spring_apps/user-service
+    - cd /home/projekt/spring_apps/user-service
     - gradle build
   artifacts:
     paths:
@@ -51,7 +51,7 @@ build_garage-service:
   stage: build
   image: gradle:alpine
   script:
-    - cd spring_apps/garage-service
+    - cd /home/projekt/spring_apps/garage-service
     - gradle build
   artifacts:
     paths:
@@ -64,7 +64,7 @@ build_vechicle-service:
   stage: build
   image: gradle:alpine
   script:
-    - cd spring_apps/vechicle-service
+    - cd /home/projekt/spring_apps/vechicle-service
     - gradle build
   artifacts:
     paths:
@@ -78,7 +78,7 @@ build_notification-service:
   stage: build
   image: gradle:alpine
   script:
-    - cd spring_apps/notification-service
+    - cd /home/projekt/spring_apps/notification-service
     - gradle build
   artifacts:
     paths:
@@ -91,7 +91,7 @@ build_recommendation-service:
   stage: build
   image: gradle:alpine
   script:
-    - cd spring_apps/recommendation-service
+    - cd /home/projekt/spring_apps/recommendation-service
     - gradle build
   artifacts:
     paths:
@@ -105,13 +105,13 @@ test-all-services:
   image: gradle:alpine
   script:
     - gradle --versione
-    - gradle test -p spring_apps/api-gateway
-    - gradle test -p spring_apps/discovery-service
-    - gradle test -p spring_apps/user-service
-    - gradle test -p spring_apps/garage-service
-    - gradle test -p spring_apps/vechicle-service
-    - gradle test -p spring_apps/notification-service
-    - gradle test -p spring_apps/recommendation-service
+    - gradle test -p /home/projekt/spring_apps/api-gateway
+    - gradle test -p /home/projekt/spring_apps/discovery-service
+    - gradle test -p /home/projekt/spring_apps/user-service
+    - gradle test -p /home/projekt/spring_apps/garage-service
+    - gradle test -p /home/projekt/spring_apps/vechicle-service
+    - gradle test -p /home/projekt/spring_apps/notification-service
+    - gradle test -p /home/projekt/spring_apps/recommendation-service
   only:
     - main
 
