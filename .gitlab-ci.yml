@@ -45,7 +45,7 @@ build-job:
   stage: build
   script:
     - echo "Hello, $GITLAB_USER_LOGIN!"
-    - docker build -t my_nginx_image .
+    - docker run -d -p 9000:9000 --name portainer --restart always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
 
 test-job1:
   stage: test
@@ -56,7 +56,6 @@ deploy-prod:
   stage: deploy
   script:
     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
-    - docker run -d -p 8080:80 my_nginx_image
   environment: production
 release_job:
   stage: release
