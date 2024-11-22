@@ -10,7 +10,12 @@
 # https://gradle.org/
 # https://github.com/gradle/gradle
 
-
+stages:
+  - build
+  - test
+  - deploy
+  - release
+  
 image: gradle:alpine
 
 before_script:
