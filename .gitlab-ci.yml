@@ -62,7 +62,8 @@ release_job:
   image: registry.gitlab.com/gitlab-org/release-cli:latest              # Run this job when a tag is created
   script:
     - echo "running release_job"
-    - tag_name=$(date +'%Y-%m-%d-%H-%M-%S')
+    - commit_message=$(git log -1 --pretty=%B)
+    - tag_name=$(date +'%Y-%m-%d-%H-%M-%S') + commit_message
     - release-cli create --description "Release created automatically for $CI_COMMIT_REF_NAME" --tag-name "$tag_name"
   # release:                               # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
   #   tag_name: "$tag_name"
