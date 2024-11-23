@@ -66,6 +66,7 @@ build_vechicle-service:
   script:
     # - cd /home/projekt/spring_apps/vechicle-service
     # - gradle build
+    - ls
     - echo "cat spring_apps/vechicle-service/test.txt"
   artifacts:
     paths:
