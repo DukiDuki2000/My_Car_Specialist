@@ -63,7 +63,7 @@ stages:
 build_vechicle-service:
   stage: build
   script:
-    - cd spring_apps/vechicle-service
+    - cd spring_apps/vehicle-service
     - gradle build
     # - cat spring_apps/vehicle-service/test.txt
     # - echo "gitara siema" > spring_apps/vehicle-service/result.txt
