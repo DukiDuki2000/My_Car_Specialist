@@ -117,6 +117,7 @@ unpack_api_gateway_jar:
     - mkdir -p ./${DEPENDENCY_DIR};
     - cd ./${DEPENDENCY_DIR};
     - jar -xf ../libs/*.jar;
+    - tree
     #- docker compose build -f docker-compose.yml
   only:
     refs:
