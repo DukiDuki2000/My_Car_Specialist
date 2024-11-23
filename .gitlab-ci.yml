@@ -64,6 +64,7 @@ build_vechicle-service:
   stage: build
   script:
     - cd spring_apps/vehicle-service
+    - chmod +x gradlew
     - ./gradlew clean build
     - ls -al build/libs
     # - cat spring_apps/vehicle-service/test.txt
