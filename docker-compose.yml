@@ -90,7 +90,7 @@ services:
     networks:
       - bridge_network 
 
-   api-gateway:
+  api-gateway:
     build:
       context: .
       dockerfile: services.Dockerfile
