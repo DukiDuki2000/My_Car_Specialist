@@ -68,7 +68,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /home/projekt/volumes/db/postgre:/bar/lib/postgresql/data
+      - /home/projekt/volumes/db/postgre:/var/lib/postgresql/data
       - /home/projekt/volumes/db/postgre:/docker-entrypoint-initdb.d
     networks:
       - bridge_network
