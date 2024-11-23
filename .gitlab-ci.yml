@@ -256,7 +256,7 @@ create_recommendation-service_image:
 deploy_services:
   stage: deploy
   script:
-    - docker compose -f docker-compose.yml -d up
+    - docker compose -f docker-compose.yml up -d
   only:
     refs:
       - main
