@@ -63,13 +63,13 @@ stages:
 build_vechicle-service:
   stage: build
   script:
-    # - cd /home/projekt/spring_apps/vechicle-service
-    # - gradle build
-    - cat spring_apps/vehicle-service/test.txt
-    - echo "gitara siema" > spring_apps/vehicle-service/result.txt
+    - cd spring_apps/vechicle-service
+    - gradle build
+    # - cat spring_apps/vehicle-service/test.txt
+    # - echo "gitara siema" > spring_apps/vehicle-service/result.txt
   artifacts:
     paths:
-      - spring_apps/vehicle-service/*.txt
+      - spring_apps/vehicle-service/build/libs/*.jar
     expire_in: 1 day
   only:
     - main
