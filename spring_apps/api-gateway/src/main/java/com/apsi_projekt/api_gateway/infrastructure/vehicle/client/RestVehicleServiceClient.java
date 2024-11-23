@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 public class RestVehicleServiceClient {
     private RestClient restClient;
 
-    RestVehicleServiceClient(@value(${service.vehicle_service}) String vehicleServiceUrl) {
+    RestVehicleServiceClient(@Value("${service.vehicle_service}") String vehicleServiceUrl) {
         this.restClient = RestClient.create(vehicleServiceUrl);
     }
 
