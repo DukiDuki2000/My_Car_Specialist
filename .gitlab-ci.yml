@@ -124,7 +124,7 @@ unpack_api_gateway_jar:
     refs:
       - main
     changes:
-     - spring_apps/**/*
+     - spring_apps/api-gateway/**/*
      - ./services.Dockerfile
      - ./docker-compose.yml
 
