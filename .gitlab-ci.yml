@@ -69,7 +69,7 @@ build_vechicle-service:
     - echo "cat spring_apps/vechicle-service/test.txt"
   artifacts:
     paths:
-      - vechicle-service/target/*.jar
+      - vechicle-service/target/*.txt
     expire_in: 1 day
   only:
     - main
