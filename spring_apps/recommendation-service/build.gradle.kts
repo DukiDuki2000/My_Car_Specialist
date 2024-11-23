@@ -52,3 +52,9 @@ tasks.asciidoctor {
 	inputs.dir(project.extra["snippetsDir"]!!)
 	dependsOn(tasks.test)
 }
+
+tasks.register("printVersion") {
+    doLast {
+        println(version)
+    }
+}
