@@ -1,0 +1,173 @@
+version: "3"
+services:
+
+  portainer:
+    image:  portainer/portainer-ce:latest
+    container_name: portainer
+    ports:
+      - 9000:9000
+    volumes:
+      - data:/portianer
+    environment:
+      ADMIN_INIT_PASSWORD:  "administrator"
+      # SERVICE_TAGS:         "management,container-monitoring"
+
+  portainer_agent:
+    image: portainer/agent:2.21.4
+    container_name: portainer_agent
+    ports:
+      - "9001:9001"
+    restart: always
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/var/lib/docker/volumes:/var/lib/docker/volumes"
+      - "/:/host"
+    # environment:
+    #   SERVICE_TAGS:         "management,container-agent"
+
+  gitlab_agent:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab_agent
+    ports:
+      - "8093:8093"
+    volumes:
+      - "/srv/gitlab-runner/config:/etc/gitlab-runner"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    # environment:
+    #   SERVICE_TAGS:         "ci-cd,gitlab-runner"
+
+  dbgate:
+    image: dbgate/dbgate
+    container_name: dbgate
+    ports:
+      - "9002:3000"
+    volumes:
+      - data:/root/.dbgate
+    environment:
+      CONNECTIONS: con1,con2
+
+      LABEL_con1: Postgres
+      SERVER_con1: postgresql
+      USER_con1: admin
+      PASSWORD_con1: admin
+      PORT_con1: 5432
+      ENGINE_con1: postgres@dbgate-plugin-postgres
+
+      LABEL_con2: MongoDB
+      URL_con2: mongodb://admin:admin@mongodb:27017/
+      ENGINE_con2: mongo@dbgate-plugin-mongo
+      # SERVICE_TAGS:         "database-management,ui"
+
+    networks:
+      - bridge_network
+
+  postgresql:
+    build:
+      context: ./volumes/db/postgre
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - /home/projekt/volumes/db/postgre:/bar/lib/postgresql/data
+      - /home/projekt/volumes/db/postgre:/docker-entrypoint-initdb.d
+    networks:
+      - bridge_network
+    environment:
+      SERVICE_TAGS:         "database,sql,postgres"
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      # SERVICE_TAGS:         "database,nosql,mongodb"
+    ports:
+      - "27017:27017"
+    volumes:
+      - /home/projekt/volumes/db/mongodb:/data/db
+      - /home/projekt/volumes/db/mongodb/init_script_mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - bridge_network 
+
+   api-gateway:
+    build:
+      context: .
+      dockerfile: services.Dockerfile
+    ports:
+     - "8080:8080"
+    # enviroment:
+    #   SERVICE_TAGS:         "database,nosql"###
+    args:
+      APP_DIR: "/spring_apps/api-gateway"
+
+
+  # user-service:
+  #   build:
+  #     context: ./spring_apps/user-service
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8081:8080"
+  #   enviroment:
+      # SERVICE_TAGS:         "database,nosql"###
+
+  # vehicle-service:
+  #   build:
+  #     context: ./spring_apps/vechicle-service
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8082:8080"
+  #   enviroment:
+        # SERVICE_TAGS:         "database,nosql"###
+
+  # garage-service:
+  #   build:
+  #     context: ./spring_apps/garage-service
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8083:8080"
+  #   enviroment:
+      # SERVICE_TAGS:         "database,nosql"###
+
+  # recommendation-service:
+  #   build:
+  #     context: ./spring_apps/recommendation-service
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8084:8080"
+  #   enviroment:
+      # SERVICE_TAGS:         "database,nosql"###
+
+  # notification-service:
+  #   build:
+  #     context: ./spring_apps/notification-service 
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8085:8080"
+  #   enviroment:
+      # SERVICE_TAGS:         "database,nosql"###
+
+  # registrator:
+  #   image: gliderlabs/registrator:latest
+  #   container_name: registrator
+  #   volumes:
+  #     - "/var/run/docker.sock:/tmp/docker.sock" # Registrator monitoruje kontenery Dockera
+  #   command: consul://127.0.0.1:8500 -interval 10        
+  #   depends_on:
+  #     - consul
+
+  # consul:
+  #   image: consul:latest
+  #   container_name: consul
+  #   ports:
+  #     - "8500:8500"
+  #     - "8600:8600/udp"
+  #   command: agent -dev -client=0.0.0.0
+
+networks:
+  bridge_network:
+    driver: bridge
+
+volumes:
+  data:
+
