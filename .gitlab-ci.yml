@@ -127,7 +127,7 @@ unpack_api_gateway_jar:
      - ./docker-compose.yml
 
 dockerize:
-  stage: package
+  stage: deploy
   script:
     - docker compose build -f docker-compose.yml
   only:
