@@ -119,6 +119,10 @@ unpack_api_gateway_jar:
     - jar -xf ../libs/*.jar;
     - tree
     #- docker compose build -f docker-compose.yml
+  artifacts:
+    paths:
+      - spring_apps/api-gateway/${DEPENDENCY_DIR}/  
+    expire_in: 1 day
   only:
     refs:
       - main
