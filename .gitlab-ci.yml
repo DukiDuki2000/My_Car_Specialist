@@ -8,7 +8,7 @@ stages:
 
 build_api-gateway:
   stage: build
-  image: gradle:alpine
+  image: gradle:latest
   script:
     - cd /home/projekt/spring_apps/api-gateway
     - gradle build
@@ -23,7 +23,7 @@ build_api-gateway:
 
 build_discovery-service:
   stage: build
-  image: gradle:alpine
+  image: gradle:latest
   script:
     - cd /home/projekt/spring_apps/discovery-service
     - gradle build
@@ -36,7 +36,7 @@ build_discovery-service:
 
 build_user-service:
   stage: build
-  image: gradle:alpine
+  image: gradle:latest
   script:
     - cd /home/projekt/spring_apps/user-service
     - gradle build
@@ -49,7 +49,7 @@ build_user-service:
 
 build_garage-service:
   stage: build
-  image: gradle:alpine
+  image: gradle:latest
   script:
     - cd /home/projekt/spring_apps/garage-service
     - gradle build
@@ -62,7 +62,7 @@ build_garage-service:
 
 build_vechicle-service:
   stage: build
-  image: gradle:alpine
+  image: gradle:latest
   script:
     - cd /home/projekt/spring_apps/vechicle-service
     - gradle build
@@ -76,7 +76,7 @@ build_vechicle-service:
 
 build_notification-service:
   stage: build
-  image: gradle:alpine
+  image: gradle:latest
   script:
     - cd /home/projekt/spring_apps/notification-service
     - gradle build
@@ -89,7 +89,7 @@ build_notification-service:
 
 build_recommendation-service:
   stage: build
-  image: gradle:alpine
+  image: gradle:latest
   script:
     - cd /home/projekt/spring_apps/recommendation-service
     - gradle build
@@ -102,7 +102,7 @@ build_recommendation-service:
 
 test-all-services:
   stage: test
-  image: gradle:alpine
+  image: gradle:latest
   script:
     - gradle --versione
     - gradle test -p /home/projekt/spring_apps/api-gateway
