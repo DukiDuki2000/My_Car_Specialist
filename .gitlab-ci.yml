@@ -25,6 +25,7 @@ build_api-gateway:
       - main
     changes:
      - spring_apps/api-gateway/**/*
+     - services.Dockerfile
 
 build_user-service:
   stage: build
@@ -42,6 +43,7 @@ build_user-service:
       - main
     changes:
      - spring_apps/user-service/**/*
+     - services.Dockerfile
 
 build_garage-service:
   stage: build
@@ -59,6 +61,7 @@ build_garage-service:
       - main
     changes:
      - spring_apps/garage-service/**/*
+     - services.Dockerfile
 
 build_vehicle-service:
   stage: build
@@ -75,6 +78,7 @@ build_vehicle-service:
       - main
     changes:
      - spring_apps/vehicle-service/**/*
+     - services.Dockerfile
 
 build_notification-service:
   stage: build
@@ -109,26 +113,7 @@ build_recommendation-service:
       - main
     changes:
      - spring_apps/recommendation-service/**/*
-
-# unpack_api_gateway_jar:
-#   stage: package
-#   script:
-#     - cd spring_apps/api-gateway;
-#     - mkdir -p ./${DEPENDENCY_DIR};
-#     - cd ./${DEPENDENCY_DIR};
-#     - jar -xf ../libs/*.jar;
-#     #- docker compose build -f docker-compose.yml
-#   artifacts:
-#     paths:
-#       - spring_apps/api-gateway/${DEPENDENCY_DIR}/  
-#     expire_in: 1 day
-#   only:
-#     refs:
-#       - main
-#     changes:
-#      - spring_apps/api-gateway/**/*
-#      - ./services.Dockerfile
-#      - ./docker-compose.yml
+     - services.Dockerfile
 
 create_api-gateway_image:
   stage: dockerize
@@ -149,6 +134,124 @@ create_api-gateway_image:
   only:
     refs:
       - main
+    changes:
+      - ./spring_apps/api-gateway/**/*
+      - services.Dockerfile
+
+create_user-service_image:
+  stage: dockerize
+  script:
+    - cd spring_apps/user-service;
+    - mkdir -p ./${DEPENDENCY_DIR};
+    - cd ./${DEPENDENCY_DIR};
+    - jar -xf ../libs/*.jar;
+    - cd ../..
+    - chmod +x ./gradlew
+    - VERSION=$(./gradlew -q printVersion)
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - ls -a
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/user-service" -t user-service:$VERSION .
+  needs:
+    - build_user-service
+  only:
+    refs:
+      - main
+    changes:
+      - ./spring_apps/user-service/**/*
+      - services.Dockerfile
+
+create_garage-service_image:
+  stage: dockerize
+  script:
+    - cd spring_apps/garage-service;
+    - mkdir -p ./${DEPENDENCY_DIR};
+    - cd ./${DEPENDENCY_DIR};
+    - jar -xf ../libs/*.jar;
+    - cd ../..
+    - chmod +x ./gradlew
+    - VERSION=$(./gradlew -q printVersion)
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - ls -a
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/garage-service" -t garage-service:$VERSION .
+  needs:
+    - build_garage-service
+  only:
+    refs:
+      - main
+    changes:
+      - ./spring_apps/garage-service/**/*
+      - services.Dockerfile
+
+create_vehicle-service_image:
+  stage: dockerize
+  script:
+    - cd spring_apps/vehicle-service;
+    - mkdir -p ./${DEPENDENCY_DIR};
+    - cd ./${DEPENDENCY_DIR};
+    - jar -xf ../libs/*.jar;
+    - cd ../..
+    - chmod +x ./gradlew
+    - VERSION=$(./gradlew -q printVersion)
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - ls -a
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/vehicle-service" -t vehicle-service:$VERSION .
+  needs:
+    - build_vehicle-service
+  only:
+    refs:
+      - main
+    changes:
+      - ./spring_apps/vehicle-service/**/*
+      - services.Dockerfile
+
+create_notification-service_image:
+  stage: dockerize
+  script:
+    - cd spring_apps/notification-service;
+    - mkdir -p ./${DEPENDENCY_DIR};
+    - cd ./${DEPENDENCY_DIR};
+    - jar -xf ../libs/*.jar;
+    - cd ../..
+    - chmod +x ./gradlew
+    - VERSION=$(./gradlew -q printVersion)
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - ls -a
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/notification-service" -t notification-service:$VERSION .
+  needs:
+    - build_notification-service
+  only:
+    refs:
+      - main
+    changes:
+      - ./spring_apps/notification-service/**/*
+      - services.Dockerfile
+
+create_recommendation-service_image:
+  stage: dockerize
+  script:
+    - cd spring_apps/recommendation-service;
+    - mkdir -p ./${DEPENDENCY_DIR};
+    - cd ./${DEPENDENCY_DIR};
+    - jar -xf ../libs/*.jar;
+    - cd ../..
+    - chmod +x ./gradlew
+    - VERSION=$(./gradlew -q printVersion)
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - ls -a
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/recommendation-service" -t recommendation-service:$VERSION .
+  needs:
+    - build_recommendation-service
+  only:
+    refs:
+      - main
+    changes:
+      - ./spring_apps/recommendation-service/**/*
+      - services.Dockerfile
 
 # dockerize:
 #   stage: dockerize
@@ -162,5 +265,25 @@ create_api-gateway_image:
 #       - main
 #     changes:
 #      - spring_apps/**/*
+#      - ./services.Dockerfile
+#      - ./docker-compose.yml
+
+# unpack_api_gateway_jar:
+#   stage: package
+#   script:
+#     - cd spring_apps/api-gateway;
+#     - mkdir -p ./${DEPENDENCY_DIR};
+#     - cd ./${DEPENDENCY_DIR};
+#     - jar -xf ../libs/*.jar;
+#     #- docker compose build -f docker-compose.yml
+#   artifacts:
+#     paths:
+#       - spring_apps/api-gateway/${DEPENDENCY_DIR}/  
+#     expire_in: 1 day
+#   only:
+#     refs:
+#       - main
+#     changes:
+#      - spring_apps/api-gateway/**/*
 #      - ./services.Dockerfile
 #      - ./docker-compose.yml
