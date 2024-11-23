@@ -181,7 +181,7 @@ create_garage-service_image:
     refs:
       - main
     changes:
-      - ./spring_apps/garage-service/**/*
+      - spring_apps/garage-service/**/*
       - services.Dockerfile
 
 create_vehicle-service_image:
@@ -204,7 +204,7 @@ create_vehicle-service_image:
     refs:
       - main
     changes:
-      - ./spring_apps/vehicle-service/**/*
+      - spring_apps/vehicle-service/**/*
       - services.Dockerfile
 
 create_notification-service_image:
@@ -227,7 +227,7 @@ create_notification-service_image:
     refs:
       - main
     changes:
-      - ./spring_apps/notification-service/**/*
+      - spring_apps/notification-service/**/*
       - services.Dockerfile
 
 create_recommendation-service_image:
@@ -250,7 +250,7 @@ create_recommendation-service_image:
     refs:
       - main
     changes:
-      - ./spring_apps/recommendation-service/**/*
+      - spring_apps/recommendation-service/**/*
       - services.Dockerfile
 
 # dockerize:
