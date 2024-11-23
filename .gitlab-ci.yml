@@ -129,7 +129,7 @@ create_api-gateway_image:
     - cd ./**/**/**/**/my_car_specialist
     - ls -a
     - tree
-    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/api-gateway" --build-arg MAIN_CLASS="ApiGatewayApplication.class" -t api-gateway:$VERSION .
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/api-gateway" --build-arg MAIN_CLASS="com.apsi_projekt.api_gateway.ApiGatewayApplication" -t api-gateway:$VERSION .
   needs:
     - build_api-gateway
   only:
@@ -152,7 +152,7 @@ create_user-service_image:
     - cd;
     - cd ./**/**/**/**/my_car_specialist
     - ls -a
-    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/user-service" --build-arg MAIN_CLASS="UserServiceApplication.class" -t user-service:$VERSION .
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/user-service" --build-arg MAIN_CLASS="com.apsi_projekt.user_service.UserServiceApplication" -t user-service:$VERSION .
   needs:
     - build_user-service
   only:
@@ -175,7 +175,7 @@ create_garage-service_image:
     - cd;
     - cd ./**/**/**/**/my_car_specialist
     - ls -a
-    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/garage-service" --build-arg MAIN_CLASS="GarageServiceApplication.class" -t garage-service:$VERSION .
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/garage-service" --build-arg MAIN_CLASS="com.apsi_projekt.garage_service.GarageServiceApplication" -t garage-service:$VERSION .
   needs:
     - build_garage-service
   only:
@@ -198,7 +198,7 @@ create_vehicle-service_image:
     - cd;
     - cd ./**/**/**/**/my_car_specialist
     - ls -a
-    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/vehicle-service" --build-arg MAIN_CLASS="VehicleServiceApplication.class" -t vehicle-service:$VERSION .
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/vehicle-service" --build-arg MAIN_CLASS="com.apsi_projekt.vehicle_service.VehicleServiceApplication" -t vehicle-service:$VERSION .
   needs:
     - build_vehicle-service
   only:
@@ -221,7 +221,7 @@ create_notification-service_image:
     - cd;
     - cd ./**/**/**/**/my_car_specialist
     - ls -a
-    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/notification-service" --build-arg MAIN_CLASS="NotificationServiceApplication.class" -t notification-service:$VERSION .
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/notification-service" --build-arg MAIN_CLASS="com.apsi_projekt.notification_service.NotificationServiceApplication" -t notification-service:$VERSION .
   needs:
     - build_notification-service
   only:
@@ -244,7 +244,7 @@ create_recommendation-service_image:
     - cd;
     - cd ./**/**/**/**/my_car_specialist
     - ls -a
-    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/recommendation-service" --build-arg MAIN_CLASS="RecommendationServiceApplication.class" -t recommendation-service:$VERSION .
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/recommendation-service" --build-arg MAIN_CLASS="com.apsi_projekt.recommendation_service.RecommendationServiceApplication" -t recommendation-service:$VERSION .
   needs:
     - build_recommendation-service
   only:
