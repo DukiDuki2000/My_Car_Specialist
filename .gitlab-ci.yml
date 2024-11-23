@@ -20,8 +20,8 @@ build_api-gateway:
   only:
     refs:
       - master
-    #changes:
-    #  - spring_apps/api-gateway/**/*
+    changes:
+     - spring_apps/api-gateway/**/*
 
 build_user-service:
   stage: build
@@ -35,7 +35,10 @@ build_user-service:
       - spring_apps/user-service/build/libs/*.jar
     expire_in: 1 day
   only:
-    - main
+    refs:
+      - master
+    changes:
+     - spring_apps/user-service/**/*
 
 build_garage-service:
   stage: build
@@ -49,7 +52,10 @@ build_garage-service:
       - spring_apps/garage-service/build/libs/*.jar
     expire_in: 1 day
   only:
-    - main
+    refs:
+      - master
+    changes:
+     - spring_apps/garage-service/**/*
 
 build_vechicle-service:
   stage: build
@@ -62,7 +68,10 @@ build_vechicle-service:
       - spring_apps/vehicle-service/build/libs/*.jar
     expire_in: 1 day
   only:
-    - main
+    refs:
+      - master
+    changes:
+     - spring_apps/vehicle-service/**/*
 
 
 build_notification-service:
@@ -77,7 +86,10 @@ build_notification-service:
       - spring_apps/notification-service/build/libs/*.jar
     expire_in: 1 day
   only:
-    - main
+    refs:
+      - master
+    changes:
+     - spring_apps/notification-service/**/*
 
 build_recommendation-service:
   stage: build
@@ -91,7 +103,10 @@ build_recommendation-service:
       - spring_apps/recommendation-service/build/libs/*.jar
     expire_in: 1 day
   only:
-    - main
+    refs:
+      - master
+    changes:
+     - spring_apps/recommendation-service/**/*
 
 # test-all-services:
 #   stage: test
