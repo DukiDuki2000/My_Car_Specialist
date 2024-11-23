@@ -117,9 +117,10 @@ dockerize:
     - for service in api-gateway user-service garage-service vehicle-service notification-service recommendation-service; do  
         mkdir -p ./spring_apps/$service/${DEPENDENCY_DIR};
         cd ./spring_apps/$service/${DEPENDENCY_DIR};
+        pwd;
+        ls -a ..;
         jar -xf ../libs/*.jar;
         cd;
-        pwd;
       done
     - tree
 
