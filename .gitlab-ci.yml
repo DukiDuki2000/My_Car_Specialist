@@ -66,6 +66,7 @@ build_vechicle-service:
     # - cd /home/projekt/spring_apps/vechicle-service
     # - gradle build
     - cat spring_apps/vehicle-service/test.txt
+    - echo "gitara siema" > spring_apps/vehicle-service//target/result.txt
   artifacts:
     paths:
       - spring_apps/vehicle-service/target/*.txt
