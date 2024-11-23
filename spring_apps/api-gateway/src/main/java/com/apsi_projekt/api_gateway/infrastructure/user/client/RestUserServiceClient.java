@@ -8,8 +8,8 @@ import org.springframework.web.client.RestClient;
 public class RestUserServiceClient {
     private final RestClient restClient;
 
-    RestUserServiceClient() {
-        this.restClient = RestClient.create("http://localhost:8081");
+    RestUserServiceClient(@Value("${service.garage_service}") String userURL) {
+        this.restClient = RestClient.create(userURL);
     }
 
     public String getHello() {
