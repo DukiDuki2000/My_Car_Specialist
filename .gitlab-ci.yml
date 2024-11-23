@@ -19,6 +19,9 @@ build_api-gateway:
     expire_in: 1 day
   only:
     - main
+  rules:
+    - changes: 
+      - /spring_apps/api-gateway/*
 
 build_user-service:
   stage: build
