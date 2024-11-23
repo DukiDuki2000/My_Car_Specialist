@@ -135,7 +135,7 @@ create_api-gateway_image:
     refs:
       - main
     changes:
-      - ./spring_apps/api-gateway/**/*
+      - spring_apps/api-gateway/**/*
       - services.Dockerfile
 
 create_user-service_image:
@@ -158,7 +158,7 @@ create_user-service_image:
     refs:
       - main
     changes:
-      - ./spring_apps/user-service/**/*
+      - spring_apps/user-service/**/*
       - services.Dockerfile
 
 create_garage-service_image:
