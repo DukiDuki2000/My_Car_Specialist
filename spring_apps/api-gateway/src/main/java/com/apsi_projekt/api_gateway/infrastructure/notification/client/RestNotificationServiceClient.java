@@ -8,8 +8,8 @@ import org.springframework.web.client.RestClient;
 public class RestNotificationServiceClient {
     private final RestClient restClient;
 
-    RestNotificationServiceClient() {
-        this.restClient = RestClient.create("http://localhost:8081");
+    RestNotificationServiceClient(@Value(${services.notification_service}) String notificationServiceUrl) {
+        this.restClient = RestClient.create(notificationServiceUrl);
     }
 
     public String getHello() {

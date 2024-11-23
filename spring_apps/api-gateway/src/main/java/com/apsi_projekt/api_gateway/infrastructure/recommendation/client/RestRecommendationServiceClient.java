@@ -8,8 +8,8 @@ import org.springframework.web.client.RestClient;
 public class RestRecommendationServiceClient {
     private final RestClient restClient;
 
-    RestRecommendationServiceClient() {
-        this.restClient = RestClient.create("http://localhost:8081");
+    RestRecommendationServiceClient(@Value(${services.recommendation_service}) String recommendationServiceUrl) {
+        this.restClient = RestClient.create(recommendationServiceUrl);
     }
 
     public String getHello() {
