@@ -130,6 +130,7 @@ unpack_api_gateway_jar:
 dockerize:
   stage: deploy
   script:
+    - tree
     - docker compose -f docker-compose.yml build
   only:
     refs:
