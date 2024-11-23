@@ -68,7 +68,7 @@ build_vechicle-service:
     - cat spring_apps/vehicle-service/test.txt
   artifacts:
     paths:
-      - vechicle-service/target/*.txt
+      - spring_apps/vehicle-service/target/*.txt
     expire_in: 1 day
   only:
     - main
