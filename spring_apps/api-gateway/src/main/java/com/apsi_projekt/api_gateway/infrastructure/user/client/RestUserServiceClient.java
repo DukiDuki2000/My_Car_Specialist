@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class RestUserServiceClient {
     private final RestClient restClient;
 
-    RestUserServiceClient(@Value("${service.user_service}") String userServiceUrl) {
+    RestUserServiceClient(@Value("${services.user_service}") String userServiceUrl) {
         this.restClient = RestClient.create(userServiceUrl);
     }
 

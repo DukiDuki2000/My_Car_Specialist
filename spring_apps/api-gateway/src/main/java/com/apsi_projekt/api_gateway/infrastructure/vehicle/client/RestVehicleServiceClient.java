@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class RestVehicleServiceClient {
     private RestClient restClient;
 
-    RestVehicleServiceClient(@Value("${service.vehicle_service}") String vehicleServiceUrl) {
+    RestVehicleServiceClient(@Value("${services.vehicle_service}") String vehicleServiceUrl) {
         this.restClient = RestClient.create(vehicleServiceUrl);
     }
 
