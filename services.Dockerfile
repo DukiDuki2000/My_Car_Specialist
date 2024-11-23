@@ -1,4 +1,4 @@
-FROM 23-alpine-jdk
+FROM amazoncorretto:23-alpine-jdk
 
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
