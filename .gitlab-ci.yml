@@ -23,8 +23,8 @@ build_api-gateway:
   only:
     refs:
       - main
-    changes:
-     - spring_apps/api-gateway/**/*
+    # changes:
+    #  - spring_apps/api-gateway/**/*
 
 build_user-service:
   stage: build
@@ -40,8 +40,8 @@ build_user-service:
   only:
     refs:
       - main
-    changes:
-     - spring_apps/user-service/**/*
+    # changes:
+    #  - spring_apps/user-service/**/*
 
 build_garage-service:
   stage: build
@@ -57,8 +57,8 @@ build_garage-service:
   only:
     refs:
       - main
-    changes:
-     - spring_apps/garage-service/**/*
+    # changes:
+    #  - spring_apps/garage-service/**/*
 
 build_vehicle-service:
   stage: build
@@ -73,8 +73,8 @@ build_vehicle-service:
   only:
     refs:
       - main
-    changes:
-     - spring_apps/vehicle-service/**/*
+    # changes:
+    #  - spring_apps/vehicle-service/**/*
 
 build_notification-service:
   stage: build
@@ -90,8 +90,8 @@ build_notification-service:
   only:
     refs:
       - main
-    changes:
-     - spring_apps/notification-service/**/*
+    # changes:
+    #  - spring_apps/notification-service/**/*
 
 build_recommendation-service:
   stage: build
@@ -107,14 +107,15 @@ build_recommendation-service:
   only:
     refs:
       - main
-    changes:
-     - spring_apps/recommendation-service/**/*
+    # changes:
+    #  - spring_apps/recommendation-service/**/*
 
 dockerize:
   stage: package
   script:
     - for service in api-gateway user-service garage-service vehicle-service notification-service recommendation-service; do  
         mkdir -p ./spring_apps/$service/${DEPENDENCY_DIR};
+        jar -xf ./spring_apps/$service/build/libs/*.jar -d ./spring_apps/$service/${DEPENDENCY_DIR};
       done
     - tree
 
