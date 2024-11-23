@@ -18,9 +18,10 @@ build_api-gateway:
       - spring_apps/api-gateway/build/libs/*.jar
     expire_in: 1 day
   only:
-    changes:
-      - spring_apps/api-gateway/**/*
-
+    refs:
+      - master
+    #changes:
+    #  - spring_apps/api-gateway/**/*
 
 build_user-service:
   stage: build
