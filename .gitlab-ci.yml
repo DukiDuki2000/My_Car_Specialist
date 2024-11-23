@@ -6,59 +6,47 @@ stages:
   - release
 
 
-# build_api-gateway:
-#   stage: build
-#   image: gradle:latest
-#   script:
-#     - cd /home/projekt/spring_apps/api-gateway
-#     - gradle build
-#   artifacts:
-#     paths:
-#       - api-gateway/target/*.jar
-#     expire_in: 1 day
-#   only:
-#     - main
+build_api-gateway:
+  stage: build
+  image: gradle:latest
+  script:
+    - cd /home/projekt/spring_apps/api-gateway
+    - chmod +x gradlew
+    - ./gradlew clean build
+  artifacts:
+    paths:
+      - spring_apps/api-gateway/build/libs/*.jar
+    expire_in: 1 day
+  only:
+    - main
 
+build_user-service:
+  stage: build
+  image: gradle:latest
+  script:
+    - cd spring_apps/user-service
+    - chmod +x gradlew
+    - ./gradlew clean build
+  artifacts:
+    paths:
+      - spring_apps/user-service/build/libs/*.jar
+    expire_in: 1 day
+  only:
+    - main
 
-
-# build_discovery-service:
-#   stage: build
-#   image: gradle:latest
-#   script:
-#     - cd /home/projekt/spring_apps/discovery-service
-#     - gradle build
-#   artifacts:
-#     paths:
-#       - discovery-service/target/*.jar
-#     expire_in: 1 day
-#   only:
-#     - main
-
-# build_user-service:
-#   stage: build
-#   image: gradle:latest
-#   script:
-#     - cd /home/projekt/spring_apps/user-service
-#     - gradle build
-#   artifacts:
-#     paths:
-#       - user-service/target/*.jar
-#     expire_in: 1 day
-#   only:
-#     - main
-
-# build_garage-service:
-#   stage: build
-#   image: gradle:latest
-#   script:
-#     - cd /home/projekt/spring_apps/garage-service
-#     - gradle build
-#   artifacts:
-#     paths:
-#       - garage-service/target/*.jar
-#     expire_in: 1 day
-#   only:
-#     - main
+build_garage-service:
+  stage: build
+  image: gradle:latest
+  script:
+    - cd spring_apps/garage-service
+    - chmod +x gradlew
+    - ./gradlew clean build
+  artifacts:
+    paths:
+      - spring_apps/garage-service/build/libs/*.jar
+    expire_in: 1 day
+  only:
+    - main
 
 build_vechicle-service:
   stage: build
@@ -66,9 +54,6 @@ build_vechicle-service:
     - cd spring_apps/vehicle-service
     - chmod +x gradlew
     - ./gradlew clean build
-    - ls -al build/libs 
-    # - cat spring_apps/vehicle-service/test.txt
-    # - echo "gitara siema" > spring_apps/vehicle-service/result.txt
   artifacts:
     paths:
       - spring_apps/vehicle-service/build/libs/*.jar
@@ -77,31 +62,33 @@ build_vechicle-service:
     - main
 
 
-# build_notification-service:
-#   stage: build
-#   image: gradle:latest
-#   script:
-#     - cd /home/projekt/spring_apps/notification-service
-#     - gradle build
-#   artifacts:
-#     paths:
-#       - notification-service/target/*.jar
-#     expire_in: 1 day
-#   only:
-#     - main
+build_notification-service:
+  stage: build
+  image: gradle:latest
+  script:
+    - cd spring_apps/notification-service
+    - chmod +x gradlew
+    - ./gradlew clean build
+  artifacts:
+    paths:
+      - spring_apps/notification-service/build/libs/*.jar
+    expire_in: 1 day
+  only:
+    - main
 
-# build_recommendation-service:
-#   stage: build
-#   image: gradle:latest
-#   script:
-#     - cd /home/projekt/spring_apps/recommendation-service
-#     - gradle build
-#   artifacts:
-#     paths:
-#       - recommendation-service/target/*.jar
-#     expire_in: 1 day
-#   only:
-#     - main
+build_recommendation-service:
+  stage: build
+  image: gradle:latest
+  script:
+    - cd spring_apps/recommendation-service
+    - chmod +x gradlew
+    - ./gradlew clean build
+  artifacts:
+    paths:
+      - spring_apps/recommendation-service/build/libs/*.jar
+    expire_in: 1 day
+  only:
+    - main
 
 # test-all-services:
 #   stage: test
