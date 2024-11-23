@@ -6,66 +6,67 @@ stages:
   - release
 
 
-build_api-gateway:
-  stage: build
-  image: gradle:latest
-  script:
-    - cd /home/projekt/spring_apps/api-gateway
-    - gradle build
-  artifacts:
-    paths:
-      - api-gateway/target/*.jar
-    expire_in: 1 day
-  only:
-    - main
+# build_api-gateway:
+#   stage: build
+#   image: gradle:latest
+#   script:
+#     - cd /home/projekt/spring_apps/api-gateway
+#     - gradle build
+#   artifacts:
+#     paths:
+#       - api-gateway/target/*.jar
+#     expire_in: 1 day
+#   only:
+#     - main
 
 
 
-build_discovery-service:
-  stage: build
-  image: gradle:latest
-  script:
-    - cd /home/projekt/spring_apps/discovery-service
-    - gradle build
-  artifacts:
-    paths:
-      - discovery-service/target/*.jar
-    expire_in: 1 day
-  only:
-    - main
+# build_discovery-service:
+#   stage: build
+#   image: gradle:latest
+#   script:
+#     - cd /home/projekt/spring_apps/discovery-service
+#     - gradle build
+#   artifacts:
+#     paths:
+#       - discovery-service/target/*.jar
+#     expire_in: 1 day
+#   only:
+#     - main
 
-build_user-service:
-  stage: build
-  image: gradle:latest
-  script:
-    - cd /home/projekt/spring_apps/user-service
-    - gradle build
-  artifacts:
-    paths:
-      - user-service/target/*.jar
-    expire_in: 1 day
-  only:
-    - main
+# build_user-service:
+#   stage: build
+#   image: gradle:latest
+#   script:
+#     - cd /home/projekt/spring_apps/user-service
+#     - gradle build
+#   artifacts:
+#     paths:
+#       - user-service/target/*.jar
+#     expire_in: 1 day
+#   only:
+#     - main
 
-build_garage-service:
-  stage: build
-  image: gradle:latest
-  script:
-    - cd /home/projekt/spring_apps/garage-service
-    - gradle build
-  artifacts:
-    paths:
-      - garage-service/target/*.jar
-    expire_in: 1 day
-  only:
-    - main
+# build_garage-service:
+#   stage: build
+#   image: gradle:latest
+#   script:
+#     - cd /home/projekt/spring_apps/garage-service
+#     - gradle build
+#   artifacts:
+#     paths:
+#       - garage-service/target/*.jar
+#     expire_in: 1 day
+#   only:
+#     - main
 
 build_vechicle-service:
   stage: build
   image: gradle:latest
   script:
-    - cd /home/projekt/spring_apps/vechicle-service
-    - gradle build
+    # - cd /home/projekt/spring_apps/vechicle-service
+    # - gradle build
+    - echo "cat spring_apps/vechicle-service/test.txt"
   artifacts:
     paths:
       - vechicle-service/target/*.jar
@@ -74,46 +75,46 @@ build_vechicle-service:
     - main
 
 
-build_notification-service:
-  stage: build
-  image: gradle:latest
-  script:
-    - cd /home/projekt/spring_apps/notification-service
-    - gradle build
-  artifacts:
-    paths:
-      - notification-service/target/*.jar
-    expire_in: 1 day
-  only:
-    - main
+# build_notification-service:
+#   stage: build
+#   image: gradle:latest
+#   script:
+#     - cd /home/projekt/spring_apps/notification-service
+#     - gradle build
+#   artifacts:
+#     paths:
+#       - notification-service/target/*.jar
+#     expire_in: 1 day
+#   only:
+#     - main
 
-build_recommendation-service:
-  stage: build
-  image: gradle:latest
-  script:
-    - cd /home/projekt/spring_apps/recommendation-service
-    - gradle build
-  artifacts:
-    paths:
-      - recommendation-service/target/*.jar
-    expire_in: 1 day
-  only:
-    - main
+# build_recommendation-service:
+#   stage: build
+#   image: gradle:latest
+#   script:
+#     - cd /home/projekt/spring_apps/recommendation-service
+#     - gradle build
+#   artifacts:
+#     paths:
+#       - recommendation-service/target/*.jar
+#     expire_in: 1 day
+#   only:
+#     - main
 
-test-all-services:
-  stage: test
-  image: gradle:latest
-  script:
-    - gradle --versione
-    - gradle test -p /home/projekt/spring_apps/api-gateway
-    - gradle test -p /home/projekt/spring_apps/discovery-service
-    - gradle test -p /home/projekt/spring_apps/user-service
-    - gradle test -p /home/projekt/spring_apps/garage-service
-    - gradle test -p /home/projekt/spring_apps/vechicle-service
-    - gradle test -p /home/projekt/spring_apps/notification-service
-    - gradle test -p /home/projekt/spring_apps/recommendation-service
-  only:
-    - main
+# test-all-services:
+#   stage: test
+#   image: gradle:latest
+#   script:
+#     - gradle --versione
+#     - gradle test -p /home/projekt/spring_apps/api-gateway
+#     - gradle test -p /home/projekt/spring_apps/discovery-service
+#     - gradle test -p /home/projekt/spring_apps/user-service
+#     - gradle test -p /home/projekt/spring_apps/garage-service
+#     - gradle test -p /home/projekt/spring_apps/vechicle-service
+#     - gradle test -p /home/projekt/spring_apps/notification-service
+#     - gradle test -p /home/projekt/spring_apps/recommendation-service
+#   only:
+#     - main
 
 
 
