@@ -253,6 +253,17 @@ create_recommendation-service_image:
       - spring_apps/recommendation-service/**/*
       - services.Dockerfile
 
+deploy_services:
+  stage: deploy
+  script:
+    - docker compose -f docker-compose.yml -d up
+  only:
+    refs:
+      - main
+    changes:
+      - spring_apps/**/*
+      - services.Dockerfile
+      - docker-compose.yml
 # dockerize:
 #   stage: dockerize
 #   script:
