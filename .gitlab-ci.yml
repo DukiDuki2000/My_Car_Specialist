@@ -10,7 +10,7 @@ build_api-gateway:
   stage: build
   image: gradle:latest
   script:
-    - cd /home/projekt/spring_apps/api-gateway
+    - cd spring_apps/api-gateway
     - chmod +x gradlew
     - ./gradlew clean build
   artifacts:
