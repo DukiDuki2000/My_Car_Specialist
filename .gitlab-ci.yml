@@ -113,7 +113,7 @@ build_recommendation-service:
 unpack_api_gateway_jar:
   stage: package
   script:
-    - cd /spring_apps/api-gaterway;
+    - cd spring_apps/api-gaterway;
     - mkdir -p ./${DEPENDENCY_DIR};
     - cd ./${DEPENDENCY_DIR};
     - jar -xf ../libs/*.jar;
