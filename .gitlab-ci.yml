@@ -15,7 +15,7 @@ build_api-gateway:
   script:
     - cd spring_apps/api-gateway
     - chmod +x gradlew
-    - ./gradlew clean build
+    - ./gradlew bootJar
   artifacts:
     paths:
       - spring_apps/api-gateway/build/libs/*.jar
@@ -32,7 +32,7 @@ build_user-service:
   script:
     - cd spring_apps/user-service
     - chmod +x gradlew
-    - ./gradlew clean build
+    - ./gradlew bootJar
   artifacts:
     paths:
       - spring_apps/user-service/build/libs/*.jar
@@ -49,7 +49,7 @@ build_garage-service:
   script:
     - cd spring_apps/garage-service
     - chmod +x gradlew
-    - ./gradlew clean build
+    - ./gradlew bootJar
   artifacts:
     paths:
       - spring_apps/garage-service/build/libs/*.jar
@@ -65,7 +65,7 @@ build_vehicle-service:
   script:
     - cd spring_apps/vehicle-service
     - chmod +x gradlew
-    - ./gradlew clean build
+    - ./gradlew bootJar
   artifacts:
     paths:
       - spring_apps/vehicle-service/build/libs/*.jar
@@ -82,7 +82,7 @@ build_notification-service:
   script:
     - cd spring_apps/notification-service
     - chmod +x gradlew
-    - ./gradlew clean build
+    - ./gradlew bootJar
   artifacts:
     paths:
       - spring_apps/notification-service/build/libs/*.jar
@@ -99,7 +99,7 @@ build_recommendation-service:
   script:
     - cd spring_apps/recommendation-service
     - chmod +x gradlew
-    - ./gradlew clean build
+    - ./gradlew bootJar
   artifacts:
     paths:
       - spring_apps/recommendation-service/build/libs/*.jar
