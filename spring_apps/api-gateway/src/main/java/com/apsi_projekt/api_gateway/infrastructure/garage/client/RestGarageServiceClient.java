@@ -9,7 +9,7 @@ public class RestGarageServiceClient {
     private final RestClient restClient;
 
     RestGarageServiceClient () {
-        this.restClient = RestClient.create("http://localhost:8082");
+        this.restClient = RestClient.create("http://garage-service:8082");
     }
 
     public String getHello() {
