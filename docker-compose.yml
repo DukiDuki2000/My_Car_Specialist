@@ -94,12 +94,13 @@ services:
     build:
       context: .
       dockerfile: services.Dockerfile
+      args:
+        APP_DIR: "/spring_apps/api-gateway"
     ports:
      - "8080:8080"
     # enviroment:
     #   SERVICE_TAGS:         "database,nosql"###
-    args:
-      APP_DIR: "/spring_apps/api-gateway"
+
 
 
   # user-service:
