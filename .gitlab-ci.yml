@@ -114,7 +114,7 @@ dockerize:
   stage: package
   script:
     - for service in api-gateway user-service garage-service vehicle-service notification-service recommendation-service; do  
-        mkdir -p /spring_apps/$service/${DEPENDENCY_DIR};
+        mkdir -p ./spring_apps/$service/${DEPENDENCY_DIR};
       done
     - tree
 
