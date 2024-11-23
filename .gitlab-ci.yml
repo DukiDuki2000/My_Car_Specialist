@@ -143,7 +143,7 @@ create_api-gateway_image:
     - cd;
     - cd ./**/**/**/**/my_car_specialist
     - ls -a
-    - docker build -f services.Docksrfile --build-arg APP_DIR="/spring_apps/api-gateway" -t api-gateway:$VERSION .
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/api-gateway" -t api-gateway:$VERSION .
   needs:
     - build_api-gateway
   only:
