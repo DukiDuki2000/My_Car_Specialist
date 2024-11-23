@@ -117,8 +117,6 @@ unpack_api_gateway_jar:
     - mkdir -p ./${DEPENDENCY_DIR};
     - cd ./${DEPENDENCY_DIR};
     - jar -xf ../libs/*.jar;
-    - cd ../../../..
-    - pwd
     #- docker compose build -f docker-compose.yml
   only:
     refs:
@@ -128,24 +126,14 @@ unpack_api_gateway_jar:
      - ./services.Dockerfile
      - ./docker-compose.yml
 
-# dockerize:
-#   stage: package
-#   script:
-#     - tree
-#     - for service in api-gateway user-service garage-service vehicle-service notification-service recommendation-service; do  
-#         cd;
-#         cd ./**/**/**/**/my_car_specialist/spring_apps;
-#         mkdir -p ./$service/${DEPENDENCY_DIR};
-#         cd ./$service/${DEPENDENCY_DIR};
-#         jar -xf ../libs/*.jar;
-#       done
-#     - cd;
-#     - cd ./**/**/**/**/my_car_specialist
-#     - docker compose build -f docker-compose.yml
-#   only:
-#     refs:
-#       - main
-#     changes:
-#      - spring_apps/**/*
-#      - ./services.Dockerfile
-#      - ./docker-compose.yml
+dockerize:
+  stage: package
+  script:
+    - docker compose build -f docker-compose.yml
+  only:
+    refs:
+      - main
+    changes:
+     - spring_apps/**/*
+     - ./services.Dockerfile
+     - ./docker-compose.yml
