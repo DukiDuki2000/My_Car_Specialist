@@ -132,6 +132,8 @@ dockerize:
   script:
     - tree
     - docker compose -f docker-compose.yml build
+  dependencies:
+    - unpack_api_gateway_jar
   only:
     refs:
       - main
