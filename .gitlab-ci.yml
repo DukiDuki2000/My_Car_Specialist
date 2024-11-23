@@ -2,7 +2,7 @@
 stages:
   - build
   - test
-  - package
+  - dockerize
   - deploy
   - release
 
@@ -110,19 +110,38 @@ build_recommendation-service:
     changes:
      - spring_apps/recommendation-service/**/*
 
-unpack_api_gateway_jar:
-  stage: package
+# unpack_api_gateway_jar:
+#   stage: package
+#   script:
+#     - cd spring_apps/api-gateway;
+#     - mkdir -p ./${DEPENDENCY_DIR};
+#     - cd ./${DEPENDENCY_DIR};
+#     - jar -xf ../libs/*.jar;
+#     #- docker compose build -f docker-compose.yml
+#   artifacts:
+#     paths:
+#       - spring_apps/api-gateway/${DEPENDENCY_DIR}/  
+#     expire_in: 1 day
+#   only:
+#     refs:
+#       - main
+#     changes:
+#      - spring_apps/api-gateway/**/*
+#      - ./services.Dockerfile
+#      - ./docker-compose.yml
+
+create_api-gateway_image:
+  stage: dockerize
   script:
     - cd spring_apps/api-gateway;
     - mkdir -p ./${DEPENDENCY_DIR};
     - cd ./${DEPENDENCY_DIR};
     - jar -xf ../libs/*.jar;
-    - tree
-    #- docker compose build -f docker-compose.yml
-  artifacts:
-    paths:
-      - spring_apps/api-gateway/${DEPENDENCY_DIR}/  
-    expire_in: 1 day
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - docker build -f services.Docksrfile --build-arg APP_DIR="/spring_apps/api-gateway" -t api-gateway:$VERSION
+  needs:
+    - build_api-gateway
   only:
     refs:
       - main
@@ -131,17 +150,17 @@ unpack_api_gateway_jar:
      - ./services.Dockerfile
      - ./docker-compose.yml
 
-dockerize:
-  stage: deploy
-  script:
-    - tree
-    - docker compose -f docker-compose.yml build
-  dependencies:
-    - unpack_api_gateway_jar
-  only:
-    refs:
-      - main
-    changes:
-     - spring_apps/**/*
-     - ./services.Dockerfile
-     - ./docker-compose.yml
+# dockerize:
+#   stage: dockerize
+#   script:
+#     - tree
+#     - docker compose -f docker-compose.yml build
+#   dependencies:
+#     - unpack_api_gateway_jar
+#   only:
+#     refs:
+#       - main
+#     changes:
+#      - spring_apps/**/*
+#      - ./services.Dockerfile
+#      - ./docker-compose.yml
