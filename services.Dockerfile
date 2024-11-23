@@ -3,7 +3,7 @@ FROM eclipse-temurin:23-jre
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
-ARG APP_DIR=/spring_apps
+ARG APP_DIR
 ARG DEPENDENCY=build/dependency
 
 COPY ${APP_DIR}/${DEPENDENCY}/BOOT-INF/lib /app/lib
