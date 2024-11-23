@@ -126,7 +126,7 @@ dockerize:
       - main
     changes:
      - spring_apps/**/*
-     - ./Dockerfile_services
+     - ./services.Dockerfile
      - ./docker-compose.yml
 
 
