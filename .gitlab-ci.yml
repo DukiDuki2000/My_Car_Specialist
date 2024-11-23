@@ -142,6 +142,7 @@ create_api-gateway_image:
     - VERSION=$(./gradlew -q printVersion)
     - cd;
     - cd ./**/**/**/**/my_car_specialist
+    - ls -a
     - docker build -f services.Docksrfile --build-arg APP_DIR="/spring_apps/api-gateway" -t api-gateway:$VERSION .
   needs:
     - build_api-gateway
