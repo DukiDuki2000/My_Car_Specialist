@@ -2,9 +2,12 @@
 stages:
   - build
   - test
+  - package
   - deploy
   - release
 
+variables:
+  DEPENDENCY_DIR: build/dependency
 
 build_api-gateway:
   stage: build
@@ -57,7 +60,7 @@ build_garage-service:
     changes:
      - spring_apps/garage-service/**/*
 
-build_vechicle-service:
+build_vehicle-service:
   stage: build
   script:
     - cd spring_apps/vehicle-service
@@ -107,6 +110,12 @@ build_recommendation-service:
     changes:
      - spring_apps/recommendation-service/**/*
 
-
+dockerize:
+  stage: package
+  script:
+    - for service in api-gateway user-service garage-service vehicle-service notification-service recommendation-service; do  
+        mkdir -p /spring_apps/$service/${DEPENDENCY_DIR};
+      done
+    - tree
 
 
