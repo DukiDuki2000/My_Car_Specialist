@@ -121,6 +121,9 @@ dockerize:
         cd ./$service/${DEPENDENCY_DIR};
         jar -xf ../libs/*.jar;
       done
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - docker compose build -f docker-compose.yml
   only:
     refs:
       - main
