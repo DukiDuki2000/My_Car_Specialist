@@ -9,8 +9,8 @@ import org.springframework.web.client.RestTemplate;
 public class RestVehicleServiceClient {
     private RestClient restClient;
 
-    RestVehicleServiceClient() {
-        this.restClient = RestClient.create("http://localhost:8083");
+    RestVehicleServiceClient(@value(${service.vehicle_service}) String vehicleServiceUrl) {
+        this.restClient = RestClient.create(vehicleServiceUrl);
     }
 
     public String getHello() {
