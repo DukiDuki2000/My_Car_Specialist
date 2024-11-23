@@ -64,7 +64,7 @@ build_vechicle-service:
   stage: build
   script:
     - cd spring_apps/vehicle-service
-    - gradle bootJar
+    - ./gradlew clean build
     - ls -al build/libs
     # - cat spring_apps/vehicle-service/test.txt
     # - echo "gitara siema" > spring_apps/vehicle-service/result.txt
