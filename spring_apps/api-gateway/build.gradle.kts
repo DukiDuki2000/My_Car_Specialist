@@ -49,8 +49,8 @@ dependencyManagement {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
-task printVersion {
+tasks.register("printVersion") {
     doLast {
-        println version
+        println(version)
     }
 }
