@@ -149,10 +149,6 @@ create_api-gateway_image:
   only:
     refs:
       - main
-    changes:
-     - spring_apps/api-gateway/**/*
-     - ./services.Dockerfile
-     - ./docker-compose.yml
 
 # dockerize:
 #   stage: dockerize
