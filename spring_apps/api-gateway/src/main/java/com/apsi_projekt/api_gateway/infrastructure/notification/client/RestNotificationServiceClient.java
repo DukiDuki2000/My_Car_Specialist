@@ -8,7 +8,7 @@ import org.springframework.web.client.RestClient;
 public class RestNotificationServiceClient {
     private final RestClient restClient;
 
-    RestNotificationServiceClient(@Value(${services.notification_service}) String notificationServiceUrl) {
+    RestNotificationServiceClient(@Value("${services.notification_service}") String notificationServiceUrl) {
         this.restClient = RestClient.create(notificationServiceUrl);
     }
 

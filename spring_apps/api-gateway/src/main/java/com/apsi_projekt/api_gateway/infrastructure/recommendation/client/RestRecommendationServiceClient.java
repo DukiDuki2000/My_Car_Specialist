@@ -8,7 +8,7 @@ import org.springframework.web.client.RestClient;
 public class RestRecommendationServiceClient {
     private final RestClient restClient;
 
-    RestRecommendationServiceClient(@Value(${services.recommendation_service}) String recommendationServiceUrl) {
+    RestRecommendationServiceClient(@Value("${services.recommendation_service}") String recommendationServiceUrl) {
         this.restClient = RestClient.create(recommendationServiceUrl);
     }
 

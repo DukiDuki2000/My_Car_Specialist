@@ -8,8 +8,8 @@ import org.springframework.web.client.RestClient;
 public class RestGarageServiceClient {
     private final RestClient restClient;
 
-    RestGarageServiceClient () {
-        this.restClient = RestClient.create("http://garage-service:8080");
+    RestGarageServiceClient (@Value("${services.garage_service}") String garageServiceUrl) {
+        this.restClient = RestClient.create(garageServiceUrl);
     }
 
     public String getHello() {
