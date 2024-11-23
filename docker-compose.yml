@@ -2,42 +2,41 @@ version: "3"
 services:
 
   api-gateway:
-    image: api-gateway:latest
+    image: api-gateway:0.0.1-SNAPSHOT
     ports:
      - "8080:8080"
     networks:
       - bridge_network
   
   user-service:
-    image: user-service:latest
+    image: user-service:0.0.1-SNAPSHOT
     ports:
      - "8081:8080"
     networks:
       - bridge_network
   
   garage-service:
-    image: garage-service:latest
+    image: garage-service:0.0.1-SNAPSHOT
     ports:
      - "8082:8080"
     networks:
       - bridge_network
   
   vehicle-service:
-    image: vehicle-service:latest
+    image: vehicle-service:0.0.1-SNAPSHOT
     ports:
      - "8083:8080"
     networks:
       - bridge_network
   
   recommendation-service:
-    image: recommendation-service:latest
-    ports:
+    image: recommendation-service:0.0.1-SNAPSHOT
      - "8084:8080"
     networks:
       - bridge_network
   
   notification-service:
-    image: notification-service:latest
+    image: notification-service:0.0.1-SNAPSHOT
     ports:
      - "8085:8080"
     networks:
