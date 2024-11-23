@@ -13,6 +13,6 @@ public class NotificationRestController {
 
     @GetMapping()
     public String sayHello() {
-        return "Hello from Notification Service";
+        return "Hello from Notification Service!";
     }
 }
