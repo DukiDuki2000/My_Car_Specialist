@@ -1,8 +1,6 @@
-FROM eclipse-temurin:23-jre
+FROM 23-alpine-jdk
 
-RUN apt-get update && apt-get install -y shadow
-
-RUN addgroup --system spring && adduser --system --ingroup spring spring
+RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
 ARG APP_DIR
