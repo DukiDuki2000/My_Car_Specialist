@@ -116,7 +116,7 @@ dockerize:
     - tree
     - for service in api-gateway user-service garage-service vehicle-service notification-service recommendation-service; do  
         cd;
-        cd ./*/spring_apps;
+        cd ./**/**/**/**/my_car_specialist/spring_apps;
         pwd;
         mkdir -p ./$service/${DEPENDENCY_DIR};
         cd ./$service/${DEPENDENCY_DIR};
