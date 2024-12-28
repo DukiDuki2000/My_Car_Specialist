@@ -13,6 +13,6 @@ public class RecommendationRestController {
 
     @GetMapping()
     public String sayHello() {
-        return "Hello from Recommendation Service";
+        return "Hello from Recommendation Service!";
     }
 }
