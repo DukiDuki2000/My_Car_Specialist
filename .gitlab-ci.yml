@@ -70,6 +70,7 @@ build_vehicle-service:
     - cd spring_apps/vehicle-service
     - chmod +x gradlew
     - ./gradlew bootJar
+    - echo "VIN_DECODER_API_KEY=${VIN_DECODER_API_KEY}"
   artifacts:
     paths:
       - spring_apps/vehicle-service/build/libs/*.jar
