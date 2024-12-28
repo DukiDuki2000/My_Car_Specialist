@@ -66,6 +66,9 @@ build_garage-service:
 build_vehicle-service:
   stage: build
   image: gradle:8.11
+  variables:
+    VIN_DECODER_API_KEY: "d5904da5e0b8"
+    VIN_DECODER_SECRET_KEY: "76f979778e"
   script:
     - cd spring_apps/vehicle-service
     - chmod +x gradlew
