@@ -65,6 +65,7 @@ build_garage-service:
 
 build_vehicle-service:
   stage: build
+  image: gradle:8.11
   script:
     - cd spring_apps/vehicle-service
     - chmod +x gradlew
