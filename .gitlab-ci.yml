@@ -11,7 +11,7 @@ variables:
 
 build_api-gateway:
   stage: build
-  image: gradle:latest
+  image: gradle:8.11
   script:
     - cd spring_apps/api-gateway
     - chmod +x gradlew
