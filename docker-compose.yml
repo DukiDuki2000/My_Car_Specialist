@@ -23,7 +23,7 @@ services:
       - bridge_network
   
   vehicle-service:
-    image: vehicle-service:latest
+    image: vehicle-service:0.0.1-SNAPSHOT
     ports:
      - "8083:8080"
     networks:
