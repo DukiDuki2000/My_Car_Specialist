@@ -20,7 +20,7 @@ public class VehicleRestController {
 
     @GetMapping()
     public String sayHello() {
-        return "Hello from Vehicle Service!";
+        return "Hello from Vehicle Service";
     }
 
 
