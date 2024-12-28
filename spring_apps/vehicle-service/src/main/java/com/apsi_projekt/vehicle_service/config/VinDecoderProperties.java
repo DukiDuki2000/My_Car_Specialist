@@ -1,6 +1,7 @@
 package com.apsi_projekt.vehicle_service.config;
 
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,5 +25,10 @@ public class VinDecoderProperties {
 
     public String getSecretKey() {
         return secretKey;
+    }
+    @PostConstruct
+    public void debugLog() {
+        System.out.println("[DEBUG] vin.decoder.apiKey=" + apiKey);
+        System.out.println("[DEBUG] vin.decoder.secretKey=" + secretKey);
     }
 }
