@@ -14,6 +14,6 @@ public class UserRestController {
 
     @GetMapping()
     public String sayHello() {
-        return "Hello from User Service!";
+        return "Hello from User Service";
     }
 }
