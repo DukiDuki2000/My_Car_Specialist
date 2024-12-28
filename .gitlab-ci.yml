@@ -66,9 +66,6 @@ build_garage-service:
 build_vehicle-service:
   stage: build
   image: gradle:8.11
-  variables:
-    VIN_DECODER_API_KEY: "d5904da5e0b8"
-    VIN_DECODER_SECRET_KEY: "76f979778e"
   script:
     - cd spring_apps/vehicle-service
     - chmod +x gradlew
@@ -203,7 +200,7 @@ create_vehicle-service_image:
     - cd;
     - cd ./**/**/**/**/my_car_specialist
     - ls -a
-    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/vehicle-service" --build-arg MAIN_CLASS=com.apsi_projekt.vehicle_service.VehicleServiceApplication -t vehicle-service:$VERSION .
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/vehicle-service" --build-arg MAIN_CLASS=com.apsi_projekt.vehicle_service.VehicleServiceApplication --build-arg VIN_DECODER_API_KEY=${VIN_DECODER_API_KEY} --build-arg VIN_DECODER_SECRET_KEY=${VIN_DECODER_SECRET_KEY} -t vehicle-service:$VERSION .
   needs:
     - build_vehicle-service
   only:
