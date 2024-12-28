@@ -113,6 +113,7 @@ services:
 networks:
   bridge_network:
     driver: bridge
+    external: true
 
 volumes:
   data:
