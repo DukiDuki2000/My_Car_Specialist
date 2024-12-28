@@ -29,7 +29,7 @@ build_api-gateway:
 
 build_user-service:
   stage: build
-  image: gradle:latest
+  image: gradle:8.11
   script:
     - cd spring_apps/user-service
     - chmod +x gradlew
@@ -47,7 +47,7 @@ build_user-service:
 
 build_garage-service:
   stage: build
-  image: gradle:latest
+  image: gradle:8.11
   script:
     - cd spring_apps/garage-service
     - chmod +x gradlew
@@ -83,7 +83,7 @@ build_vehicle-service:
 
 build_notification-service:
   stage: build
-  image: gradle:latest
+  image: gradle:8.11
   script:
     - cd spring_apps/notification-service
     - chmod +x gradlew
