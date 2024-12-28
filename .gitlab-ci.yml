@@ -11,7 +11,7 @@ variables:
 
 build_api-gateway:
   stage: build
-  image: gradle:latest
+  image: gradle:8.11
   script:
     - cd spring_apps/api-gateway
     - chmod +x gradlew
@@ -29,7 +29,7 @@ build_api-gateway:
 
 build_user-service:
   stage: build
-  image: gradle:latest
+  image: gradle:8.11
   script:
     - cd spring_apps/user-service
     - chmod +x gradlew
@@ -47,7 +47,7 @@ build_user-service:
 
 build_garage-service:
   stage: build
-  image: gradle:latest
+  image: gradle:8.11
   script:
     - cd spring_apps/garage-service
     - chmod +x gradlew
@@ -65,10 +65,12 @@ build_garage-service:
 
 build_vehicle-service:
   stage: build
+  image: gradle:8.11
   script:
     - cd spring_apps/vehicle-service
     - chmod +x gradlew
     - ./gradlew bootJar
+    - echo "VIN_DECODER_API_KEY=${VIN_DECODER_API_KEY}"
   artifacts:
     paths:
       - spring_apps/vehicle-service/build/libs/*.jar
@@ -82,7 +84,7 @@ build_vehicle-service:
 
 build_notification-service:
   stage: build
-  image: gradle:latest
+  image: gradle:8.11
   script:
     - cd spring_apps/notification-service
     - chmod +x gradlew
