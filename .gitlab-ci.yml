@@ -162,7 +162,7 @@ create_user-service_image:
       --build-arg SPRING_DATASOURCE_USERNAME="${POSTGRESQL_USERNAME}" \
       --build-arg SPRING_DATASOURCE_PASSWORD="${POSTGRESQL_PASSWORD}" \
       --build-arg JWT_SECRET="${JWT_SECRET_KEY}" \
-      -t user-service:$VERSION_commit_${CI_COMMIT_SHA} \
+      -t user-service:${VERSION}_commit_${CI_COMMIT_SHA} \
       -t user-service:latest \
       .
   needs:
