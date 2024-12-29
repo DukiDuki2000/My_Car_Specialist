@@ -273,7 +273,7 @@ deploy_services:
 cleanup_images:
   stage: cleanup
   script:
-    - docker image prune -a --filter "until=3d" -f
+    - docker image prune -a --filter "until=72h" -f
   needs:
     - deploy_services
 # dockerize:
