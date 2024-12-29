@@ -23,7 +23,7 @@ build_api-gateway:
     expire_in: 1 day
   only:
     refs:
-      - main
+      - backend
     changes:
      - spring_apps/api-gateway/**/*
      - services.Dockerfile
@@ -41,7 +41,7 @@ build_user-service:
     expire_in: 1 day
   only:
     refs:
-      - main
+      - backend
     changes:
      - spring_apps/user-service/**/*
      - services.Dockerfile
@@ -59,7 +59,7 @@ build_garage-service:
     expire_in: 1 day
   only:
     refs:
-      - main
+      - backend
     changes:
      - spring_apps/garage-service/**/*
      - services.Dockerfile
@@ -78,7 +78,7 @@ build_vehicle-service:
     expire_in: 1 day
   only:
     refs:
-      - main
+      - backend
     changes:
      - spring_apps/vehicle-service/**/*
      - services.Dockerfile
@@ -96,7 +96,7 @@ build_notification-service:
     expire_in: 1 day
   only:
     refs:
-      - main
+      - backend
     changes:
      - spring_apps/notification-service/**/*
 
@@ -113,7 +113,7 @@ build_recommendation-service:
     expire_in: 1 day
   only:
     refs:
-      - main
+      - backend
     changes:
      - spring_apps/recommendation-service/**/*
      - services.Dockerfile
@@ -137,7 +137,7 @@ create_api-gateway_image:
     - build_api-gateway
   only:
     refs:
-      - main
+      - backend
     changes:
       - spring_apps/api-gateway/**/*
       - services.Dockerfile
@@ -161,7 +161,7 @@ create_user-service_image:
     - build_user-service
   only:
     refs:
-      - main
+      - backend
     changes:
       - spring_apps/user-service/**/*
       - services.Dockerfile
@@ -184,7 +184,7 @@ create_garage-service_image:
     - build_garage-service
   only:
     refs:
-      - main
+      - backend
     changes:
       - spring_apps/garage-service/**/*
       - services.Dockerfile
@@ -208,7 +208,7 @@ create_vehicle-service_image:
     - build_vehicle-service
   only:
     refs:
-      - main
+      - backend
     changes:
       - spring_apps/vehicle-service/**/*
       - services.Dockerfile
@@ -231,7 +231,7 @@ create_notification-service_image:
     - build_notification-service
   only:
     refs:
-      - main
+      - backend
     changes:
       - spring_apps/notification-service/**/*
       - services.Dockerfile
@@ -254,7 +254,7 @@ create_recommendation-service_image:
     - build_recommendation-service
   only:
     refs:
-      - main
+      - backend
     changes:
       - spring_apps/recommendation-service/**/*
       - services.Dockerfile
@@ -265,7 +265,7 @@ deploy_services:
     - docker compose -f docker-compose.yml up -d
   only:
     refs:
-      - main
+      - backend
     changes:
       - spring_apps/**/*
       - services.Dockerfile
