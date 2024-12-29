@@ -15,6 +15,6 @@ public class ApiGatewayApplication {
 	}
 	@GetMapping("/hello")
 	public String hello(@RequestParam(value = "name", defaultValue = "api-gateway") String name) {
-		return String.format("Hello %s!", name, "in docker now working!!");
+		return String.format("Hello %s!", name, "in docker now working!");
 	}
 }
