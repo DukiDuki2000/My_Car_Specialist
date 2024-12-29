@@ -5,6 +5,7 @@ stages:
   - dockerize
   - deploy
   - release
+  - cleanup
 
 variables:
   DEPENDENCY_DIR: build/dependency
@@ -268,6 +269,13 @@ deploy_services:
       - spring_apps/**/*
       - services.Dockerfile
       - docker-compose.yml
+
+cleanup_images:
+  stage: cleanup
+  script:
+    - docker image prune -a --filter "until=3d" -f
+  needs:
+    - deploy_services
 # dockerize:
 #   stage: dockerize
 #   script:
