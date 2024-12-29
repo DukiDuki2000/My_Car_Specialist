@@ -155,16 +155,8 @@ create_user-service_image:
     - cd;
     - cd ./**/**/**/**/my_car_specialist
     - ls -a
-    - docker build -f services.Dockerfile \
-      --build-arg APP_DIR="/spring_apps/user-service" \
-      --build-arg MAIN_CLASS=com.apsi_projekt.user_service.UserServiceApplication \
-      --build-arg SPRING_DATASOURCE_URL="jdbc:postgresql://${POSTGRESQL_CONTAINER}/${POSTGRESQL_DATABASE_AUTH}" \
-      --build-arg SPRING_DATASOURCE_USERNAME="${POSTGRESQL_USERNAME}" \
-      --build-arg SPRING_DATASOURCE_PASSWORD="${POSTGRESQL_PASSWORD}" \
-      --build-arg JWT_SECRET="${JWT_SECRET_KEY}" \
-      -t user-service:${VERSION}_commit_${CI_COMMIT_SHA} \
-      -t user-service:latest \
-      .
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/user-service" --build-arg MAIN_CLASS=com.apsi_projekt.user_service.UserServiceApplication --build-arg SPRING_DATASOURCE_URL="jdbc:postgresql://${POSTGRESQL_CONTAINER}/${POSTGRESQL_DATABASE_AUTH}" --build-arg SPRING_DATASOURCE_USERNAME="${POSTGRESQL_USERNAME}" --build-arg SPRING_DATASOURCE_PASSWORD="${POSTGRESQL_PASSWORD}" --build-arg JWT_SECRET="${JWT_SECRET_KEY}" -t user-service:${VERSION}_commit_${CI_COMMIT_SHA} -t user-service:latest .
+
   needs:
     - build_user-service
   only:
