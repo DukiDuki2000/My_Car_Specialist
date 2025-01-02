@@ -18,13 +18,13 @@ export default function Home() {
 
           <div className="flex justify-center space-x-6">
             <a
-                href="/auth/login"
+                href="/pages/auth/login"
                 className="bg-blue-600 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-2xl hover:bg-blue-700 transition-transform transform hover:-translate-y-1 duration-300"
             >
               Zaloguj się
             </a>
             <a
-                href="/auth/register"
+                href="/pages/auth/register"
                 className="bg-gray-100 text-gray-800 px-8 py-3 rounded-full shadow-lg hover:shadow-2xl hover:bg-gray-200 transition-transform transform hover:-translate-y-1 duration-300"
             >
               Rejestracja
