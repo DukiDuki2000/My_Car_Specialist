@@ -1,0 +1,36 @@
+server:
+  port: 8088
+spring:
+    application:
+        name: api-gateway
+    cloud:
+      gateway:
+        routes:
+            - id: user-service
+              uri: http://localhost:8081
+              predicates:
+                - Path=/user/auth/**
+
+            - id: vehicle-service
+              uri: http://localhost:8083
+              predicates:
+                - Path=/vehicles/**
+
+            - id: garage-service
+              uri: http://localhost:8082
+              predicates:
+                - Path=/garage/**
+              filters:
+                - name: RoleFilter
+
+logging:
+  level:
+    org.springframework: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.cloud: DEBUG
+
+
+jwt:
+  secret: 13d62b2ebf87f2825bf47e3d3bd508cadae45348ce7aecec79c5eed515b0b84c59e882aae27b63ea77f9dd34888ff01c2de2bb243d8860a65af6d777082c36c7adc20e705c4c9be2eea454531c61630d529cb7d4f9c3da50a5c59ded83c08d903d7d892eb94a42a04288895ac2456016dff791b3e730c82b6979c06dcb9421bad1eeb45f14ab28d6a05eabeb1b79dcc576316983ccd9afdc4077439f7b270f9ff1bc7f9c25662545f0f0dc87ba3e506ef890a909500abb9a38370195f861878de097f12213dd2fdf15179325517c64780f476f4d278e7498b99234e599a8ef47f6b736fdbb54bad6ebc930fe4c9eefeac31c31cb4f2ff76c7385dd33d0af2924
+
+
