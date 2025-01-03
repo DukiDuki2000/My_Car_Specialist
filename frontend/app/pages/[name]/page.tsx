@@ -22,10 +22,10 @@ const UserDashboard = ({ params }: { params: { name: string } }) => {
             const userType = tokenPayload.role;
 
             // Redirect based on user role
-            if (userType === 'client') {
-                router.push(`/${name}/client-dashboard`); 
-            } else if (userType === 'employee') {
-                router.push(`/${name}/employee-dashboard`);  
+            if (userType === 'ROLE_CLIENT') {
+                router.push(`/pages/${name}/client-dashboard`); 
+            } else if (userType === 'ROLE_GARAGE') {
+                router.push(`/pages/${name}/garage-dashboard`);  
             } else {
                 router.push('/pages/auth/login');  
             }
