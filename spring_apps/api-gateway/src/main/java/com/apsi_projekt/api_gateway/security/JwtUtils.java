@@ -5,7 +5,6 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.apache.kafka.common.errors.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +34,7 @@ public class JwtUtils {
                     .getBody();
         } catch (JwtException e) {
             // Logowanie błędu lub odpowiednia obsługa
-            throw new ApiException("Token is invalid or expired: " + e.getMessage());
+            throw new JwtException("Token is invalid or expired: " + e.getMessage());
         }
     }
     public boolean isTokenExpired(String token) {
@@ -46,14 +45,5 @@ public class JwtUtils {
 
     public boolean isValid(String token) {
         return !this.isTokenExpired(token);
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 }
