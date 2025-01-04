@@ -1,18 +1,46 @@
-
 stages:
   - build
-  - test
   - dockerize
+  - test
   - deploy
   - release
+  
 
-build_job:
+
+build_frontend:
   stage: build
+  image: node:20-alpine
   script:
-    - echo "Budowanie..."
-  only:
-    - frontend-client-side-interface
+    - cd frontend
+    - npm install
+    - npm install next react react-dom
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/public/
+      - frontend/package.json
+      - frontend/package-lock.json
+    expire_in: 1 day
+
+#    changes:
+#      - frontend/**/*
+#      - frontend/user/package.json
+#      - frontend/user/package-lock.json
+
+dockerize_frontend:
+  stage: dockerize
+  script:
+    - cd ./frontend
+    - VERSION=$(node -p "require('./package.json').version")
+    - docker build -f Dockerfile -t frontend_client:${VERSION}_commit_${CI_COMMIT_SHA} -t frontend_client:latest .
+  needs:
+    - build_frontend
 
 
-
-
+deploy_services:
+  stage: deploy
+  script:
+    - cd ./frontend
+    - docker compose -f docker-compose.yml up -d
+  needs:
+    - dockerize_frontend
