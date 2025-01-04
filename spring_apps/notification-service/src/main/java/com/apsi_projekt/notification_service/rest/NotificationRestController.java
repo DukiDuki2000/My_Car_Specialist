@@ -15,6 +15,6 @@ public class NotificationRestController {
     @GetMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String sayHello() {
-        return "Hello from Notification Service!";
+        return "Hello from Notification Service!!";
     }
 }
