@@ -12,7 +12,7 @@ build_frontend:
   image: node:20-alpine
   script:
     - cd frontend
-    - export NODE_ENV=development
+    - export NODE_ENV=production
     - npm install
     - npm install next react react-dom
     - npm install tailwindcss postcss autoprefixer
