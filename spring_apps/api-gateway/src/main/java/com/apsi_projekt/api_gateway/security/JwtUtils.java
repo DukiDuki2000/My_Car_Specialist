@@ -12,15 +12,15 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtils {
 
     @Value("${jwt.secret}")
     private String secret;
-
-    public JwtUtils() {
-    }
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
@@ -44,6 +44,15 @@ public class JwtUtils {
     }
 
     public boolean isValid(String token) {
+        System.out.println(this.getRoles(token).getFirst());
         return !this.isTokenExpired(token);
+    }
+
+    public List<String> getRoles(String token) {
+        Claims claims = this.getClaims(token);
+        List<Map<String, String>> roles = claims.get("Roles", List.class);
+        return roles.stream()
+                .map(role -> role.get("authority"))
+                .collect(Collectors.toList());
     }
 }
