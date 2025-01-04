@@ -12,7 +12,7 @@ build_frontend:
   image: node:20-alpine
   script:
     - cd frontend
-    - tree
+    - cut package.json
     - export NODE_ENV=production
     - npm ci
     # - npm install
