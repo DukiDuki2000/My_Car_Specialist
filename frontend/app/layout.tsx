@@ -3,8 +3,8 @@
 import { ReactNode } from 'react';
 import { usePathname } from 'next/navigation'; // Hook do pobierania ścieżki
 import './globals.css';
-
 import { useRouter } from 'next/navigation';
+import Link from 'next/link'; // Import komponentu Link
 
 type LayoutProps = {
     children: ReactNode;
@@ -48,22 +48,22 @@ export default function Layout({ children }: LayoutProps) {
     let headerContent;
     if (pathname.startsWith('/pages/auth/login')) {
         headerContent = (
-            <a href="/" className="text-2xl font-bold text-gray-700 hover:text-blue-500">
+            <Link href="/" className="text-2xl font-bold text-gray-700 hover:text-blue-500">
                 MyCarSpecialist
-            </a>
+            </Link>
         );
     } else if (pathname.startsWith('/pages/auth/register')) {
         headerContent = (
             <div className="w-full bg-transparent flex items-center">
-                <a href="/" className="text-2xl font-bold text-gray-700 hover:text-blue-500">
+                <Link href="/" className="text-2xl font-bold text-gray-700 hover:text-blue-500">
                     MyCarSpecialist
-                </a>
-                <a
+                </Link>
+                <Link
                     href="/pages/auth/login"
                     className="ml-auto bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
                 >
                     Log In
-                </a>
+                </Link>
             </div>
         );
     } else {

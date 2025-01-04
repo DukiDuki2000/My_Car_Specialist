@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import Link from 'next/link'; // Import komponentu Link
 
 export default function Home() {
     const router = useRouter();
@@ -44,18 +45,18 @@ export default function Home() {
                 </p>
 
                 <div className="flex justify-center space-x-6">
-                    <a
+                    <Link
                         href="/pages/auth/login"
                         className="bg-blue-600 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-2xl hover:bg-blue-700 transition-transform transform hover:-translate-y-1 duration-300"
                     >
                         Zaloguj się
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                         href="/pages/auth/register"
                         className="bg-gray-100 text-gray-800 px-8 py-3 rounded-full shadow-lg hover:shadow-2xl hover:bg-gray-200 transition-transform transform hover:-translate-y-1 duration-300"
                     >
                         Rejestracja
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>
