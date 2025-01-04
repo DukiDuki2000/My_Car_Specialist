@@ -28,8 +28,6 @@ services:
   vehicle-service:
     image: vehicle-service:latest
     container_name: MCS_Vehicle_Service
-    ports:
-     - "8080"
     networks:
       - bridge_network
   
