@@ -15,7 +15,7 @@ build_frontend:
     - export NODE_ENV=development
     - npm install
     - npm install next react react-dom
-    - npm run build
+    - npm run build dev
   artifacts:
     paths:
       - frontend/public/
