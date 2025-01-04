@@ -1,0 +1,13 @@
+services:
+  frontend_user:
+    image: frontend_client:latest
+    container_name: MCS_Frontend_client
+    ports:
+      - "5000:5000"
+    networks:
+      - bridge_network
+
+networks:
+  bridge_network:
+    driver: bridge
+    external: true
