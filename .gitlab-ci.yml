@@ -16,6 +16,7 @@ build_frontend:
     - npm install
     - npm install next react react-dom
     - npm install tailwindcss postcss autoprefixer
+    - npx tailwindcss init
     - npm run build
   artifacts:
     paths:
