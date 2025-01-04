@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation'; 
+import { useRouter, useParams } from 'next/navigation'; 
 
-const UserDashboard = ({ params }: { params: { name: string } }) => { 
+const UserDashboard = () => { 
     const router = useRouter();
-    const { name } = params; 
+    const { name } = useParams(); // Get params from the hook
 
     useEffect(() => {
         if (!name) return;
