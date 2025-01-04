@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation'; 
 
 const UserDashboard = ({ params }: { params: { name: string } }) => { 
-
     const router = useRouter();
     const { name } = params; 
 
