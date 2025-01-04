@@ -21,7 +21,7 @@ export default function Login() {
         setError(null);
 
         try {
-            const response = await fetch('http://localhost:8081/user/auth/signin', {
+            const response = await fetch('/api/user/auth/signin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export default function Login() {
             if (data.token) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('username', data.username);
-                localStorage.setItem('role', data.roles[0]); // Zapisz pierwszą rolę użytkownika
+                localStorage.setItem('role', data.roles[0]); 
 
                 // Przekierowanie na odpowiedni dashboard na podstawie roli
                 if (data.roles.includes('ROLE_CLIENT')) {

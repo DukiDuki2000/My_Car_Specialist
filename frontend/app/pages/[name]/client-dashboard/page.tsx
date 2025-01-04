@@ -14,13 +14,13 @@ export default function ClientDashboard() {
 
         if (!token || !username || !role) {
             // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
-            router.push('/pages/auth/login');
+            router.push('/');
             return;
         }
 
         if (role !== 'ROLE_CLIENT') {
             // Przekierowanie, jeśli użytkownik nie jest klientem
-            router.push('/pages/auth/login');
+            router.push('/');
             return;
         }
     }, [router]);
@@ -37,9 +37,22 @@ export default function ClientDashboard() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-20">
 
+                    {/* Dodanie pojazdu */}
+                    <div
+                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/add-car`)}
+                        className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-20 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
+                    >
+                        <img
+                            src="/car.svg"
+                            alt="Dodaj samochód"
+                            className="h-40 w-40 mb-8"
+                        />
+                        <p className="text-gray-800 font-semibold text-2xl">Dodanie pojazdu</p>
+                    </div>
+
                     {/* Nowe zgłoszenie */}
                     <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-services/add-request`)}
+                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/add-request`)}
                         className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
                     >
                         <img
@@ -52,7 +65,7 @@ export default function ClientDashboard() {
 
                     {/* Aktualne zgłoszeń */}
                     <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-services/request-history`)}
+                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/request-history`)}
                         className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
                     >
                         <img
@@ -65,7 +78,7 @@ export default function ClientDashboard() {
 
                     {/* Historia pojazdów */}
                     <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-services/car_history`)}
+                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/car_history`)}
                         className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-20 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
                     >
                         <img

@@ -47,18 +47,19 @@ export default function GarageDashboard() {
             <main className="flex items-center justify-center flex-col -mt-16 px-4 h-[calc(100vh-80px)]">
                 <h2 className="text-4xl font-bold text-gray-800 mb-12">Panel Warsztatu</h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-10">
-                    {/* Dodanie pojazdu */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
+
+                    {/* Sprawdzenie zgłoszeń od klientów */}
                     <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/add-car`)}
-                        className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-20 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
+                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/request-history`)}
+                        className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
                     >
                         <img
-                            src="/car.svg"
-                            alt="Dodaj samochód"
+                            src="/listaZgloszen.svg"
+                            alt="Lista zgłoszeń"
                             className="h-40 w-40 mb-8"
                         />
-                        <p className="text-gray-800 font-semibold text-2xl">Dodanie pojazdu</p>
+                        <p className="text-gray-800 font-semibold text-2xl">Sprawdzenie zgłoszeń</p>
                     </div>
 
                     {/* Nowe zgłoszenie */}
@@ -74,7 +75,7 @@ export default function GarageDashboard() {
                         <p className="text-gray-800 font-semibold text-2xl">Nowe zlecenie</p>
                     </div>
 
-                    {/* Aktualne zgłoszeń */}
+                    {/* Aktualne zgłoszenia */}
                     <div
                         onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/request-history`)}
                         className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
@@ -97,7 +98,20 @@ export default function GarageDashboard() {
                             alt="Dodaj samochód"
                             className="h-40 w-40 mb-8"
                         />
-                        <p className="text-gray-800 font-semibold text-2xl">Historia pojazdów</p>
+                        <p className="text-gray-800 font-semibold text-2xl">Sprawdzenie historii pojazdu</p>
+                    </div>
+
+                    {/* Historia zgłoszeń */}
+                    <div
+                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/request-history`)}
+                        className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
+                    >
+                        <img
+                            src="/listaZgloszen.svg"
+                            alt="Lista zgłoszeń"
+                            className="h-40 w-40 mb-8"
+                        />
+                        <p className="text-gray-800 font-semibold text-2xl">Historia zleceń</p>
                     </div>
                 </div>
             </main>

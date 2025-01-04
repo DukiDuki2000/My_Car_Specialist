@@ -34,7 +34,7 @@ export default function Register() {
         };
 
         try {
-            const response = await fetch('http://localhost:8081/user/auth/signup', {
+            const response = await fetch('/api/user/auth/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -18,15 +18,16 @@ export default function WorkshopSearch() {
   ];
 
   useEffect(() => {
-    // Sprawdzanie, czy użytkownik jest zalogowany (czy istnieje token)
+    // Pobranie informacji o roli użytkownika z local storage
+    const role = localStorage.getItem('role');
     const token = localStorage.getItem('token');
-    if (!token) {
-      // Jeśli brak tokenu, przekierowanie na stronę logowania
-      router.push('/pages/auth/login');
+
+    if (!token || role !== 'ROLE_CLIENT') {
+      // Jeśli brak tokenu lub rola nie jest ROLE_CLIENT, przekierowanie na stronę logowania
+      router.push('/');
     }
   }, [router]);
 
-  // Zmieniamy miejsce filtrowania warsztatów, aby nie wykonywało się za każdym razem
   const filteredWorkshops = React.useMemo(() => {
     return workshops.filter(
       (workshop) =>

@@ -26,6 +26,10 @@ const UserDashboard = ({ params }: { params: { name: string } }) => {
                 router.push(`/pages/${name}/client-dashboard`); 
             } else if (userType === 'ROLE_GARAGE') {
                 router.push(`/pages/${name}/garage-dashboard`);  
+            } else if (userType === 'ROLE_ADMIN') {
+                router.push(`/pages/${name}/admin-dashboard`); // Dashboard administratora
+            } else if (userType === 'ROLE_MODERATOR') {
+                router.push(`/pages/${name}/moderator-dashboard`); // Dashboard moderatora
             } else {
                 router.push('/pages/auth/login');  
             }
