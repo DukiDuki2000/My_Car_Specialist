@@ -38,3 +38,4 @@ out/
 **/application-local.properties
 **/gradlew.bat
 /.gradle/
+**/application-local.yml

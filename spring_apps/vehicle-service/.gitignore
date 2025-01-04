@@ -39,3 +39,4 @@ idea .gitignore
 /spring_apps/vehicle-service/src/main/resources/application.properties
 **/application-local.properties
 **/gradlew.bat
+**/application-local.yml

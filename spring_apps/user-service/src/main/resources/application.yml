@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    username: ${POSTGRESQL_USERNAME}
+    url: jdbc:postgresql://${POSTGRESQL_CONTAINER}/${POSTGRESQL_DATABASE_AUTH}
+    password: ${POSTGRESQL_PASSWORD}
+  application:
+    name: user-service
+  jpa:
+    hibernate:
+      ddl-auto: update
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  expiration: '300000'
