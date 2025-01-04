@@ -39,11 +39,11 @@ export default function Login() {
 
             const data = await response.json();
 
-            // Sprawdzenie i zapisanie danych w localStorage
-            if (data.token) {
+            // Sprawdzenie i zapisanie danych w localStorage tylko w przeglądarce
+            if (typeof window !== 'undefined' && data.token) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('username', data.username);
-                localStorage.setItem('role', data.roles[0]); 
+                localStorage.setItem('role', data.roles[0]);
 
                 // Przekierowanie na odpowiedni dashboard na podstawie roli
                 if (data.roles.includes('ROLE_CLIENT')) {
