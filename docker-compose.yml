@@ -13,7 +13,7 @@ services:
     image: user-service:latest
     container_name: MCS_User_Service
     ports:
-     - "8080"
+     - "8081:8080"
     networks:
       - bridge_network
   
@@ -21,13 +21,15 @@ services:
     image: garage-service:latest
     container_name: MCS_Garage_Service
     ports:
-     - "8080"
+     - "8082:8080"
     networks:
       - bridge_network
   
   vehicle-service:
     image: vehicle-service:latest
     container_name: MCS_Vehicle_Service
+    ports:
+     - "8083:8080"
     networks:
       - bridge_network
   
@@ -35,7 +37,7 @@ services:
     image: recommendation-service:latest
     container_name: MCS_Recommendation_Service
     ports:
-     - "8080"
+     - "8084:8080"
     networks:
       - bridge_network
   
@@ -43,7 +45,7 @@ services:
     image: notification-service:latest
     container_name: MCS_Notification_Service
     ports:
-     - "8080"
+     - "8085:8080"
     networks:
       - bridge_network
   
