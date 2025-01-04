@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 import { usePathname } from 'next/navigation'; // Hook do pobierania ścieżki
-import '../globals.css';
+import './globals.css';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'; // Import komponentu Link
 
