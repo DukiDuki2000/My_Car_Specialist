@@ -1,32 +1,21 @@
 stages:
   - build
   - dockerize
-  - test
   - deploy
-  - release
-  
-
 
 build_frontend:
   stage: build
   image: node:20-alpine
   script:
     - cd frontend
-    - export NODE_ENV=development
+    - export NODE_ENV=production
     - npm install
-    - npm install next react react-dom
     - npm run build
   artifacts:
     paths:
+      - frontend/.next
       - frontend/public/
-      - frontend/package.json
-      - frontend/package-lock.json
     expire_in: 1 day
-
-#    changes:
-#      - frontend/**/*
-#      - frontend/user/package.json
-#      - frontend/user/package-lock.json
 
 dockerize_frontend:
   stage: dockerize
@@ -36,7 +25,6 @@ dockerize_frontend:
     - docker build -f Dockerfile -t frontend_client:${VERSION}_commit_${CI_COMMIT_SHA} -t frontend_client:latest .
   needs:
     - build_frontend
-
 
 deploy_services:
   stage: deploy

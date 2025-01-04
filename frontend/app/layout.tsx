@@ -1,10 +1,9 @@
-'use client'; // Layout jako komponent kliencki
+'use client';
 
-import { ReactNode } from 'react';
-import { usePathname } from 'next/navigation'; // Hook do pobierania ścieżki
+import { ReactNode, useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import './globals.css';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link'; // Import komponentu Link
 
 type LayoutProps = {
     children: ReactNode;
@@ -13,105 +12,89 @@ type LayoutProps = {
 export default function Layout({ children }: LayoutProps) {
     const pathname = usePathname();
     const router = useRouter();
+    const [userData, setUserData] = useState({
+        token: '',
+        username: '',
+        role: '',
+    });
+
+    useEffect(() => {
+        setUserData({
+            token: localStorage.getItem('token') || '',
+            username: localStorage.getItem('username') || 'Guest',
+            role: localStorage.getItem('role') || '',
+        });
+    }, []);
 
     const handleLogout = () => {
-        // Czyszczenie danych użytkownika z localStorage
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
-        localStorage.removeItem('role');
-        
-        // Przekierowanie do strony logowania
-        router.push('/pages/auth/login'); // Ustaw odpowiednią ścieżkę, np. "/login"
+        localStorage.clear();
+        router.push('/auth/login');
     };
 
     const handleNavigation = () => {
-        const role = localStorage.getItem('role');
-        const username = localStorage.getItem('username');
-
-        if (role === 'ROLE_ADMIN') {
-            router.push(`/pages/${username}/admin-dashboard`); // Dashboard administratora
-        } else if (role === 'ROLE_MODERATOR') {
-            router.push(`/pages/${username}/moderator-dashboard`); // Dashboard moderatora
-        } else if (role === 'ROLE_GARAGE') {
-            router.push(`/pages/${username}/garage-dashboard`); // Dashboard garażu
-        } else if (role === 'ROLE_CLIENT') {
-            router.push(`/pages/${username}/client-dashboard`); // Dashboard klienta
-        } else {
-            router.push('/'); // Jeśli brak roli, przejdź do logowania
-        }
+        const { role, username } = userData;
+        const dashboardRoutes: Record<string, string> = {
+            ROLE_ADMIN: `/admin-dashboard`,
+            ROLE_MODERATOR: `/moderator-dashboard`,
+            ROLE_GARAGE: `/garage-dashboard`,
+            ROLE_CLIENT: `/client-dashboard`,
+        };
+        const path = dashboardRoutes[role] ? `/pages/${username}${dashboardRoutes[role]}` : '/';
+        router.push(path);
     };
 
-    // Sprawdzenie, czy użytkownik jest zalogowany
-    const isLoggedIn = Boolean(localStorage.getItem('token'));
-
-    // Zmienna kontrolująca treść w headerze
-    let headerContent;
-    if (pathname.startsWith('/pages/auth/login')) {
-        headerContent = (
-            <Link href="/" className="text-2xl font-bold text-gray-700 hover:text-blue-500">
-                MyCarSpecialist
-            </Link>
-        );
-    } else if (pathname.startsWith('/pages/auth/register')) {
-        headerContent = (
-            <div className="w-full bg-transparent flex items-center">
+    const headerContent = (() => {
+        if (pathname.startsWith('/auth/login')) {
+            return (
                 <Link href="/" className="text-2xl font-bold text-gray-700 hover:text-blue-500">
                     MyCarSpecialist
                 </Link>
-                <Link
-                    href="/pages/auth/login"
-                    className="ml-auto bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-                >
-                    Log In
-                </Link>
-            </div>
-        );
-    } else {
-        headerContent = (
-            <div className="w-full bg-transparent flex items-center">
+            );
+        }
+        if (pathname.startsWith('/auth/register')) {
+            return (
+                <div className="flex items-center">
+                    <Link href="/" className="text-2xl font-bold text-gray-700 hover:text-blue-500">
+                        MyCarSpecialist
+                    </Link>
+                    <Link
+                        href="/auth/login"
+                        className="ml-auto bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                    >
+                        Log In
+                    </Link>
+                </div>
+            );
+        }
+        return (
+            <div className="flex items-center">
                 <a
-                    onClick={handleNavigation} // Przekierowanie w zależności od roli
+                    onClick={handleNavigation}
                     className="text-2xl font-bold text-gray-800 hover:text-blue-500 cursor-pointer"
                 >
                     MyCarSpecialist
                 </a>
-                {isLoggedIn && (
+                {userData.token && (
                     <div className="ml-auto flex items-center space-x-4">
                         <button
-                            onClick={handleLogout} // Funkcja obsługująca wylogowanie
+                            onClick={handleLogout}
                             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                         >
-                            Wyloguj się
+                            Log Out
                         </button>
-                        <span className="text-sm text-gray-800 font-semibold">
-                            {localStorage.getItem('username') || 'Nieznany Użytkownik'}
-                        </span>
+                        <span className="text-sm text-gray-800 font-semibold">{userData.username}</span>
                     </div>
                 )}
             </div>
         );
-    }
+    })();
 
     return (
-        <html lang="en">
-            <head>
-                {/* Link do Google Fonts */}
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-                    rel="stylesheet"
-                />
-            </head>
-            <body className="font-poppins bg-gray-50 min-h-screen">
-                {/* Renderuj nagłówek, a treść zależy od strony */}
-                <header className="bg-gray-100 p-4 shadow-md">
-                    <nav className="container mx-auto flex items-center justify-between">
-                        {headerContent}
-                    </nav>
-                </header>
-                <main className="p-4">{children}</main>
-            </body>
-        </html>
+        <div className="font-poppins bg-gray-50 min-h-screen">
+            <header className="bg-gray-100 p-4 shadow-md">
+                <nav className="container mx-auto">{headerContent}</nav>
+            </header>
+            <main className="p-4">{children}</main>
+        </div>
     );
 }
