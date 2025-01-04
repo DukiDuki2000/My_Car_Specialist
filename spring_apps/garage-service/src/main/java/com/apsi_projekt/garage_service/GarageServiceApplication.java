@@ -17,7 +17,7 @@ public class GarageServiceApplication {
 	}
 	@GetMapping("/hello")
 	public String hello(@RequestParam(value = "name", defaultValue = "garage-service") String name) {
-		return String.format("Hello %s!", name, "in container now!");
+		return String.format("Hello %s!", name, "in container now!!");
 	}
 	@Bean
 	public RestTemplate restTemplate() {
