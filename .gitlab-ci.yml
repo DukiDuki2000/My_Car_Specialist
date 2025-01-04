@@ -15,7 +15,8 @@ build_frontend:
     - export NODE_ENV=development
     - npm install
     - npm install next react react-dom
-    - npm run dev
+    - npm install tailwindcss postcss autoprefixer
+    - npm run build
   artifacts:
     paths:
       - frontend/public/
