@@ -15,6 +15,6 @@ public class VehicleServiceApplication {
 	}
 	@GetMapping("/hello")
 	public String hello(@RequestParam(value = "name", defaultValue = "vehicle-service") String name) {
-		return String.format("Hello %s!", name, "in docker now!!");
+		return String.format("Hello %s!", name, "in docker now!");
 	}
 }
