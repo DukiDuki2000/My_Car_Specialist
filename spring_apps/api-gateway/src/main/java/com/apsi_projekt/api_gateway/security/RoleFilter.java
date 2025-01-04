@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 
 @Component
 public class RoleFilter implements GatewayFilterFactory<RoleFilter.Config> {
@@ -28,16 +30,24 @@ public class RoleFilter implements GatewayFilterFactory<RoleFilter.Config> {
             HttpHeaders headers = exchange.getRequest().getHeaders();
             String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
 
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete();
-            }
+            if (routerValidator.isSecured.test(exchange.getRequest())){
+                if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                    return exchange.getResponse().setComplete();
+                }
 
-            String token = authHeader.substring(7);
+                String token = authHeader.substring(7);
 
-            if (!jwtUtils.isValid(token)) {
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete();
+                if (!jwtUtils.isValid(token)) {
+                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                    return exchange.getResponse().setComplete();
+                }
+                List<String> roles = jwtUtils.getRoles(token);
+                exchange = exchange.mutate()
+                        .request(exchange.getRequest().mutate()
+                                .header("X-Roles", String.join(",", roles))
+                                .build())
+                        .build();
             }
             return chain.filter(exchange);
         };

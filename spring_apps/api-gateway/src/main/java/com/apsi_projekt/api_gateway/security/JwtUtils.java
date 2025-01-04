@@ -44,7 +44,6 @@ public class JwtUtils {
     }
 
     public boolean isValid(String token) {
-        System.out.println(this.getRoles(token).getFirst());
         return !this.isTokenExpired(token);
     }
 
