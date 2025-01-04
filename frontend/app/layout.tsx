@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'; // Hook do pobierania ścieżki
 import './globals.css';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'; // Import komponentu Link
-import Head from 'next/head'; // Import komponentu Head
 
 type LayoutProps = {
     children: ReactNode;
@@ -16,10 +15,13 @@ export default function Layout({ children }: LayoutProps) {
     const router = useRouter();
 
     const handleLogout = () => {
+        // Czyszczenie danych użytkownika z localStorage
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
-        router.push('/pages/auth/login');
+        
+        // Przekierowanie do strony logowania
+        router.push('/pages/auth/login'); // Ustaw odpowiednią ścieżkę, np. "/login"
     };
 
     const handleNavigation = () => {
@@ -27,20 +29,22 @@ export default function Layout({ children }: LayoutProps) {
         const username = localStorage.getItem('username');
 
         if (role === 'ROLE_ADMIN') {
-            router.push(`/pages/${username}/admin-dashboard`);
+            router.push(`/pages/${username}/admin-dashboard`); // Dashboard administratora
         } else if (role === 'ROLE_MODERATOR') {
-            router.push(`/pages/${username}/moderator-dashboard`);
+            router.push(`/pages/${username}/moderator-dashboard`); // Dashboard moderatora
         } else if (role === 'ROLE_GARAGE') {
-            router.push(`/pages/${username}/garage-dashboard`);
+            router.push(`/pages/${username}/garage-dashboard`); // Dashboard garażu
         } else if (role === 'ROLE_CLIENT') {
-            router.push(`/pages/${username}/client-dashboard`);
+            router.push(`/pages/${username}/client-dashboard`); // Dashboard klienta
         } else {
-            router.push('/');
+            router.push('/'); // Jeśli brak roli, przejdź do logowania
         }
     };
 
+    // Sprawdzenie, czy użytkownik jest zalogowany
     const isLoggedIn = Boolean(localStorage.getItem('token'));
 
+    // Zmienna kontrolująca treść w headerze
     let headerContent;
     if (pathname.startsWith('/pages/auth/login')) {
         headerContent = (
@@ -66,7 +70,7 @@ export default function Layout({ children }: LayoutProps) {
         headerContent = (
             <div className="w-full bg-transparent flex items-center">
                 <a
-                    onClick={handleNavigation}
+                    onClick={handleNavigation} // Przekierowanie w zależności od roli
                     className="text-2xl font-bold text-gray-800 hover:text-blue-500 cursor-pointer"
                 >
                     MyCarSpecialist
@@ -74,7 +78,7 @@ export default function Layout({ children }: LayoutProps) {
                 {isLoggedIn && (
                     <div className="ml-auto flex items-center space-x-4">
                         <button
-                            onClick={handleLogout}
+                            onClick={handleLogout} // Funkcja obsługująca wylogowanie
                             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                         >
                             Wyloguj się
@@ -89,8 +93,8 @@ export default function Layout({ children }: LayoutProps) {
     }
 
     return (
-        <>
-            <Head>
+        <html lang="en">
+            <head>
                 {/* Link do Google Fonts */}
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -98,13 +102,16 @@ export default function Layout({ children }: LayoutProps) {
                     href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
                     rel="stylesheet"
                 />
-            </Head>
-            <header className="bg-gray-100 p-4 shadow-md">
-                <nav className="container mx-auto flex items-center justify-between">
-                    {headerContent}
-                </nav>
-            </header>
-            <main className="p-4">{children}</main>
-        </>
+            </head>
+            <body className="font-poppins bg-gray-50 min-h-screen">
+                {/* Renderuj nagłówek, a treść zależy od strony */}
+                <header className="bg-gray-100 p-4 shadow-md">
+                    <nav className="container mx-auto flex items-center justify-between">
+                        {headerContent}
+                    </nav>
+                </header>
+                <main className="p-4">{children}</main>
+            </body>
+        </html>
     );
 }
