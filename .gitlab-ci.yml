@@ -132,7 +132,7 @@ create_api-gateway_image:
     - cd ./**/**/**/**/my_car_specialist
     - ls -a
     - tree
-    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/api-gateway" --build-arg MAIN_CLASS=com.apsi_projekt.api_gateway.ApiGatewayApplication -build-arg JWT_SECRET="${JWT_SECRET_KEY}"  -t api-gateway:$VERSION_commit_${CI_COMMIT_SHA}  -t api-gateway:latest .
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/api-gateway" --build-arg MAIN_CLASS=com.apsi_projekt.api_gateway.ApiGatewayApplication --build-arg JWT_SECRET="${JWT_SECRET_KEY}"  -t api-gateway:$VERSION_commit_${CI_COMMIT_SHA}  -t api-gateway:latest .
   needs:
     - build_api-gateway
   only:
