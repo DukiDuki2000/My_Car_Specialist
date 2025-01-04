@@ -1,4 +1,4 @@
-'use client'; // Upewnij się, że komponent jest klientem
+'use client';
 
 import { FormEvent, useState } from 'react';
 
