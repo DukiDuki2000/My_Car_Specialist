@@ -1,7 +1,6 @@
 spring:
   application:
     name: garage-service
-
   datasource:
     username: ${POSTGRESQL_USERNAME}
     url: jdbc:postgresql://${POSTGRESQL_CONTAINER}/${POSTGRESQL_DATABASE_GARAGES}
