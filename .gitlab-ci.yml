@@ -24,7 +24,7 @@ build_frontend:
     #- npm install tailwindcss postcss autoprefixer
     # - npx tailwindcss init
     - ls -la node_modules/tailwindcss
-    - npm run dev
+    - npm run build 
   artifacts:
     paths:
       - frontend/public/
