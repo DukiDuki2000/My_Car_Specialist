@@ -4,9 +4,11 @@ import com.apsi_projekt.vehicle_service.model.Vehicle;
 import com.apsi_projekt.vehicle_service.model.VinDecodeResponse;
 import com.apsi_projekt.vehicle_service.service.VinDecoderService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import com.apsi_projekt.vehicle_service.repository.VehicleRepository;
 
@@ -29,7 +31,8 @@ public class VehicleRestController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Vehicle> create(@RequestBody Vehicle vehicle, HttpServletRequest request) {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Vehicle> create(@RequestBody Vehicle vehicle, HttpServletRequest request)  {
         String usernameHeader = request.getHeader("X-Username");
         String idHeader = request.getHeader("X-Id");
         vehicle.setUserId(idHeader);
@@ -37,7 +40,6 @@ public class VehicleRestController {
         Vehicle saved = vehicleRepository.save(vehicle);
         return ResponseEntity.ok(saved);
     }
-
 
     @GetMapping()
     public String sayHello() {
