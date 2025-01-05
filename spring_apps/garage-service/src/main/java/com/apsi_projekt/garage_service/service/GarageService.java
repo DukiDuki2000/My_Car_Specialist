@@ -23,13 +23,13 @@ public class GarageService {
         VATResposne response = restTemplate.getForObject(apiUrl, VATResposne.class, nip, date);
 
         if (response != null && response.getResult() != null && response.getResult().getSubject() != null) {
+            
             VATResposne.Subject subject = response.getResult().getSubject();
-            String companyAddress =subject.getResidenceAddress();
-            String workingAddress=subject.getWorkingAddress();
+
             return new CompanyInfo(
                     subject.getName(),
-                    companyAddress,
-                    workingAddress,
+                    subject.getResidenceAddress(),
+                    subject.getWorkingAddress(),
                     subject.getRegon(),
                     subject.getNip()
             );
