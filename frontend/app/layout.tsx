@@ -1,9 +1,9 @@
 'use client'; // Layout jako komponent kliencki
 
 import { ReactNode, useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation'; // Hooki do nawigacji Next.js
+import { usePathname, useRouter } from 'next/navigation';
 import './globals.css';
-import Link from 'next/link'; // Import komponentu Link
+import Link from 'next/link';
 
 type LayoutProps = {
     children: ReactNode;
@@ -13,7 +13,6 @@ export default function Layout({ children }: LayoutProps) {
     const pathname = usePathname();
     const router = useRouter();
 
-    // Stan przechowujący informacje o zalogowanym użytkowniku
     const [user, setUser] = useState<{
         username: string | null;
         role: string | null;
@@ -24,20 +23,23 @@ export default function Layout({ children }: LayoutProps) {
         token: null,
     });
 
-    // Hook useEffect, aby pobrać dane z localStorage po stronie klienta
+    // Inicjalizacja danych użytkownika z localStorage
     useEffect(() => {
         const token = localStorage.getItem('token');
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('role');
 
-        setUser({ username, role, token });
+        if (token && username && role) {
+            setUser({ username, role, token });
+        }
     }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
-        router.push('/pages/auth/login'); // Ustaw odpowiednią ścieżkę do logowania
+        setUser({ username: null, role: null, token: null }); // Reset stanu użytkownika
+        router.push('/pages/auth/login');
     };
 
     const handleNavigation = () => {
@@ -50,11 +52,10 @@ export default function Layout({ children }: LayoutProps) {
         } else if (user.role === 'ROLE_CLIENT') {
             router.push(`/pages/${user.username}/client-dashboard`);
         } else {
-            router.push('/'); // Jeśli brak roli, przekieruj do logowania
+            router.push('/');
         }
     };
 
-    // Zmienna kontrolująca treść w headerze
     let headerContent;
     if (pathname.startsWith('/pages/auth/login')) {
         headerContent = (
@@ -105,7 +106,6 @@ export default function Layout({ children }: LayoutProps) {
     return (
         <html lang="en">
             <head>
-                {/* Link do Google Fonts */}
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link
@@ -114,7 +114,6 @@ export default function Layout({ children }: LayoutProps) {
                 />
             </head>
             <body className="font-poppins bg-gray-50 min-h-screen">
-                {/* Renderuj nagłówek, a treść zależy od strony */}
                 <header className="bg-gray-100 p-4 shadow-md">
                     <nav className="container mx-auto flex items-center justify-between">
                         {headerContent}
