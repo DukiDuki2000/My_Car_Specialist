@@ -14,7 +14,7 @@ public class RouterValidator {
             "/garage/openApi",
             "/notification/openApi",
             "/user/openApi",
-            "/vechicle/openApi",
+            "/vehicle/openApi"
     );
 
     public Predicate<ServerHttpRequest> isSecured =
