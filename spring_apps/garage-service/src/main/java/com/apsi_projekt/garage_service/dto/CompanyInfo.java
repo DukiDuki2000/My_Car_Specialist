@@ -47,7 +47,7 @@ public class CompanyInfo {
         this.companyRegon = companyRegon;
     }
 
-    public String getAddres(){
+    public String getAddresOFWHAT(){
         return (companyAddress != null && !companyAddress.isEmpty()) ? companyAddress : workingAddress;
     }
 }
