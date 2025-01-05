@@ -179,7 +179,7 @@ create_garage-service_image:
     - cd;
     - cd ./**/**/**/**/my_car_specialist
     - ls -a
-    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/garage-service" --build-arg MAIN_CLASS=com.apsi_projekt.garage_service.GarageServiceApplication --build-arg SPRING_DATASOURCE_URL="jdbc:postgresql://${POSTGRESQL_CONTAINER}/${POSTGRESQL_DATABASE_GARAGES}" -t garage-service:$VERSION_commit_${CI_COMMIT_SHA}  -t garage-service:latest .
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/garage-service" --build-arg MAIN_CLASS=com.apsi_projekt.garage_service.GarageServiceApplication --build-arg SPRING_DATASOURCE_URL="jdbc:postgresql://${POSTGRESQL_CONTAINER}/${POSTGRESQL_DATABASE_GARAGES}" --build-arg SPRING_DATASOURCE_USERNAME="${POSTGRESQL_USERNAME}" --build-arg SPRING_DATASOURCE_PASSWORD="${POSTGRESQL_PASSWORD}" -t garage-service:$VERSION_commit_${CI_COMMIT_SHA}  -t garage-service:latest .
   needs:
     - build_garage-service
   only:
