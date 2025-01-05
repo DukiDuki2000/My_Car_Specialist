@@ -106,13 +106,18 @@ export default function ServiceHistory() {
   };
 
   const [selectedCar, setSelectedCar] = useState<string>("Auto Syna BMW E36");
+  const [currentSortConfig, setCurrentSortConfig] = useState<{ key: keyof Service; direction: "ascending" | "descending" } | null>(null);
   const [historySortConfig, setHistorySortConfig] = useState<{ key: keyof Service; direction: "ascending" | "descending" } | null>(null);
+
+  const [currentServices, setCurrentServices] = useState<Service[]>([...initialServicesByCar[selectedCar].current]);
   const [historyServices, setHistoryServices] = useState<Service[]>([...initialServicesByCar[selectedCar].history]);
 
   const handleCarChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const car = e.target.value;
     setSelectedCar(car);
+    setCurrentServices([...initialServicesByCar[car].current]);
     setHistoryServices([...initialServicesByCar[car].history]);
+    setCurrentSortConfig(null);
     setHistorySortConfig(null);
   };
 
@@ -143,7 +148,8 @@ export default function ServiceHistory() {
     services: Service[],
     sortConfig: any,
     setSortConfig: any,
-    setServices: (sorted: Service[]) => void
+    setServices: (sorted: Service[]) => void,
+    isCurrent: boolean = false
   ) => (
     <table className="min-w-full border border-blue-400">
       <thead>
@@ -172,13 +178,30 @@ export default function ServiceHistory() {
           >
             Data zgłoszenia {renderSortArrows("dateReported", sortConfig)}
           </th>
-          <th
-            className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-            onClick={() => sortServices(services, "dateCompleted", setServices, sortConfig, setSortConfig)}
-          >
-            Data ukończenia {renderSortArrows("dateCompleted", sortConfig)}
-          </th>
-          <th className="px-4 py-2 border border-blue-400 text-center">Raport PDF</th>
+          {isCurrent ? (
+            <>
+              <th className="px-4 py-2 border border-blue-400 text-left">Telefon</th>
+              <th className="px-4 py-2 border border-blue-400 text-left">Email</th>
+              <th className="px-4 py-2 border border-blue-400 text-center">
+                <span
+                  onClick={() => sortServices(services, "status", setServices, sortConfig, setSortConfig)}
+                  className="cursor-pointer"
+                >
+                  Status {renderSortArrows("status", sortConfig)}
+                </span>
+              </th>
+            </>
+          ) : (
+            <>
+              <th
+                className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
+                onClick={() => sortServices(services, "dateCompleted", setServices, sortConfig, setSortConfig)}
+              >
+                Data ukończenia {renderSortArrows("dateCompleted", sortConfig)}
+              </th>
+              <th className="px-4 py-2 border border-blue-400 text-center">Raport PDF</th>
+            </>
+          )}
         </tr>
       </thead>
       <tbody>
@@ -188,12 +211,32 @@ export default function ServiceHistory() {
             <td className="px-4 py-2 border border-blue-400">{service.cost} zł</td>
             <td className="px-4 py-2 border border-blue-400">{service.workshop}</td>
             <td className="px-4 py-2 border border-blue-400">{service.dateReported}</td>
-            <td className="px-4 py-2 border border-blue-400">{service.dateCompleted}</td>
-            <td className="px-4 py-2 border border-blue-400 text-center">
-              <a href={service.pdfLink} target="_blank" rel="noopener noreferrer">
-                <img src="/PDF.png" alt="PDF Ikona" className="w-6 h-6 mx-auto" />
-              </a>
-            </td>
+            {isCurrent ? (
+              <>
+                <td className="px-4 py-2 border border-blue-400">{service.phone}</td>
+                <td className="px-4 py-2 border border-blue-400">{service.email}</td>
+                <td
+                  className={`px-4 py-2 border border-blue-400 text-center ${
+                    service.status === "w trakcie"
+                      ? "text-yellow-500 font-bold"
+                      : service.status === "gotowe"
+                      ? "text-green-500 font-bold"
+                      : ""
+                  }`}
+                >
+                  {service.status}
+                </td>
+              </>
+            ) : (
+              <>
+                <td className="px-4 py-2 border border-blue-400">{service.dateCompleted}</td>
+                <td className="px-4 py-2 border border-blue-400 text-center">
+                  <a href={service.pdfLink} target="_blank" rel="noopener noreferrer">
+                    <img src="/PDF.png" alt="PDF Ikona" className="w-6 h-6 mx-auto" />
+                  </a>
+                </td>
+              </>
+            )}
           </tr>
         ))}
       </tbody>
@@ -202,7 +245,7 @@ export default function ServiceHistory() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Historia zgłoszeń</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Aktualne zgłoszenia</h1>
 
       {/* Car Selection */}
       <div className="mb-8">
@@ -223,11 +266,13 @@ export default function ServiceHistory() {
         </select>
       </div>
 
-      {/* Service History Table */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Historia zgłoszeń serwisowych</h2>
-        {renderTable(historyServices, historySortConfig, setHistorySortConfig, setHistoryServices)}
+      {/* Current Services Table */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">Aktualne zgłoszenia serwisowe</h2>
+        {renderTable(currentServices, currentSortConfig, setCurrentSortConfig, setCurrentServices, true)}
       </div>
+
+
     </div>
   );
 }
