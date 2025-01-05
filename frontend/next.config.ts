@@ -5,15 +5,15 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/vehicle/decode-info/:vin', 
-        destination: 'http://localhost:8080/vehicle/decode-info/:vin',
+        destination: 'http://MCS_API_Gateway:8080/vehicle/decode-info/:vin',
       },
       {
         source: '/api/user/auth/signin',
-        destination: 'http://localhost:8080/user/auth/signin'
+        destination: 'http://MCS_API_Gateway:8080/user/auth/signin'
       },
       {
         source: '/api/user/auth/signup',
-        destination: 'http://localhost:8080/user/auth/signup'
+        destination: 'http://MCS_API_Gateway:8080/user/auth/signup'
       },
     ];
   },
