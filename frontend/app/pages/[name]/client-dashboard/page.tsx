@@ -6,24 +6,24 @@ import { useEffect } from 'react';
 export default function ClientDashboard() {
     const router = useRouter();
 
-    // useEffect(() => {
-    //     // Sprawdzanie, czy użytkownik jest zalogowany
-    //     const token = localStorage.getItem('token');
-    //     const username = localStorage.getItem('username');
-    //     const role = localStorage.getItem('role');
+    useEffect(() => {
+        // Sprawdzanie, czy użytkownik jest zalogowany
+        const token = localStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        const role = localStorage.getItem('role');
 
-    //     if (!token || !username || !role) {
-    //         // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
-    //         router.push('/');
-    //         return;
-    //     }
+        if (!token || !username || !role) {
+            // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
+            router.push('/');
+            return;
+        }
 
-    //     if (role !== 'ROLE_CLIENT') {
-    //         // Przekierowanie, jeśli użytkownik nie jest klientem
-    //         router.push('/');
-    //         return;
-    //     }
-    // }, [router]);
+        if (role !== 'ROLE_CLIENT') {
+            // Przekierowanie, jeśli użytkownik nie jest klientem
+            router.push('/');
+            return;
+        }
+    }, [router]);
 
     const handleNavigate = (path: string) => {
         router.push(path); // Przekierowanie na podaną ścieżkę
