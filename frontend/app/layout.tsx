@@ -1,4 +1,4 @@
-'use client';
+'use client'; // Layout jako komponent kliencki
 
 import { ReactNode, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation'; // Hooki do nawigacji Next.js
@@ -88,7 +88,7 @@ export default function Layout({ children }: LayoutProps) {
                 >
                     MyCarSpecialist
                 </a>
-                {!isLoading && user.token && (
+                {!isLoading && user.token && user.token !== 'null' && user.token !== '' && (
                     <div className="ml-auto flex items-center space-x-4">
                         <button
                             onClick={handleLogout}
