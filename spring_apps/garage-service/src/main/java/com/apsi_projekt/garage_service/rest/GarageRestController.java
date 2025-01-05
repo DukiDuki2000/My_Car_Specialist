@@ -25,7 +25,7 @@ public class GarageRestController {
         return "Hello from Garage Service";
     }
 
-    @GetMapping("/{nip}")
+    @GetMapping("/openApi/{nip}")
     public ResponseEntity<CompanyInfo> getFirmaInfoByNip(@PathVariable String nip) {
 
         if (!nip.matches("\\d{10}")) {
