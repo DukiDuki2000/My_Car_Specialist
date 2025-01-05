@@ -8,11 +8,13 @@ spring:
           uri: http://user-service:8080
           predicates:
             - Path=/user/auth/**
+          filters:
+            - name: RoleFilter
 
         - id: vehicle-service
           uri: http://vehicle-service:8080
           predicates:
-            - Path=/vehicles/**
+            - Path=/vehicle/**
 
         - id: garage-service
           uri: http://garage-service:8080
@@ -20,6 +22,22 @@ spring:
             - Path=/garage/**
           filters:
             - name: RoleFilter
+
+        - id: recommendation-service
+          uri: http://recommendation-service:8080
+          predicates:
+            - Path=/recommendation-service/**
+          filters:
+            - name: RoleFilter
+
+        - id: notification-service
+          uri: http://notification-service:8080
+          predicates:
+            - Path=/notification-service/**
+          filters:
+            - name: RoleFilter
+
+
 
 
 jwt:
