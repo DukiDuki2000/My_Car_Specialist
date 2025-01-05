@@ -1,9 +1,8 @@
 'use client'; // Layout jako komponent kliencki
 
-import { ReactNode } from 'react';
-import { usePathname } from 'next/navigation'; // Hook do pobierania ścieżki
+import { ReactNode, useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation'; // Hooki do nawigacji Next.js
 import './globals.css';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link'; // Import komponentu Link
 
 type LayoutProps = {
@@ -14,35 +13,46 @@ export default function Layout({ children }: LayoutProps) {
     const pathname = usePathname();
     const router = useRouter();
 
+    // Stan przechowujący informacje o zalogowanym użytkowniku
+    const [user, setUser] = useState<{
+        username: string | null;
+        role: string | null;
+        token: string | null;
+    }>({
+        username: null,
+        role: null,
+        token: null,
+    });
+
+    // Hook useEffect, aby pobrać dane z localStorage po stronie klienta
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        const role = localStorage.getItem('role');
+
+        setUser({ username, role, token });
+    }, []);
+
     const handleLogout = () => {
-        // Czyszczenie danych użytkownika z localStorage
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
-        
-        // Przekierowanie do strony logowania
-        router.push('/pages/auth/login'); // Ustaw odpowiednią ścieżkę, np. "/login"
+        router.push('/pages/auth/login'); // Ustaw odpowiednią ścieżkę do logowania
     };
 
     const handleNavigation = () => {
-        const role = localStorage.getItem('role');
-        const username = localStorage.getItem('username');
-
-        if (role === 'ROLE_ADMIN') {
-            router.push(`/pages/${username}/admin-dashboard`); // Dashboard administratora
-        } else if (role === 'ROLE_MODERATOR') {
-            router.push(`/pages/${username}/moderator-dashboard`); // Dashboard moderatora
-        } else if (role === 'ROLE_GARAGE') {
-            router.push(`/pages/${username}/garage-dashboard`); // Dashboard garażu
-        } else if (role === 'ROLE_CLIENT') {
-            router.push(`/pages/${username}/client-dashboard`); // Dashboard klienta
+        if (user.role === 'ROLE_ADMIN') {
+            router.push(`/pages/${user.username}/admin-dashboard`);
+        } else if (user.role === 'ROLE_MODERATOR') {
+            router.push(`/pages/${user.username}/moderator-dashboard`);
+        } else if (user.role === 'ROLE_GARAGE') {
+            router.push(`/pages/${user.username}/garage-dashboard`);
+        } else if (user.role === 'ROLE_CLIENT') {
+            router.push(`/pages/${user.username}/client-dashboard`);
         } else {
-            router.push('/'); // Jeśli brak roli, przejdź do logowania
+            router.push('/'); // Jeśli brak roli, przekieruj do logowania
         }
     };
-
-    // Sprawdzenie, czy użytkownik jest zalogowany
-    const isLoggedIn = Boolean(localStorage.getItem('token'));
 
     // Zmienna kontrolująca treść w headerze
     let headerContent;
@@ -70,21 +80,21 @@ export default function Layout({ children }: LayoutProps) {
         headerContent = (
             <div className="w-full bg-transparent flex items-center">
                 <a
-                    onClick={handleNavigation} // Przekierowanie w zależności od roli
+                    onClick={handleNavigation}
                     className="text-2xl font-bold text-gray-800 hover:text-blue-500 cursor-pointer"
                 >
                     MyCarSpecialist
                 </a>
-                {isLoggedIn && (
+                {user.token && (
                     <div className="ml-auto flex items-center space-x-4">
                         <button
-                            onClick={handleLogout} // Funkcja obsługująca wylogowanie
+                            onClick={handleLogout}
                             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                         >
                             Wyloguj się
                         </button>
                         <span className="text-sm text-gray-800 font-semibold">
-                            {localStorage.getItem('username') || 'Nieznany Użytkownik'}
+                            {user.username || 'Nieznany Użytkownik'}
                         </span>
                     </div>
                 )}

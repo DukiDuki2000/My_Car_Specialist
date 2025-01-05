@@ -2,27 +2,28 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import Link from 'next/link'; // Import komponentu Link
+import Link from 'next/link';
 
 export default function Home() {
     const router = useRouter();
 
     useEffect(() => {
-        // Sprawdzanie, czy użytkownik jest zalogowany
-        const token = localStorage.getItem('token');
-        const username = localStorage.getItem('username');
-        const role = localStorage.getItem('role');
+        // Ensure localStorage is accessed only in the browser
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('token');
+            const username = localStorage.getItem('username');
+            const role = localStorage.getItem('role');
 
-        if (token && username && role) {
-            // Przekierowanie na podstawie roli użytkownika
-            if (role === 'ROLE_ADMIN') {
-                router.push(`/pages/${username}/admin-dashboard`); // Dashboard administratora
-            } else if (role === 'ROLE_MODERATOR') {
-                router.push(`/pages/${username}/moderator-dashboard`); // Dashboard moderatora
-            } else if (role === 'ROLE_GARAGE') {
-                router.push(`/pages/${username}/garage-dashboard`); // Dashboard garażu
-            } else if (role === 'ROLE_CLIENT') {
-                router.push(`/pages/${username}/client-dashboard`); // Dashboard klienta
+            if (token && username && role) {
+                if (role === 'ROLE_ADMIN') {
+                    router.push(`/pages/${username}/admin-dashboard`);
+                } else if (role === 'ROLE_MODERATOR') {
+                    router.push(`/pages/${username}/moderator-dashboard`);
+                } else if (role === 'ROLE_GARAGE') {
+                    router.push(`/pages/${username}/garage-dashboard`);
+                } else if (role === 'ROLE_CLIENT') {
+                    router.push(`/pages/${username}/client-dashboard`);
+                }
             }
         }
     }, [router]);

@@ -1,13 +1,19 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function Login() {
     const [formData, setFormData] = useState({ username: '', password: '' });
     const [error, setError] = useState<string | null>(null);
+    const [isClient, setIsClient] = useState(false);
     const router = useRouter();
+
+    // Ensure the component is running on the client side
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -39,26 +45,26 @@ export default function Login() {
 
             const data = await response.json();
 
-            // Sprawdzenie i zapisanie danych w localStorage tylko w przeglądarce
-            if (typeof window !== 'undefined' && data.token) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('username', data.username);
-                localStorage.setItem('role', data.roles[0]);
+            if (isClient) {
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('username', data.username);
+                    localStorage.setItem('role', data.roles[0]);
 
-                // Przekierowanie na odpowiedni dashboard na podstawie roli
-                if (data.roles.includes('ROLE_CLIENT')) {
-                    router.push(`/pages/${data.username}/client-dashboard`);
-                } else if (data.roles.includes('ROLE_GARAGE')) {
-                    router.push(`/pages/${data.username}/garage-dashboard`);
-                } else if (data.roles.includes('ROLE_MODERATOR')) {
-                    router.push(`/pages/${data.username}/moderator-dashboard`);
-                } else if (data.roles.includes('ROLE_ADMIN')) {
-                    router.push(`/pages/${data.username}/admin-dashboard`);
+                    if (data.roles.includes('ROLE_CLIENT')) {
+                        router.push(`/pages/${data.username}/client-dashboard`);
+                    } else if (data.roles.includes('ROLE_GARAGE')) {
+                        router.push(`/pages/${data.username}/garage-dashboard`);
+                    } else if (data.roles.includes('ROLE_MODERATOR')) {
+                        router.push(`/pages/${data.username}/moderator-dashboard`);
+                    } else if (data.roles.includes('ROLE_ADMIN')) {
+                        router.push(`/pages/${data.username}/admin-dashboard`);
+                    } else {
+                        throw new Error('Nieznana rola użytkownika');
+                    }
                 } else {
-                    throw new Error('Nieznana rola użytkownika');
+                    throw new Error('Brak tokena w odpowiedzi');
                 }
-            } else {
-                throw new Error('Brak tokena w odpowiedzi');
             }
         } catch (err: any) {
             setError(err.message || 'Wystąpił błąd podczas logowania');
