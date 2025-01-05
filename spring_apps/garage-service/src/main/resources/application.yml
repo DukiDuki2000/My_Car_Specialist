@@ -1,3 +1,12 @@
 spring:
   application:
     name: garage-service
+
+  datasource:
+    username: ${POSTGRESQL_USERNAME}
+    url: jdbc:postgresql://${POSTGRESQL_CONTAINER}/${POSTGRESQL_DATABASE_GARAGES}
+    password: ${POSTGRESQL_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
