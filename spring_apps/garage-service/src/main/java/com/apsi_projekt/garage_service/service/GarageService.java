@@ -15,16 +15,12 @@ public class GarageService {
 
     private final RestTemplate restTemplate;
     private final String apiUrl = "https://wl-api.mf.gov.pl/api/search/nip/{nip}?date={date}";
-    private GarageRepository garageRepository;
+    private final GarageRepository garageRepository;
 
+    @Autowired
     public GarageService(RestTemplate restTemplate, GarageRepository garageRepository) {
         this.restTemplate = restTemplate;
         this.garageRepository = garageRepository;
-    }
-
-    @Autowired
-    public GarageService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
     }
 
     public CompanyInfo getCompanyInfoByNip(String nip) {
