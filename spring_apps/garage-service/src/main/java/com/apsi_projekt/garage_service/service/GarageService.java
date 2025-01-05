@@ -24,9 +24,12 @@ public class GarageService {
 
         if (response != null && response.getResult() != null && response.getResult().getSubject() != null) {
             VATResposne.Subject subject = response.getResult().getSubject();
+            String companyAddress =subject.getResidenceAddress();
+            String workingAddress=subject.getWorkingAddress();
             return new CompanyInfo(
                     subject.getName(),
-                    subject.getResidenceAddress(),
+                    companyAddress,
+                    workingAddress,
                     subject.getRegon(),
                     subject.getNip()
             );

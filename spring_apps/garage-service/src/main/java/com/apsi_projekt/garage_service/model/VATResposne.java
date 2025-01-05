@@ -2,6 +2,7 @@ package com.apsi_projekt.garage_service.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Setter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VATResposne {
@@ -30,18 +31,19 @@ public class VATResposne {
     }
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Subject {
+        @Setter
         private String name;
+        @Setter
         private String nip;
+        @Setter
         private String regon;
+        @Setter
         private String residenceAddress;
-
+        @Setter
+        private String workingAddress;
         @JsonProperty("name")
         public String getName() {
             return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
         }
 
         @JsonProperty("nip")
@@ -49,17 +51,9 @@ public class VATResposne {
             return nip;
         }
 
-        public void setNip(String nip) {
-            this.nip = nip;
-        }
-
         @JsonProperty("regon")
         public String getRegon() {
             return regon;
-        }
-
-        public void setRegon(String regon) {
-            this.regon = regon;
         }
 
         @JsonProperty("residenceAddress")
@@ -67,8 +61,10 @@ public class VATResposne {
             return residenceAddress;
         }
 
-        public void setResidenceAddress(String residenceAddress) {
-            this.residenceAddress = residenceAddress;
-        }
+
+        @JsonProperty("workingAddress")
+        public String getWorkingAddress() {return workingAddress;}
+
+
     }
 }

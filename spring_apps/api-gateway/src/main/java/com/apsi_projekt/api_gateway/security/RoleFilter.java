@@ -42,10 +42,14 @@ public class RoleFilter implements GatewayFilterFactory<RoleFilter.Config> {
                     exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                     return exchange.getResponse().setComplete();
                 }
+                String id = jwtUtils.getId(token);
+                String username = jwtUtils.getUsername(token);
                 List<String> roles = jwtUtils.getRoles(token);
                 exchange = exchange.mutate()
                         .request(exchange.getRequest().mutate()
                                 .header("X-Roles", String.join(",", roles))
+                                .header("X-Id",id)
+                                .header("X-Username", username)
                                 .build())
                         .build();
             }

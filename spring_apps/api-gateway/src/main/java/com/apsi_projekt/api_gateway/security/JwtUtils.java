@@ -54,4 +54,13 @@ public class JwtUtils {
                 .map(role -> role.get("authority"))
                 .collect(Collectors.toList());
     }
+    public String getUsername(String token) {
+        Claims claims = this.getClaims(token);
+        return claims.getSubject();
+    }
+    public String getId(String token) {
+        Claims claims = this.getClaims(token);
+        return claims.getId();
+    }
+
 }
