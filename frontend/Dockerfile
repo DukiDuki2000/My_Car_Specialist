@@ -13,8 +13,8 @@ RUN npm ci --only=production
 COPY --from=builder /frontend/.next ./.next
 COPY --from=builder /frontend/public ./public
 COPY --from=builder /frontend/next.config.ts ./
-COPY --from=builder /frontend/postcss.config.js ./
-COPY --from=builder /frontend/tailwind.config.js ./
+COPY --from=builder /frontend/postcss.config.mjs ./
+COPY --from=builder /frontend/tailwind.config.ts ./
 EXPOSE 5000
 ENV NODE_ENV=production
 CMD ["npx", "next", "start", "-p", "5000"]
