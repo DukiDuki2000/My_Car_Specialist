@@ -31,7 +31,6 @@ public class VehicleRestController {
     }
 
     @PostMapping("/add")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Vehicle> create(@RequestBody Vehicle vehicle, HttpServletRequest request)  {
         String usernameHeader = request.getHeader("X-Username");
         String idHeader = request.getHeader("X-Id");
