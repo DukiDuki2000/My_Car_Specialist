@@ -33,14 +33,14 @@ export default function Layout({ children }: LayoutProps) {
         const role = localStorage.getItem('role');
 
         setUser({ username, role, token });
-        setIsLoading(false); // Ustawiamy isLoading na false po załadowaniu danych
+        setIsLoading(false);
     }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
-        router.push('/pages/auth/login'); // Ustaw odpowiednią ścieżkę do logowania
+        router.push('/'); 
     };
 
     const handleNavigation = () => {
