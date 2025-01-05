@@ -26,14 +26,14 @@ spring:
         - id: recommendation-service
           uri: http://recommendation-service:8080
           predicates:
-            - Path=/recommendation-service/**
+            - Path=/recommendation/**
           filters:
             - name: RoleFilter
 
         - id: notification-service
           uri: http://notification-service:8080
           predicates:
-            - Path=/notification-service/**
+            - Path=/notification/**
           filters:
             - name: RoleFilter
 
