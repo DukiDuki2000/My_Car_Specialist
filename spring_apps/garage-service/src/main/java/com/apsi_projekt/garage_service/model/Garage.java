@@ -55,7 +55,6 @@ public class Garage {
     @Column(name = "phone_number", nullable = false, length = 20)
     String phoneNumber;
 
-    @NotBlank
     @NotNull
     @ElementCollection(fetch = FetchType.LAZY)
     @Column(name = "ibans", nullable = false, length = 35)
