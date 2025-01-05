@@ -1,9 +1,9 @@
-'use client'; // Layout jako komponent kliencki
+'use client';
 
 import { ReactNode, useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation'; // Hooki do nawigacji Next.js
 import './globals.css';
-import Link from 'next/link';
+import Link from 'next/link'; // Import komponentu Link
 
 type LayoutProps = {
     children: ReactNode;
@@ -13,6 +13,7 @@ export default function Layout({ children }: LayoutProps) {
     const pathname = usePathname();
     const router = useRouter();
 
+    // Stan przechowujący informacje o zalogowanym użytkowniku
     const [user, setUser] = useState<{
         username: string | null;
         role: string | null;
@@ -23,23 +24,23 @@ export default function Layout({ children }: LayoutProps) {
         token: null,
     });
 
-    // Inicjalizacja danych użytkownika z localStorage
+    const [isLoading, setIsLoading] = useState<boolean>(true); // Stan do kontroli załadowania danych
+
+    // Hook useEffect, aby pobrać dane z localStorage po stronie klienta
     useEffect(() => {
         const token = localStorage.getItem('token');
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('role');
 
-        if (token && username && role) {
-            setUser({ username, role, token });
-        }
+        setUser({ username, role, token });
+        setIsLoading(false); // Ustawiamy isLoading na false po załadowaniu danych
     }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
-        setUser({ username: null, role: null, token: null }); // Reset stanu użytkownika
-        router.push('/pages/auth/login');
+        router.push('/pages/auth/login'); // Ustaw odpowiednią ścieżkę do logowania
     };
 
     const handleNavigation = () => {
@@ -52,10 +53,11 @@ export default function Layout({ children }: LayoutProps) {
         } else if (user.role === 'ROLE_CLIENT') {
             router.push(`/pages/${user.username}/client-dashboard`);
         } else {
-            router.push('/');
+            router.push('/'); // Jeśli brak roli, przekieruj do logowania
         }
     };
 
+    // Zmienna kontrolująca treść w headerze
     let headerContent;
     if (pathname.startsWith('/pages/auth/login')) {
         headerContent = (
@@ -86,7 +88,7 @@ export default function Layout({ children }: LayoutProps) {
                 >
                     MyCarSpecialist
                 </a>
-                {user.token && (
+                {!isLoading && user.token && (
                     <div className="ml-auto flex items-center space-x-4">
                         <button
                             onClick={handleLogout}
@@ -106,6 +108,7 @@ export default function Layout({ children }: LayoutProps) {
     return (
         <html lang="en">
             <head>
+                {/* Link do Google Fonts */}
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link
@@ -114,6 +117,7 @@ export default function Layout({ children }: LayoutProps) {
                 />
             </head>
             <body className="font-poppins bg-gray-50 min-h-screen">
+                {/* Renderuj nagłówek, a treść zależy od strony */}
                 <header className="bg-gray-100 p-4 shadow-md">
                     <nav className="container mx-auto flex items-center justify-between">
                         {headerContent}
