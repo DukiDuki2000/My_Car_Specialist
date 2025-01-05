@@ -17,7 +17,7 @@ public class GarageOpenApiController {
 
     public GarageOpenApiController(GarageService garageService) {this.garageService = garageService;}
 
-    @GetMapping("/openApi/{nip}")
+    @GetMapping("/{nip}")
     public ResponseEntity<CompanyInfo> getFirmaInfoByNip(@PathVariable String nip) {
         System.out.println("Recieved request with nip: " + nip);
         if (!nip.matches("\\d{10}")) {
