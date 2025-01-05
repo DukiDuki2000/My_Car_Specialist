@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 // Define service type
 type Service = {
@@ -25,6 +27,27 @@ type ServicesByCar = {
 };
 
 export default function ServiceHistory() {
+    const router = useRouter();
+
+    useEffect(() => {
+        // Sprawdzanie, czy użytkownik jest zalogowany
+        const token = localStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        const role = localStorage.getItem('role');
+
+        if (!token || !username || !role) {
+            // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
+            router.push('/');
+            return;
+        }
+
+        if (role !== 'ROLE_CLIENT') {
+            // Przekierowanie, jeśli użytkownik nie jest klientem
+            router.push('/');
+            return;
+        }
+    }, [router]);  
+    
   const initialServicesByCar: ServicesByCar = {
     "Auto Syna BMW E36": {
       current: [
@@ -202,7 +225,7 @@ export default function ServiceHistory() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Historia zgłoszeń</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Historia zleceń</h1>
 
       {/* Car Selection */}
       <div className="mb-8">

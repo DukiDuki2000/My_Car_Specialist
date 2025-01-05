@@ -2,8 +2,30 @@
 
 import { useRouter } from "next/navigation";
 
+import { useEffect } from 'react';
+
 export default function ClientDashboard() {
-  const router = useRouter();
+    const router = useRouter();
+
+    useEffect(() => {
+        // Sprawdzanie, czy użytkownik jest zalogowany
+        const token = localStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        const role = localStorage.getItem('role');
+
+        if (!token || !username || !role) {
+            // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
+            router.push('/');
+            return;
+        }
+
+        if (role !== 'ROLE_CLIENT') {
+            // Przekierowanie, jeśli użytkownik nie jest klientem
+            router.push('/');
+            return;
+        }
+    }, [router]);    
+
 
   const handleNavigate = (path: string) => {
     router.push(path); // Przekierowanie na podaną ścieżkę
@@ -13,7 +35,7 @@ export default function ClientDashboard() {
     <div className="absolute bottom-0 h-100 w-full">
       {/* Treść */}
       <main className="flex items-center justify-center flex-col -mt-16 px-4 h-[calc(100vh-80px)]">
-        <h2 className="text-4xl font-bold text-gray-800 mb-12">Lista Zgłoszeń</h2>
+        <h2 className="text-4xl font-bold text-gray-800 mb-12">Lista zleceń</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-20">
           {/* Nowe zgłoszenie */}
@@ -26,7 +48,7 @@ export default function ClientDashboard() {
               alt="Nowe zgłoszenie"
               className="h-40 w-40 mb-8"
             />
-            <p className="text-gray-800 font-semibold text-2xl">Aktualne zgłoszenia</p>
+            <p className="text-gray-800 font-semibold text-2xl">Aktualne zlecenia</p>
           </div>
 
           {/* Lista zgłoszeń */}
@@ -39,7 +61,7 @@ export default function ClientDashboard() {
               alt="Lista zgłoszeń"
               className="h-40 w-40 mb-8"
             />
-            <p className="text-gray-800 font-semibold text-2xl">Historia zgłoszeń</p>
+            <p className="text-gray-800 font-semibold text-2xl">Historia zleceń</p>
           </div>
         </div>
       </main>

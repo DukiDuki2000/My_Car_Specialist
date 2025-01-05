@@ -73,21 +73,11 @@ export default function ClientDashboard() {
                             alt="Lista zgłoszeń"
                             className="h-40 w-40 mb-8"
                         />
-                        <p className="text-gray-800 font-semibold text-2xl">Aktualne zlecenia</p>
+                        <p className="text-gray-800 font-semibold text-2xl">Lista zleceń</p>
                     </div>
 
-                    {/* Historia pojazdów */}
-                    <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/car_history`)}
-                        className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-20 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
-                    >
-                        <img
-                            src="/car.svg"
-                            alt="Historia pojazdów"
-                            className="h-40 w-40 mb-8"
-                        />
-                        <p className="text-gray-800 font-semibold text-2xl">Historia pojazdów</p>
-                    </div>
+                    
+                    
                 </div>
             </main>
         </div>
