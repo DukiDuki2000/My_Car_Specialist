@@ -1,6 +1,6 @@
 'use client'; // Layout jako komponent kliencki
 
-import { ReactNode, useEffect, useState } from 'react';
+import { useCallback, ReactNode, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation'; // Hooki do nawigacji Next.js
 import './globals.css';
 import Link from 'next/link'; // Import komponentu Link
@@ -26,22 +26,45 @@ export default function Layout({ children }: LayoutProps) {
 
     const [isLoading, setIsLoading] = useState<boolean>(true); // Stan do kontroli załadowania danych
 
-    // Hook useEffect, aby pobrać dane z localStorage po stronie klienta
-    useEffect(() => {
+    // Funkcja do aktualizacji stanu użytkownika na podstawie localStorage
+    const updateUserFromLocalStorage = () => {
         const token = localStorage.getItem('token');
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('role');
-
         setUser({ username, role, token });
+    };
+
+    // Hook useEffect, aby pobrać dane z localStorage po stronie klienta
+    useEffect(() => {
+        updateUserFromLocalStorage();
         setIsLoading(false);
+
+        // Uaktualnienie stanu po zmianie w localStorage
+        const handleStorageChange = () => {
+            updateUserFromLocalStorage();
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
     }, []);
 
-    const handleLogout = () => {
+    // Hook useEffect do monitorowania zmiany ścieżki i odświeżenia stanu
+    useEffect(() => {
+        // Odświeżenie stanu użytkownika przy każdej zmianie ścieżki
+        setIsLoading(true); // Opcjonalnie ustawiamy na ładowanie, jeśli chcemy np. pokazać spinner
+        updateUserFromLocalStorage();
+        setIsLoading(false);
+    }, [pathname]);
+
+    const handleLogout = useCallback(() => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
+        setUser({ username: null, role: null, token: null }); // Natychmiastowe zaktualizowanie stanu
         router.push('/'); 
-    };
+    }, [router]);
 
     const handleNavigation = () => {
         if (user.role === 'ROLE_ADMIN') {
