@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
         source: '/api/user/auth/signup',
         destination: 'http://MCS_API_Gateway:8080/user/auth/signup'
       },
+      {
+        source: '/api/nip-garage/:nip',
+        destination: 'http://MCS_API_Gateway:8080/garage/openApi/:nip'
+      }
     ];
   },
 };
