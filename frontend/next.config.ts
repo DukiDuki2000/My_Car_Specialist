@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
       {
         source: '/api/nip-garage/:nip',
         destination: 'http://MCS_API_Gateway:8080/garage/openApi/:nip'
+      },
+      {
+        source: '/api/vehicle/add',
+        destination: 'http://MCS_API_Gateway:8080/vehicle/add'
       }
     ];
   },

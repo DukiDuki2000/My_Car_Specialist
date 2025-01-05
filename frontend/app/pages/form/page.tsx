@@ -10,7 +10,7 @@ export default function AddCarForm() {
   const [formData, setFormData] = useState({
     nip: '',
     companyName: '',
-    companyAddress: '',
+    addres: '',
     companyRegon: '',
   });
 
@@ -28,12 +28,11 @@ export default function AddCarForm() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(data); // Debugging
 
         setFormData((prevState) => ({
           ...prevState,
           companyName: data.companyName || '',
-          companyAddress: data.companyAddress || '',
+          addres: data.addres || '',
           companyRegon: data.companyRegon || '',
         }));
       } catch (error) {
@@ -109,18 +108,18 @@ export default function AddCarForm() {
         {/* Adres firmy */}
         <div className="mb-6">
           <label
-            htmlFor="companyAddress"
+            htmlFor="addres"
             className="block text-lg font-medium text-gray-700 mb-2"
           >
             Adres firmy
           </label>
           <input
             type="text"
-            id="companyAddress"
-            name="companyAddress"
-            value={formData.companyAddress}
+            id="addres"
+            name="addres"
+            value={formData.addres}
             onChange={(e) =>
-              setFormData({ ...formData, companyAddress: e.target.value })
+              setFormData({ ...formData, addres: e.target.value })
             }
             required
             className="w-full px-4 py-3 text-lg border border-blue-400 rounded focus:outline-none focus:ring-4 focus:ring-blue-300"

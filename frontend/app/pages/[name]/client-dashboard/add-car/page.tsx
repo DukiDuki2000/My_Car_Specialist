@@ -21,17 +21,69 @@ export default function AddCarForm() {
     driveType: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Samochód został dodany!');
+
+    const token = localStorage.getItem('token'); // Pobierz token z localStorage
+    if (!token) {
+      alert('Brak tokena autoryzacji!');
+      return;
+    }
+
+    // Przygotowanie danych w odpowiednim formacie
+    const data = {
+      vin: formData.vin,
+      registrationNumber: formData.plateNumber,
+      brand: formData.make,
+      model: formData.model,
+      modelYear: formData.modelYear,
+      productionYear: formData.modelYear, // Jeśli productionYear jest równy modelYear
+      generation: formData.series,
+      engineCapacity: formData.engineDisplacement,
+      enginePower: formData.enginePower,
+      fuelType: formData.fuelType,
+      engineCode: formData.engineCode,
+      driveType: formData.driveType,
+    };
+
+    try {
+      const response = await fetch('/api/vehicle/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Dodanie tokena Bearer
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        alert('Samochód został dodany!');
+        router.back(); // Opcjonalnie przekierowanie
+      } else {
+        throw new Error('Błąd podczas dodawania samochodu');
+      }
+    } catch (error) {
+      console.error('Error adding car:', error);
+      alert('Wystąpił błąd przy dodawaniu samochodu');
+    }
   };
 
   // Funkcja do wypełniania formularza na podstawie odpowiedzi z API
   const handleDecodeVin = async () => {
     const vin = formData.vin; // Pobranie numeru VIN z formularza
+    const token = localStorage.getItem('token'); // Załóżmy, że token jest w localStorage
     if (vin) {
       try {
-        const response = await fetch(`/api/vehicle/decode-info/${vin}`);
+        const response = await fetch(`/api/vehicle/decode-info/${vin}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // Dodanie tokena Bearer
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Błąd podczas dekodowania VIN');
+        }
         const data = await response.json();
 
         // Mapowanie odpowiedzi z API na dane formularza
