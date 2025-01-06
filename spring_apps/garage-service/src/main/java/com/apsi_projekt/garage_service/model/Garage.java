@@ -61,4 +61,7 @@ public class Garage {
     List<@NotBlank
         @Pattern(regexp = "^[A-Z]{2}\\d{2}[A-Z0-9]{4,30}$")
         @Size(min = 15, max = 34) String> ibans;
+
+    private Long userId;
+    private String userName;
 }

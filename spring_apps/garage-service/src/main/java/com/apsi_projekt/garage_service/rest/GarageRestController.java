@@ -4,6 +4,7 @@ import com.apsi_projekt.garage_service.model.Garage;
 import com.apsi_projekt.garage_service.model.GarageRequest;
 import com.apsi_projekt.garage_service.service.GarageRequestService;
 import com.apsi_projekt.garage_service.service.GarageService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,11 @@ public class GarageRestController {
 
     @PostMapping("/add")
     @PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Garage> add(@Valid @RequestBody Garage newGarage) {
+    public ResponseEntity<Garage> add(@Valid @RequestBody Garage newGarage, HttpServletRequest request) {
+        String usernameHeader = request.getHeader("X-Username");
+        String idHeader = request.getHeader("X-Id");
+        newGarage.setUserId(Long.parseLong(idHeader));
+        newGarage.setUserName(usernameHeader);
         Garage savedGarage = garageService.addGarage(newGarage);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedGarage); // 201 - Created
     }

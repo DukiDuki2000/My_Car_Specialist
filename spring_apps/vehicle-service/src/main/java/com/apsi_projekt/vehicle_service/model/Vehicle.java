@@ -63,7 +63,7 @@ public class Vehicle {
     @Size(max = 50, message = "Drive type must be <= 50 characters")
     private String driveType;
 
-    private String userId;
+    private Long userId;
     private String userName;
 
     public void setVin(String vin) {

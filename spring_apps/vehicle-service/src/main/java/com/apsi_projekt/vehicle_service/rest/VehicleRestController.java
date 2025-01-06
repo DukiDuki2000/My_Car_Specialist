@@ -34,7 +34,7 @@ public class VehicleRestController {
     public ResponseEntity<Vehicle> create(@RequestBody Vehicle vehicle, HttpServletRequest request)  {
         String usernameHeader = request.getHeader("X-Username");
         String idHeader = request.getHeader("X-Id");
-        vehicle.setUserId(idHeader);
+        vehicle.setUserId(Long.parseLong(idHeader));
         vehicle.setUserName(usernameHeader);
         Vehicle saved = vehicleRepository.save(vehicle);
         return ResponseEntity.ok(saved);
