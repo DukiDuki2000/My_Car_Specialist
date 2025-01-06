@@ -44,6 +44,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         } else if (apiKey != null && authHeader == null) {  // Jeśli klucz API jest obecny, ale brak JWT
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid API Key");
+        } else {
+            filterChain.doFilter(request, response);
         }
     }
 }
