@@ -14,3 +14,6 @@ vin:
     secretKey: ${VIN_DECODER_SECRET_KEY}
     apiKey: ${VIN_DECODER_API_KEY}
 
+API:
+  SECRET:
+    KEY: ${API_SECRET_KEY}
