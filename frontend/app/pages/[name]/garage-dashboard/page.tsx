@@ -12,26 +12,26 @@ export default function GarageDashboard() {
         setIsClient(true);
     }, []);
 
-    useEffect(() => {
-        if (!isClient) return; // Zatrzymaj, jeśli nie jesteśmy po stronie klienta
+    // useEffect(() => {
+    //     if (!isClient) return; // Zatrzymaj, jeśli nie jesteśmy po stronie klienta
 
-        // Sprawdzanie, czy użytkownik jest zalogowany
-        const token = localStorage.getItem('token');
-        const username = localStorage.getItem('username');
-        const role = localStorage.getItem('role');
+    //     // Sprawdzanie, czy użytkownik jest zalogowany
+    //     const token = localStorage.getItem('token');
+    //     const username = localStorage.getItem('username');
+    //     const role = localStorage.getItem('role');
 
-        if (!token || !username || !role) {
-            // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
-            router.push('/pages/auth/login');
-            return;
-        }
+    //     if (!token || !username || !role) {
+    //         // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
+    //         router.push('/pages/auth/login');
+    //         return;
+    //     }
 
-        if (role !== 'ROLE_GARAGE') {
-            // Przekierowanie, jeśli użytkownik nie jest garażem
-            router.push('/pages/auth/login');
-            return;
-        }
-    }, [router, isClient]);
+    //     if (role !== 'ROLE_GARAGE') {
+    //         // Przekierowanie, jeśli użytkownik nie jest garażem
+    //         router.push('/pages/auth/login');
+    //         return;
+    //     }
+    // }, [router, isClient]);
 
     const handleNavigate = (path: string) => {
         router.push(path); // Przekierowanie na podaną ścieżkę
