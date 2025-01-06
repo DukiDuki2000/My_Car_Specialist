@@ -40,7 +40,7 @@ export default function ClientDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-20">
           {/* Nowe zgłoszenie */}
           <div
-            onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/request-actual`)}  // Przekierowanie na stronę "Nowe zgłoszenie"
+            onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/requests-list/request-actual`)}  // Przekierowanie na stronę "Nowe zgłoszenie"
             className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
           >
             <img
@@ -53,7 +53,7 @@ export default function ClientDashboard() {
 
           {/* Lista zgłoszeń */}
           <div
-             onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/request-history`)} // Przekierowanie na stronę "historie zgloszen"
+             onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/requests-list/request-history`)} // Przekierowanie na stronę "historie zgloszen"
             className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
           >
             <img

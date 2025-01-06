@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-export default function ClientDashboard() {
+export default function VehiclesDashboard() {
     const router = useRouter();
 
     useEffect(() => {
@@ -33,13 +33,13 @@ export default function ClientDashboard() {
         <div className="absolute bottom-0 h-100 w-full">
             {/* Treść */}
             <main className="flex items-center justify-center flex-col -mt-16 px-4 h-[calc(100vh-80px)]">
-                <h2 className="text-4xl font-bold text-gray-800 mb-12">Panel Klienta</h2>
+                <h2 className="text-4xl font-bold text-gray-800 mb-12">Pojazdy</h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-20">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-20">
 
-                    {/* Pojazdy */}
+                    {/* Dodaj pojazd */}
                     <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/vehicles`)}
+                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/vehicles/add-car`)}
                         className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-20 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
                     >
                         <img
@@ -47,37 +47,21 @@ export default function ClientDashboard() {
                             alt="Pojazdy"
                             className="h-40 w-40 mb-8"
                         />
-                        <p className="text-gray-800 font-semibold text-2xl">Pojazdy</p>
+                        <p className="text-gray-800 font-semibold text-2xl">Dodaj pojazd</p>
                     </div>
 
-                    {/* Nowe zgłoszenie */}
+                    {/* Twoje pojazdy */}
                     <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/add-request`)}
+                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/vehicles/show-vehicles`)}
                         className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
                     >
                         <img
-                            src="/pencil.svg"
-                            alt="Nowe zgłoszenie"
+                            src="/car.svg"
+                            alt="Twoje pojazdy"
                             className="h-40 w-40 mb-8"
                         />
-                        <p className="text-gray-800 font-semibold text-2xl">Nowe zlecenie</p>
+                        <p className="text-gray-800 font-semibold text-2xl">Twoje pojazdy</p>
                     </div>
-
-                    {/* Aktualne zgłoszeń */}
-                    <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/requests-list`)}
-                        className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
-                    >
-                        <img
-                            src="/listaZgloszen.svg"
-                            alt="Lista zgłoszeń"
-                            className="h-40 w-40 mb-8"
-                        />
-                        <p className="text-gray-800 font-semibold text-2xl">Lista zleceń</p>
-                    </div>
-
-                    
-                    
                 </div>
             </main>
         </div>
