@@ -14,7 +14,7 @@ public class UserRestController {
 
 
     @GetMapping("/openApi")
-    @PreAuthorize("hasRole('ROLE_SERVICE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String sayHello() {
         return "Hello from User Service";
     }
