@@ -44,8 +44,8 @@ export default function GarageDashboard() {
     return (
         <div className="absolute bottom-0 h-100 w-full">
             {/* Treść */}
-            <main className="flex items-center justify-center flex-col -mt-16 px-4 h-[calc(100vh-80px)]">
-                <h2 className="text-4xl font-bold text-gray-800 mb-12">Panel Warsztatu</h2>
+            <main className="flex items-center justify-center flex-col -mt-16 px-4 h-[calc(80vh-80px)]">
+                <h2 className="text-4xl font-bold text-gray-800 mb-14">Panel Warsztatu</h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
 
@@ -55,7 +55,7 @@ export default function GarageDashboard() {
                         className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
                     >
                         <img
-                            src="/listaZgloszen.svg"
+                            src="/note.svg"
                             alt="Lista zgłoszeń"
                             className="h-40 w-40 mb-8"
                         />
@@ -103,11 +103,11 @@ export default function GarageDashboard() {
 
                     {/* Historia zgłoszeń */}
                     <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/request-history`)}
+                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/history`)}
                         className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
                     >
                         <img
-                            src="/listaZgloszen.svg"
+                            src="/history.svg"
                             alt="Lista zgłoszeń"
                             className="h-40 w-40 mb-8"
                         />
