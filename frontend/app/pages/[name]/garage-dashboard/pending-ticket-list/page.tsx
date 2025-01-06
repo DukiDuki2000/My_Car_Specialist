@@ -30,25 +30,25 @@ export default function GarageDashboard() {
     setUsername(storedUsername);
   }, []);
 
-//   // Logika autoryzacji
-//   useEffect(() => {
-//     if (!isClient) return; // Zatrzymaj, jeśli nie jesteśmy po stronie klienta
+  // Logika autoryzacji
+  useEffect(() => {
+    if (!isClient) return; // Zatrzymaj, jeśli nie jesteśmy po stronie klienta
 
-//     const token = localStorage.getItem('token');
-//     const role = localStorage.getItem('role');
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
 
-//     if (!token || !username || !role) {
-//       // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
-//       router.push('/pages/auth/login');
-//       return;
-//     }
+    if (!token || !username || !role) {
+      // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
+      router.push('/pages/auth/login');
+      return;
+    }
 
-//     if (role !== 'ROLE_GARAGE') {
-//       // Przekierowanie, jeśli użytkownik nie jest garażem
-//       router.push('/pages/auth/login');
-//       return;
-//     }
-//   }, [router, isClient, username]);
+    if (role !== 'ROLE_GARAGE') {
+      // Przekierowanie, jeśli użytkownik nie jest garażem
+      router.push('/pages/auth/login');
+      return;
+    }
+  }, [router, isClient, username]);
 
   // Inicjalizacja stanu z initialRequests
   const [requests, setRequests] = useState<ServiceRequest[]>([
