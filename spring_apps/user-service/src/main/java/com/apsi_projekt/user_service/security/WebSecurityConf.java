@@ -12,14 +12,12 @@ import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.util.List;
+import org.springframework.security.web.util.matcher.IpAddressMatcher;
 
 @Configuration
 @EnableMethodSecurity
@@ -55,25 +53,17 @@ public class WebSecurityConf {
         return new BCryptPasswordEncoder();
     }
 
+    IpAddressMatcher hasIpAddress = new IpAddressMatcher("172.21.0.9");
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-        List<String> allowedHosts = List.of(
-                "garage-service",  // Nazwa hosta innego serwisu
-                "127.0.0.1",       // IP localhost
-                "localhost"        // Nazwa localhost
-        );
-
-        http.csrf(AbstractHttpConfigurer::disable)
+        http.csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/user/auth/**").permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
-                                .requestMatchers("/**").access((authentication, context) -> {
-                                    String remoteHost = context.getRequest().getRemoteAddr(); // Pobierz nazwę hosta
-                                    return new AuthorizationDecision(allowedHosts.contains(remoteHost)); // Sprawdź, czy jest na liście
-                                })
+                                .requestMatchers("/**").access((authentication, context) -> new AuthorizationDecision(hasIpAddress.matches(context.getRequest())))
                                 .anyRequest().authenticated()
                 );
 
