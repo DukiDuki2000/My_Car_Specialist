@@ -31,7 +31,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         String apiKey = request.getHeader(API_KEY_HEADER);
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if(apiKey != null && apiKey.equals(EXPECTED_API_KEY)) {
+        if(apiKey != null && apiKey.equals(EXPECTED_API_KEY) && authHeader == null) {
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_SERVICE"));
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     null, null, authorities
