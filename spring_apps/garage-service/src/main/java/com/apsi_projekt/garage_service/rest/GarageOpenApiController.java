@@ -1,14 +1,14 @@
 package com.apsi_projekt.garage_service.rest;
 
 import com.apsi_projekt.garage_service.dto.CompanyInfo;
+import com.apsi_projekt.garage_service.model.GarageRequest;
+import com.apsi_projekt.garage_service.service.GarageRequestService;
 import com.apsi_projekt.garage_service.service.GarageService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,10 +20,12 @@ public class GarageOpenApiController {
     String API_KEY;
 
     private final GarageService garageService;
+    private final GarageRequestService garageRequestService;
     private final RestTemplate restTemplate;
 
-    public GarageOpenApiController(GarageService garageService, RestTemplateBuilder builder) {
+    public GarageOpenApiController(GarageService garageService,GarageRequestService garageRequestService, RestTemplateBuilder builder) {
         this.garageService = garageService;
+        this.garageRequestService = garageRequestService;
         this.restTemplate = builder.build();
     }
 
@@ -63,4 +65,9 @@ public class GarageOpenApiController {
         }
     }
 
+    @PostMapping("/add_request")
+    public ResponseEntity<GarageRequest> addGarageRequest(@Valid @RequestBody GarageRequest garageRequest) {
+        GarageRequest savedGarageRequest=garageRequestService.addGarageRequest(garageRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedGarageRequest);
+    }
 }
