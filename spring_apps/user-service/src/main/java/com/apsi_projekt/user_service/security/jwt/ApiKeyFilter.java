@@ -38,8 +38,6 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         } else if (apiKey != null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid API Key");
-        } else {
-            filterChain.doFilter(request, response);
         }
     }
 }
