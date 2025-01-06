@@ -57,7 +57,7 @@ export default function GarageDashboard() {
       clientName: 'Jan Kowalski',
       email: 'jan.kowalski@example.com',
       phoneNumber: '+48 123 456 789',
-      car: 'BMW 3 Series – XYZ 12345',
+      car: 'BMW 3 Series ',
       serviceDescription: 'Wymiana oleju i filtrów',
       city: 'Warszawa',
       status: 'Pending',
@@ -68,7 +68,7 @@ export default function GarageDashboard() {
       clientName: 'Anna Nowak',
       email: 'anna.nowak@example.com',
       phoneNumber: '+48 987 654 321',
-      car: 'Audi A4 – ABC 67890',
+      car: 'Audi A4 ',
       serviceDescription: 'Naprawa hamulców',
       city: 'Kraków',
       status: 'Pending',
@@ -79,7 +79,7 @@ export default function GarageDashboard() {
       clientName: 'Piotr Wiśniewski',
       email: 'piotr.wisniewski@example.com',
       phoneNumber: '+48 555 666 777',
-      car: 'Toyota Corolla – DEF 11223',
+      car: 'Toyota Corolla ',
       serviceDescription: 'Diagnostyka komputerowa',
       city: 'Warszawa',
       status: 'Pending',
@@ -90,7 +90,7 @@ export default function GarageDashboard() {
       clientName: 'Maria Zielińska',
       email: 'maria.zielinska@example.com',
       phoneNumber: '+48 444 333 222',
-      car: 'Honda Civic – GHI 44556',
+      car: 'Honda Civic ',
       serviceDescription: 'Wymiana opon',
       city: 'Gdańsk',
       status: 'Pending',
@@ -132,7 +132,7 @@ export default function GarageDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-6">Panel Garażu - Zarządzanie Zgłoszeniami</h1>
+      <h1 className="text-3xl font-bold mb-6">Zarządzanie Zgłoszeniami</h1>
 
       {/* Wyświetlanie stanu ładowania i błędów */}
       {loading && <p>Ładowanie zgłoszeń...</p>}
@@ -140,18 +140,16 @@ export default function GarageDashboard() {
 
       {/* Tabela zgłoszeń */}
       <div className="overflow-x-auto">
-        <table className="w-full bg-white shadow-md rounded mb-4 table-fixed">
+        <table className="w-full bg-white shadow-md rounded mb-4 table-auto">
           <thead>
             <tr>
-              <th className="px-4 py-2 border w-12">ID</th>
-              <th className="px-4 py-2 border w-32">Klient</th>
-              <th className="px-4 py-2 border w-48">Email Klienta</th>
-              <th className="px-4 py-2 border w-40">Numer Telefonu</th>
-              <th className="px-4 py-2 border w-40">Samochód</th>
-              <th className="px-4 py-2 border w-56">Opis Usługi</th>
-              <th className="px-4 py-2 border w-32">Miejscowość</th>
-              <th className="px-4 py-2 border w-32">Status</th>
-              <th className="px-4 py-2 border w-32">Akcje</th>
+              <th className="px-4 py-2 border">ID</th>
+              <th className="px-4 py-2 border">Klient</th>
+              <th className="px-4 py-2 border">Email Klienta</th>
+              <th className="px-4 py-2 border">Numer Telefonu</th>
+              <th className="px-4 py-2 border">Samochód</th>
+              <th className="px-4 py-2 border">Zgłoszona usługa</th>
+              <th className="px-4 py-2 border">Akcje</th>
             </tr>
           </thead>
           <tbody>
@@ -160,15 +158,21 @@ export default function GarageDashboard() {
                 <tr key={request.id} className="text-center">
                   <td className="px-4 py-2 border">{request.id}</td>
                   <td className="px-4 py-2 border">{request.clientName}</td>
-                  <td className="px-4 py-2 border">{request.email}</td>
-                  <td className="px-4 py-2 border">{request.phoneNumber}</td>
-                  <td className="px-4 py-2 border">{request.car}</td>
-                  <td className="px-4 py-2 border">{request.serviceDescription}</td>
-                  <td className="px-4 py-2 border">{request.city}</td>
                   <td className="px-4 py-2 border">
-                    {request.status === 'Pending' && 'Oczekuje'}
-                    {request.status === 'Accepted' && 'Przyjęte'}
-                    {request.status === 'Rejected' && 'Odrzucone'}
+                    <span className="whitespace-nowrap overflow-hidden text-ellipsis block">
+                      {request.email}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2 border">{request.phoneNumber}</td>
+                  <td className="px-4 py-2 border">
+                    <span className="whitespace-nowrap overflow-hidden text-ellipsis block">
+                      {request.car}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2 border">
+                    <span className="whitespace-normal break-words">
+                      {request.serviceDescription}
+                    </span>
                   </td>
                   <td className="px-4 py-2 border w-32">
                     <div className="flex justify-center items-center h-full">
@@ -197,7 +201,7 @@ export default function GarageDashboard() {
             ) : (
               <tr>
                 <td
-                  colSpan={9} // Zwiększono colSpan, ponieważ mamy teraz 9 kolumn
+                  colSpan={7} // Zmniejszono colSpan do 7, ponieważ mamy teraz 7 kolumn
                   className="px-4 py-2 border text-center text-sm text-gray-500"
                 >
                   Brak zgłoszeń do wyświetlenia.

@@ -1,189 +1,150 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
-// Define service type
-type Service = {
+// Definicje interfejsów
+interface ServiceRequest {
   id: number;
-  type: string;
-  cost: number;
-  client: string; // Client name
-  phone: string; // Client phone number
-  email: string; // Client email
-  dateReported: string;
-  status: "w trakcie" | "gotowe"; // Service status
-};
+  clientName: string;
+  email: string; // Nowe pole
+  phoneNumber: string; // Nowe pole
+  car: string;
+  serviceDescription: string;
+  createdAt: string;
+}
 
-// Define initial services
-const initialServices: Service[] = [
-  { id: 1, type: "Wymiana hamulców", cost: 800, client: "Jan Kowalski", phone: "123-456-789", email: "JanKowalski@wp.com", dateReported: "2023-06-15", status: "w trakcie" },
-  { id: 2, type: "Diagnostyka silnika", cost: 300, client: "Anna Nowak", phone: "987-654-321", email: "Ania2010@onet.com", dateReported: "2023-06-20", status: "gotowe" },
-  { id: 3, type: "Wymiana oleju", cost: 150, client: "Michał Nowak", phone: "456-789-123", email: "MichalNowak@gmail.com", dateReported: "2023-07-10", status: "w trakcie" }
-];
+export default function GarageDashboard() {
+  const router = useRouter();
+  const [isClient, setIsClient] = useState(false); // Stan do sprawdzenia, czy działamy po stronie klienta
+  const [username, setUsername] = useState<string | null>(null); // Dodany stan dla [name]
 
-export default function CurrentRequests() {
-    const router = useRouter();
+  // Ustawienie stanu isClient po zamontowaniu komponentu
+  useEffect(() => {
+    setIsClient(true);
+    
+    // Pobieranie username z localStorage
+    const storedUsername = localStorage.getItem('username');
+    setUsername(storedUsername);
+  }, []);
 
-    useEffect(() => {
-        // Sprawdzanie, czy użytkownik jest zalogowany
-        const token = localStorage.getItem('token');
-        const username = localStorage.getItem('username');
-        const role = localStorage.getItem('role');
+  // Logika autoryzacji
+  useEffect(() => {
+    if (!isClient) return; // Zatrzymaj, jeśli nie jesteśmy po stronie klienta
 
-        if (!token || !username || !role) {
-            // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
-            router.push('/');
-            return;
-        }
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
 
-        if (role !== 'ROLE_SERVICE') {
-            // Przekierowanie, jeśli użytkownik nie jest serwisem
-            router.push('/');
-            return;
-        }
-    }, [router]);  
+    if (!token || !username || !role) {
+      // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
+      router.push('/pages/auth/login');
+      return;
+    }
 
+    if (role !== 'ROLE_GARAGE') {
+      // Przekierowanie, jeśli użytkownik nie jest garażem
+      router.push('/pages/auth/login');
+      return;
+    }
+  }, [router, isClient, username]);
 
-    const [services, setServices] = useState<Service[]>(initialServices);
-    const [sortConfig, setSortConfig] = useState<{ key: keyof Service; direction: "ascending" | "descending" } | null>(null);
+  // Inicjalizacja stanu z initialRequests
+  const [requests, setRequests] = useState<ServiceRequest[]>([
+    {
+      id: 1,
+      clientName: 'Jan Kowalski',
+      email: 'jan.kowalski@example.com',
+      phoneNumber: '+48 123 456 789',
+      car: 'BMW 3 Series ',
+      serviceDescription: 'Wymiana oleju i filtrów',
+      createdAt: '2025-01-01T10:00:00Z',
+    },
+    {
+      id: 2,
+      clientName: 'Anna Nowak',
+      email: 'anna.nowak@example.com',
+      phoneNumber: '+48 987 654 321',
+      car: 'Audi A4 ',
+      serviceDescription: 'Naprawa hamulców',
+      createdAt: '2025-01-02T12:30:00Z',
+    },
+    {
+      id: 3,
+      clientName: 'Piotr Wiśniewski',
+      email: 'piotr.wisniewski@example.com',
+      phoneNumber: '+48 555 666 777',
+      car: 'Toyota Corolla ',
+      serviceDescription: 'Diagnostyka komputerowa',
+      createdAt: '2025-01-03T09:15:00Z',
+    },
+    {
+      id: 4,
+      clientName: 'Maria Zielińska',
+      email: 'maria.zielinska@example.com',
+      phoneNumber: '+48 444 333 222',
+      car: 'Honda Civic ',
+      serviceDescription: 'Wymiana opon',
+      createdAt: '2025-01-04T14:45:00Z',
+    },
+    // Dodaj więcej przykładowych zgłoszeń według potrzeb
+  ]);
 
-    const handleStatusChange = (id: number, newStatus: "w trakcie" | "gotowe") => {
-        const updatedServices = services.map((service) =>
-            service.id === id ? { ...service, status: newStatus } : service
-        );
-        setServices(updatedServices);
-    };
+  // Jeśli nie jesteśmy po stronie klienta, zwróć null
+  if (!isClient) {
+    return null;
+  }
 
-    const sortServices = (key: keyof Service) => {
-        let direction: "ascending" | "descending" = "ascending";
-        if (sortConfig?.key === key && sortConfig.direction === "ascending") {
-            direction = "descending";
-        }
+  return (
+    <div className="min-h-screen bg-gray-100 p-8">
+      <h1 className="text-3xl font-bold mb-6">Aktualne zgłoszenia</h1>
 
-        const sortedServices = [...services].sort((a, b) => {
-            if (a[key]! < b[key]!) return direction === "ascending" ? -1 : 1;
-            if (a[key]! > b[key]!) return direction === "ascending" ? 1 : -1;
-            return 0;
-        });
-
-        setServices(sortedServices);
-        setSortConfig({ key, direction });
-    };
-
-    const renderSortArrows = (key: keyof Service) => {
-        if (sortConfig?.key === key) {
-            return sortConfig.direction === "ascending" ? "▲" : "▼";
-        }
-        return "↕";
-    };
-
-    const generatePDF = (service: Service) => {
-        // Placeholder for PDF generation logic
-        alert(`Generowanie raportu PDF dla: ${service.type}, klient: ${service.client}`);
-    };
-
-    const renderTable = () => (
-        <table className="min-w-full border border-blue-400">
-            <thead>
-                <tr className="bg-blue-100">
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("type")}
+      {/* Tabela zgłoszeń */}
+      <div className="overflow-x-auto">
+        <table className="w-full bg-white shadow-md rounded mb-4 table-fixed">
+          <thead>
+            <tr>
+              <th className="px-4 py-2 border w-12">ID</th>
+              <th className="px-4 py-2 border w-32">Klient</th>
+              <th className="px-4 py-2 border w-48">Email Klienta</th>
+              <th className="px-4 py-2 border w-40">Numer Telefonu</th>
+              <th className="px-4 py-2 border w-40">Samochód</th>
+              <th className="px-4 py-2 border w-56">Zgłoszona usługa</th>
+              <th className="px-4 py-2 border w-32">Akcje</th>
+            </tr>
+          </thead>
+          <tbody>
+            {requests.length > 0 ? (
+              requests.map(request => (
+                <tr key={request.id} className="text-center">
+                  <td className="px-4 py-2 border">{request.id}</td>
+                  <td className="px-4 py-2 border">{request.clientName}</td>
+                  <td className="px-4 py-2 border">{request.email}</td>
+                  <td className="px-4 py-2 border">{request.phoneNumber}</td>
+                  <td className="px-4 py-2 border">{request.car}</td>
+                  <td className="px-4 py-2 border">{request.serviceDescription}</td>
+                  <td className="px-4 py-2 border w-32">
+                    <button
+                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                      onClick={() => router.push(`/pages/${username}/garage-dashboard/edit-request/${request.id}`)}
                     >
-                        Usługa {renderSortArrows("type")}
-                    </th>
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("cost")}
-                    >
-                        Koszt {renderSortArrows("cost")}
-                    </th>
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("client")}
-                    >
-                        Klient {renderSortArrows("client")}
-                    </th>
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("phone")}
-                    >
-                        Numer telefonu {renderSortArrows("phone")}
-                    </th>
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("email")}
-                    >
-                        Email {renderSortArrows("email")}
-                    </th>
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("dateReported")}
-                    >
-                        Data zgłoszenia {renderSortArrows("dateReported")}
-                    </th>
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("status")}
-                    >
-                        Status {renderSortArrows("status")}
-                    </th>
-                    <th className="px-4 py-2 border border-blue-400 text-center">Raport PDF</th>
+                      Modyfikuj
+                    </button>
+                  </td>
                 </tr>
-            </thead>
-            <tbody>
-                {services.map((service) => (
-                    <tr key={service.id} className="hover:bg-blue-100 transition-colors">
-                        <td className="px-4 py-2 border border-blue-400">{service.type}</td>
-                        <td className="px-4 py-2 border border-blue-400">{service.cost} zł</td>
-                        <td className="px-4 py-2 border border-blue-400">{service.client}</td>
-                        <td className="px-4 py-2 border border-blue-400">{service.phone}</td>
-                        <td className="px-4 py-2 border border-blue-400">{service.email}</td>
-                        <td className="px-4 py-2 border border-blue-400">{service.dateReported}</td>
-                        <td className="px-4 py-2 border border-blue-400 text-center">
-                            <select
-                                value={service.status}
-                                onChange={(e) => handleStatusChange(service.id, e.target.value as "w trakcie" | "gotowe")}
-                                className={`px-2 py-1 rounded text-white font-bold ${
-                                    service.status === "w trakcie" ? "bg-yellow-500" : "bg-green-500"
-                                }`}
-                            >
-                                <option value="w trakcie">W trakcie</option>
-                                <option value="gotowe">Gotowe</option>
-                            </select>
-                        </td>
-                        <td className="px-4 py-2 border border-blue-400 text-center">
-                            {service.status === "gotowe" ? (
-                                <button
-                                    onClick={() => generatePDF(service)}
-                                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                                >
-                                    Generuj raport PDF
-                                </button>
-                            ) : (
-                                <button
-                                    disabled
-                                    className="px-3 py-1 bg-gray-300 text-gray-600 rounded cursor-not-allowed"
-                                >
-                                    Generuj raport PDF
-                                </button>
-                            )}
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={7} // Zmniejszono colSpan, ponieważ mamy teraz 7 kolumn
+                  className="px-4 py-2 border text-center text-sm text-gray-500"
+                >
+                  Brak zgłoszeń do wyświetlenia.
+                </td>
+              </tr>
+            )}
+          </tbody>
         </table>
-    );
-
-    return (
-        <div className="min-h-screen bg-gray-100 p-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Aktualne zgłoszenia</h1>
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">Lista zgłoszeń</h2>
-                {renderTable()}
-            </div>
-        </div>
-    );
+      </div>
+    </div>
+  );
 }
