@@ -2,20 +2,27 @@ package com.apsi_projekt.garage_service.rest;
 
 import com.apsi_projekt.garage_service.dto.CompanyInfo;
 import com.apsi_projekt.garage_service.service.GarageService;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("garage/openApi")
 public class GarageOpenApiController {
 
     private final GarageService garageService;
+    private final RestTemplate restTemplate;
 
-    public GarageOpenApiController(GarageService garageService) {this.garageService = garageService;}
+    public GarageOpenApiController(GarageService garageService, RestTemplateBuilder builder) {
+        this.garageService = garageService;
+        this.restTemplate = builder.build();
+    }
 
     @GetMapping("/{nip}")
     public ResponseEntity<CompanyInfo> getFirmaInfoByNip(@PathVariable String nip) {
@@ -29,6 +36,16 @@ public class GarageOpenApiController {
             return ResponseEntity.ok(companyInfo);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> getAllCompanyInfos() {
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity("http://user-service:8080/user/openApi", String.class);
+            return ResponseEntity.ok(response.getBody());
+        } catch (RestClientException e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("Nie udało się połączyć");
         }
     }
 
