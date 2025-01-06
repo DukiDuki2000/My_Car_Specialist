@@ -34,6 +34,10 @@ const nextConfig: NextConfig = {
       {
         source: '/api/vehicle/searchByReg/:reg',
         destination: 'http://MCS_API_Gateway:8080/vehicle/searchByReg/:reg'
+      },
+      {
+        source: '/api/mod/garage-add',
+        destination: 'http://MCS_API_Gateway:8080/garage/add'
       }
     ];
   },
