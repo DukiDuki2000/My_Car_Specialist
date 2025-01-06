@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,6 +29,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         System.out.println("Api Key filtering...");
         String apiKey = request.getHeader(API_KEY_HEADER);
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if(apiKey != null && apiKey.equals(EXPECTED_API_KEY)) {
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_SERVICE"));
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -35,7 +37,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
-        } else if (apiKey != null) {
+        } else if (apiKey != null && authHeader == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid API Key");
         }
