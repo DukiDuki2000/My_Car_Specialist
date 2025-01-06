@@ -1,5 +1,6 @@
 package com.apsi_projekt.user_service.security;
 
+import com.apsi_projekt.user_service.security.jwt.ApiKeyFilter;
 import com.apsi_projekt.user_service.security.jwt.AuthEntryPointJwt;
 import com.apsi_projekt.user_service.security.jwt.AuthTokenFilter;
 import com.apsi_projekt.user_service.security.services.UserDetailsServiceImpl;
@@ -12,6 +13,7 @@ import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +35,8 @@ public class WebSecurityConf {
         return new AuthTokenFilter();
     }
 
+    @Bean ApiKeyFilter apiKeyFilter() {return new ApiKeyFilter();}
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -53,22 +57,23 @@ public class WebSecurityConf {
         return new BCryptPasswordEncoder();
     }
 
-    IpAddressMatcher hasIpAddress = new IpAddressMatcher("172.21.0.9");
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+
+        //IpAddressMatcher hasIpAddress = new IpAddressMatcher("172.21.0.9");
+
+        http.csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/user/auth/**").permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
-                                .requestMatchers("/**").access((authentication, context) -> new AuthorizationDecision(hasIpAddress.matches(context.getRequest())))
+                                //.requestMatchers("/**").access((authentication, context) -> new AuthorizationDecision(hasIpAddress.matches(context.getRequest())))
                                 .anyRequest().authenticated()
                 );
 
         http.authenticationProvider(authenticationProvider());
-
+        http.addFilterBefore(apiKeyFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

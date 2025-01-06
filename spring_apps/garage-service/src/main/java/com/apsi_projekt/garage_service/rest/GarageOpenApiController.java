@@ -3,8 +3,7 @@ package com.apsi_projekt.garage_service.rest;
 import com.apsi_projekt.garage_service.dto.CompanyInfo;
 import com.apsi_projekt.garage_service.service.GarageService;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +41,17 @@ public class GarageOpenApiController {
     @GetMapping("/test")
     public ResponseEntity<String> getAllCompanyInfos() {
         try {
-            ResponseEntity<String> response = restTemplate.getForEntity("http://user-service:8080/user/openApi", String.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("X-API-KEY", "PiotrKania2137");
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    "http://user-service:8080/user/openApi",
+                    HttpMethod.GET,
+                    entity,
+                    String.class
+            );
+
             return ResponseEntity.ok(response.getBody());
         } catch (RestClientException e) {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("Nie udało się połączyć");
