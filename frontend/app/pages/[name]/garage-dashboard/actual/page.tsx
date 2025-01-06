@@ -125,7 +125,7 @@ export default function GarageDashboard() {
                   <td className="px-4 py-2 border w-32">
                     <button
                       className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                      onClick={() => router.push(`/pages/${username}/garage-dashboard/edit-request/${request.id}`)}
+                      onClick={() => router.push(`/pages/${username}/garage-dashboard/actual/${request.id}`)}
                     >
                       Modyfikuj
                     </button>
