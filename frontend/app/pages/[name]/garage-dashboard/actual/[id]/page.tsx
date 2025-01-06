@@ -50,23 +50,23 @@ export default function ServiceRequestDetail() {
     setUsername(storedUsername);
   }, []);
 
-//   // Autoryzacja
-//   useEffect(() => {
-//     if (!isClient) return;
+  // Autoryzacja
+  useEffect(() => {
+    if (!isClient) return;
 
-//     const token = localStorage.getItem('token');
-//     const role = localStorage.getItem('role');
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
 
-//     if (!token || !username || !role) {
-//       router.push('/auth/login');
-//       return;
-//     }
+    if (!token || !username || !role) {
+      router.push('/auth/login');
+      return;
+    }
 
-//     if (role !== 'ROLE_GARAGE') {
-//       router.push('/auth/login');
-//       return;
-//     }
-//   }, [router, isClient, username]);
+    if (role !== 'ROLE_GARAGE') {
+      router.push('/auth/login');
+      return;
+    }
+  }, [router, isClient, username]);
 
   // Używanie danych przykładowych zamiast API
   useEffect(() => {
