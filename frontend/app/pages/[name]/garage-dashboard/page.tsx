@@ -44,14 +44,14 @@ export default function GarageDashboard() {
     return (
         <div className="absolute bottom-0 h-100 w-full">
             {/* Treść */}
-            <main className="flex items-center justify-center flex-col -mt-16 px-4 h-[calc(80vh-80px)]">
+            <main className="flex items-center justify-center flex-col -mt-16 px-4 h-[calc(110vh-80px)]">
                 <h2 className="text-4xl font-bold text-gray-800 mb-14">Panel Warsztatu</h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-10">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
 
                     {/* Sprawdzenie zgłoszeń od klientów */}
                     <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/request-history`)}
+                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/pending-ticket-list`)}
                         className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
                     >
                         <img
@@ -62,22 +62,9 @@ export default function GarageDashboard() {
                         <p className="text-gray-800 font-semibold text-2xl">Sprawdzenie zgłoszeń</p>
                     </div>
 
-                    {/* Nowe zgłoszenie */}
-                    <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/add-request`)}
-                        className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
-                    >
-                        <img
-                            src="/pencil.svg"
-                            alt="Nowe zgłoszenie"
-                            className="h-40 w-40 mb-8"
-                        />
-                        <p className="text-gray-800 font-semibold text-2xl">Nowe zlecenie</p>
-                    </div>
-
                     {/* Aktualne zgłoszenia */}
                     <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/request-history`)}
+                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/actual`)}
                         className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
                     >
                         <img
