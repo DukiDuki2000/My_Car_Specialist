@@ -38,6 +38,18 @@ const nextConfig: NextConfig = {
       {
         source: '/api/mod/garage-add',
         destination: 'http://MCS_API_Gateway:8080/garage/add'
+      },
+      {
+        source: '/api/garage-request',
+        destination: 'http://MCS_API_Gateway:8080/garage/openApi/add_request'
+      },
+      {
+        source: '/api/mod/garage/requests',
+        destination: "http://MCS_API_Gateway:8080/garage/allrequest"
+      },
+      {
+        source: '/api/mod/garage/request/:nip',
+        destination: 'http://MCS_API_Gateway:8080/garage/request/:nip'
       }
     ];
   },

@@ -10,13 +10,43 @@ export default function AddCarForm() {
   const [formData, setFormData] = useState({
     nip: '',
     companyName: '',
-    addres: '',
+    workingAddress: '',
     companyRegon: '',
+    phoneNumber: '',
+    description: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('Zgłoszenie o rejestrację wysłane!');
+
+    const payload = {
+      nip: formData.nip,
+      regon: formData.companyRegon,
+      companyName: formData.companyName,
+      address: formData.workingAddress, // Używamy wartości workingAddress jako adresu
+      phoneNumber: formData.phoneNumber,
+      description: formData.description,
+    };
+
+    try {
+      const response = await fetch('/api/garage-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      alert('Zgłoszenie zostało pomyślnie wysłane!');
+      router.push('/'); // Przekierowanie na stronę główną po udanym zgłoszeniu
+    } catch (error) {
+      console.error('Error submitting the form:', error);
+      alert('Wystąpił błąd podczas wysyłania zgłoszenia. Spróbuj ponownie później.');
+    }
   };
 
   const handleDecodeNIP = async () => {
@@ -32,7 +62,7 @@ export default function AddCarForm() {
         setFormData((prevState) => ({
           ...prevState,
           companyName: data.companyName || '',
-          addres: data.addres || '',
+          workingAddress: data.companyAddress || data.workingAddress || '',
           companyRegon: data.companyRegon || '',
         }));
       } catch (error) {
@@ -83,7 +113,7 @@ export default function AddCarForm() {
           Uzupełnij dane z NIP
         </button>
 
-        {/* Nazwa firmy */}
+        {/* Pozostałe pola formularza */}
         <div className="mb-6">
           <label
             htmlFor="companyName"
@@ -105,21 +135,20 @@ export default function AddCarForm() {
           />
         </div>
 
-        {/* Adres firmy */}
         <div className="mb-6">
           <label
-            htmlFor="addres"
+            htmlFor="workingAddress"
             className="block text-lg font-medium text-gray-700 mb-2"
           >
             Adres firmy
           </label>
           <input
             type="text"
-            id="addres"
-            name="addres"
-            value={formData.addres}
+            id="workingAddress"
+            name="workingAddress"
+            value={formData.workingAddress}
             onChange={(e) =>
-              setFormData({ ...formData, addres: e.target.value })
+              setFormData({ ...formData, workingAddress: e.target.value })
             }
             required
             className="w-full px-4 py-3 text-lg border border-blue-400 rounded focus:outline-none focus:ring-4 focus:ring-blue-300"
@@ -127,7 +156,6 @@ export default function AddCarForm() {
           />
         </div>
 
-        {/* Numer REGON */}
         <div className="mb-6">
           <label
             htmlFor="companyRegon"
@@ -148,7 +176,45 @@ export default function AddCarForm() {
           />
         </div>
 
-        {/* Przycisk wysyłania zgłoszenia */}
+        <div className="mb-6">
+          <label
+            htmlFor="phoneNumber"
+            className="block text-lg font-medium text-gray-700 mb-2"
+          >
+            Numer telefonu
+          </label>
+          <input
+            type="text"
+            id="phoneNumber"
+            name="phoneNumber"
+            value={formData.phoneNumber}
+            onChange={(e) =>
+              setFormData({ ...formData, phoneNumber: e.target.value })
+            }
+            className="w-full px-4 py-3 text-lg border border-blue-400 rounded focus:outline-none focus:ring-4 focus:ring-blue-300"
+            placeholder="Wpisz numer telefonu"
+          />
+        </div>
+
+        <div className="mb-6">
+          <label
+            htmlFor="description"
+            className="block text-lg font-medium text-gray-700 mb-2"
+          >
+            Opis
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+            className="w-full px-4 py-3 text-lg border border-blue-400 rounded focus:outline-none focus:ring-4 focus:ring-blue-300"
+            placeholder="Wpisz opis"
+          />
+        </div>
+
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-3 text-lg rounded hover:bg-blue-600 transition mt-4"
