@@ -9,3 +9,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+API:
+  SECRET:
+    KEY: "PiotrKania2137"

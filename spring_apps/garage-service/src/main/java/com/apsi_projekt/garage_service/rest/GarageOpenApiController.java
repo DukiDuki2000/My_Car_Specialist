@@ -2,6 +2,7 @@ package com.apsi_projekt.garage_service.rest;
 
 import com.apsi_projekt.garage_service.dto.CompanyInfo;
 import com.apsi_projekt.garage_service.service.GarageService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,9 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 @RequestMapping("garage/openApi")
 public class GarageOpenApiController {
+
+    @Value("${API.SECRET.KEY}")
+    String API_KEY;
 
     private final GarageService garageService;
     private final RestTemplate restTemplate;
@@ -42,7 +46,8 @@ public class GarageOpenApiController {
     public ResponseEntity<String> getAllCompanyInfos() {
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.set("X-API-KEY", "PiotrKania2137");
+
+            headers.set("X-API-KEY", API_KEY);
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
             ResponseEntity<String> response = restTemplate.exchange(
