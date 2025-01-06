@@ -103,7 +103,7 @@ export default function GarageDashboard() {
 
                     {/* Historia zgłoszeń */}
                     <div
-                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/request-history`)}
+                        onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/garage-dashboard/history`)}
                         className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
                     >
                         <img
