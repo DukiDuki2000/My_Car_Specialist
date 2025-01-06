@@ -75,14 +75,17 @@ const GarageAddForm: React.FC = () => {
     setLoading(true);
     setError(null);
     setSuccess(null);
-
+  
     const token = localStorage.getItem('token');
     if (!token) {
       setError('Brak tokena autoryzacyjnego.');
       setLoading(false);
       return;
     }
-
+  
+    // Wypisanie danych w konsoli przed wysłaniem
+    // console.log('Wysyłane dane:', JSON.stringify(formData));
+  
     try {
       const response = await fetch('/api/mod/garage-add', {
         method: 'POST',
@@ -92,11 +95,12 @@ const GarageAddForm: React.FC = () => {
         },
         body: JSON.stringify(formData),
       });
-
+  
       if (!response.ok) {
-        throw new Error(`Błąd podczas dodawania firmy: ${response.statusText}`);
+        const errorData = await response.json();
+        throw new Error(`Błąd: ${response.statusText}, Szczegóły: ${JSON.stringify(errorData)}`);
       }
-
+  
       setSuccess('Firma została pomyślnie dodana.');
       setFormData({
         companyName: '',

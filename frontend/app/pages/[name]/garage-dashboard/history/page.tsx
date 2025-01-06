@@ -42,7 +42,7 @@ export default function ServiceDashboard() {
             return;
         }
 
-        if (role !== 'ROLE_SERVICE') {
+        if (role !== 'ROLE_GARAGE') {
             // Przekierowanie, jeśli użytkownik nie jest serwisem
             router.push('/');
             return;
