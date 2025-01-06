@@ -12,7 +12,8 @@ public class UserRestController {
     public UserRestController() {
     }
 
-    @GetMapping()
+
+    @GetMapping("/openApi")
     public String sayHello() {
         return "Hello from User Service";
     }
