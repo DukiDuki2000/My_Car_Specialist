@@ -59,7 +59,7 @@ public class GarageOpenApiController {
 
             return ResponseEntity.ok(response.getBody());
         } catch (RestClientException e) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("Nie udało się połączyć");
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e.getMessage());
         }
     }
 
