@@ -13,6 +13,8 @@ public class CompanyInfo {
     private String companyName;
     private String companyAddress;
     private String workingAddress;
-    private String companyNip;
     private String companyRegon;
+    private String companyNip;
+
 }
+
