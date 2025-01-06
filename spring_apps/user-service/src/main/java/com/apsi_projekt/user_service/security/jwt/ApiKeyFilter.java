@@ -26,7 +26,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
+        System.out.println("Api Key filtering...");
         String apiKey = request.getHeader(API_KEY_HEADER);
         if(apiKey != null && apiKey.equals(EXPECTED_API_KEY)) {
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_SERVICE"));
