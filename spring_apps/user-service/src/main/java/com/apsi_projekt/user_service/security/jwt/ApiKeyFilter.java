@@ -30,6 +30,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         System.out.println("Api Key filtering...");
         String apiKey = request.getHeader(API_KEY_HEADER);
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
         if(apiKey != null && apiKey.equals(EXPECTED_API_KEY)) {
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_SERVICE"));
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -37,9 +38,12 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
-        } else if (apiKey != null && authHeader == null) {
+        } else if (apiKey != null && authHeader == null) {  // Jeśli klucz API jest obecny, ale brak JWT
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Invalid API Key");
+        } else {
+            // Jeśli brak klucza API lub JWT, przejdź dalej
+            filterChain.doFilter(request, response);
         }
     }
 }
