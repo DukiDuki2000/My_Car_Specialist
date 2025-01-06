@@ -14,4 +14,4 @@ jwt:
 
 API:
   SECRET:
-    KEY: "PiotrKania2137"
+    KEY: ${API_SECRET_KEY}
