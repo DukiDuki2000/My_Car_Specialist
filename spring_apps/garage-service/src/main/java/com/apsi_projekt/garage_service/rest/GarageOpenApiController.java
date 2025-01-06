@@ -1,21 +1,25 @@
 package com.apsi_projekt.garage_service.rest;
 
 import com.apsi_projekt.garage_service.dto.CompanyInfo;
+import com.apsi_projekt.garage_service.model.GarageRequest;
+import com.apsi_projekt.garage_service.service.GarageRequestService;
 import com.apsi_projekt.garage_service.service.GarageService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("garage/openApi")
 public class GarageOpenApiController {
 
     private final GarageService garageService;
+    private final GarageRequestService garageRequestService;
 
-    public GarageOpenApiController(GarageService garageService) {this.garageService = garageService;}
+    public GarageOpenApiController(GarageService garageService, GarageRequestService garageRequestService) {
+        this.garageService = garageService;
+        this.garageRequestService = garageRequestService;
+    }
 
     @GetMapping("/{nip}")
     public ResponseEntity<CompanyInfo> getFirmaInfoByNip(@PathVariable String nip) {
@@ -30,6 +34,11 @@ public class GarageOpenApiController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+    }
+    @PostMapping("/add_request")
+    public ResponseEntity<GarageRequest> addGarageRequest(@Valid @RequestBody GarageRequest garageRequest) {
+        GarageRequest savedGarageRequest=garageRequestService.addGarageRequest(garageRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedGarageRequest);
     }
 
 }
