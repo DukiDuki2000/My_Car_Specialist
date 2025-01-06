@@ -83,8 +83,45 @@ const GarageAddForm: React.FC = () => {
       return;
     }
   
+    // Walidacja długości danych
+    if (formData.companyName.length < 3 || formData.companyName.length > 100) {
+      setError('Nazwa firmy musi mieć od 3 do 100 znaków.');
+      setLoading(false);
+      return;
+    }
+  
+    if (formData.nip.length !== 10) {
+      setError('NIP musi mieć dokładnie 10 znaków.');
+      setLoading(false);
+      return;
+    }
+  
+    if (formData.regon.length !== 9) {
+      setError('REGON musi mieć dokładnie 9 znaków.');
+      setLoading(false);
+      return;
+    }
+  
+    if (formData.address.length < 10 || formData.address.length > 200) {
+      setError('Adres musi mieć od 10 do 200 znaków.');
+      setLoading(false);
+      return;
+    }
+  
+    if (formData.phoneNumber.length < 9 || formData.phoneNumber.length > 15) {
+      setError('Numer telefonu musi mieć od 9 do 15 znaków.');
+      setLoading(false);
+      return;
+    }
+  
+    if (formData.ibans.some(iban => iban.length < 15 || iban.length > 34)) {
+      setError('Każdy numer IBAN musi mieć od 15 do 34 znaków.');
+      setLoading(false);
+      return;
+    }
+  
     // Wypisanie danych w konsoli przed wysłaniem
-    // console.log('Wysyłane dane:', JSON.stringify(formData));
+    console.log('Wysyłane dane:', JSON.stringify(formData));
   
     try {
       const response = await fetch('/api/mod/garage-add', {
@@ -116,6 +153,7 @@ const GarageAddForm: React.FC = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="container mx-auto p-4">
