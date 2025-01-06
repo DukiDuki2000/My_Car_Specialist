@@ -35,7 +35,8 @@ public class WebSecurityConf {
         return new AuthTokenFilter();
     }
 
-    @Bean ApiKeyFilter apiKeyFilter() {return new ApiKeyFilter();}
+    @Bean
+    public ApiKeyFilter apiKeyFilter() {return new ApiKeyFilter();}
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
