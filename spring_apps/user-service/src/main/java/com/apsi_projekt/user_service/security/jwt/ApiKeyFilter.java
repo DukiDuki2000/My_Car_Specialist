@@ -22,15 +22,17 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     private static final String API_KEY_HEADER = "X-API-KEY";
 
     @Value("${API.SECRET.KEY}")
-    private static String EXPECTED_API_KEY;
+    private String EXPECTED_API_KEY;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
         System.out.println("Api Key filtering...");
         String apiKey = request.getHeader(API_KEY_HEADER);
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        System.out.println("Recieved: " + apiKey + "Expected: " + EXPECTED_API_KEY);
+
+        System.out.println("Recieved: " + apiKey + " Expected: " + EXPECTED_API_KEY);
         if(apiKey != null && apiKey.equals(EXPECTED_API_KEY) && authHeader == null) {
             System.out.println("JEST NAGŁÓWEK");
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_SERVICE"));
