@@ -71,7 +71,7 @@ public class WebSecurityConf {
                         auth.requestMatchers("/user/auth/**").permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
                                 .requestMatchers("/**").access((authentication, context) -> {
-                                    String remoteHost = context.getRequest().getRemoteHost(); // Pobierz nazwę hosta
+                                    String remoteHost = context.getRequest().getRemoteAddr(); // Pobierz nazwę hosta
                                     return new AuthorizationDecision(allowedHosts.contains(remoteHost)); // Sprawdź, czy jest na liście
                                 })
                                 .anyRequest().authenticated()
