@@ -7,7 +7,7 @@ interface Car {
   id: number;
   brand: string;
   model: string;
-  regNumber: string;
+  registrationNumber: string;
 }
 
 interface Workshop {
@@ -140,7 +140,7 @@ export default function WorkshopSearch() {
               <option value="">Wybierz</option>
               {userCars.map((car) => (
                 <option key={car.id} value={car.id.toString()}>
-                  {car.brand} {car.model} – {car.regNumber}
+                  {car.registrationNumber} - {car.brand} {car.model} 
                 </option>
               ))}
             </select>
