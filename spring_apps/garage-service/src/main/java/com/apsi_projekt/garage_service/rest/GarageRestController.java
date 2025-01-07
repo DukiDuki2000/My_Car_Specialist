@@ -1,8 +1,8 @@
 package com.apsi_projekt.garage_service.rest;
 
 import com.apsi_projekt.garage_service.model.Garage;
-import com.apsi_projekt.garage_service.model.GarageRequest;
-import com.apsi_projekt.garage_service.service.GarageRequestService;
+import com.apsi_projekt.garage_service.model.GarageAccountRequest;
+import com.apsi_projekt.garage_service.service.GarageAccountRequestService;
 import com.apsi_projekt.garage_service.service.GarageService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -19,10 +19,10 @@ import java.util.List;
 public class GarageRestController {
 
     GarageService garageService;
-    private final GarageRequestService garageRequestService;
+    private final GarageAccountRequestService garageAccountRequestService;
     @Autowired
-    public GarageRestController(GarageService garageService,GarageRequestService garageRequestService) {
-        this.garageRequestService = garageRequestService;
+    public GarageRestController(GarageService garageService, GarageAccountRequestService garageAccountRequestService) {
+        this.garageAccountRequestService = garageAccountRequestService;
         this.garageService = garageService;
     }
 
@@ -44,8 +44,8 @@ public class GarageRestController {
 
     @PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN')")
     @GetMapping("/allrequest")
-    public ResponseEntity<List<GarageRequest>> getAllRequest() {
-        List<GarageRequest> requests = garageRequestService.getAllRequests();
+    public ResponseEntity<List<GarageAccountRequest>> getAllRequest() {
+        List<GarageAccountRequest> requests = garageAccountRequestService.getAllRequests();
         if (requests.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -54,7 +54,7 @@ public class GarageRestController {
     @PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/request/{nip}")
     public ResponseEntity<Void> deleteRequestByNip(@PathVariable String nip) {
-        garageRequestService.deleteRequestByNip(nip);
+        garageAccountRequestService.deleteRequestByNip(nip);
         return ResponseEntity.ok().build();
     }
 }

@@ -18,7 +18,7 @@ import lombok.*;
         @UniqueConstraint(columnNames = "nip"),
         @UniqueConstraint(columnNames = "regon")
 })
-public class GarageRequest {
+public class GarageAccountRequest {
     private @jakarta.persistence.Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long Id;
