@@ -74,6 +74,7 @@ export default function Layout({ children }: LayoutProps) {
     }, [pathname]);
 
     const handleLogout = useCallback(() => {
+        localStorage.removeItem('id');
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('username');

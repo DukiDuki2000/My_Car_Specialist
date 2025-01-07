@@ -46,6 +46,7 @@ export default function Login() {
 
             if (isClient) {
                 if (data.accessToken) {
+                    localStorage.setItem('id', data.id);
                     localStorage.setItem('accessToken', data.accessToken);
                     localStorage.setItem('refreshToken', data.refreshToken);
                     localStorage.setItem('username', data.username);
