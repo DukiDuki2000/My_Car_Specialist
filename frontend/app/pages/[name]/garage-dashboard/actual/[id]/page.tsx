@@ -163,8 +163,8 @@ export default function ServiceRequestDetail() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <Link href={`/${name}/garage-dashboard`} className="text-blue-500 hover:underline">
-        &larr; Powrót do Dashboardu
+      <Link href={`/pages/${name}/garage-dashboard`} className="text-blue-500 hover:underline">
+        &larr; Powrót
       </Link>
       <h1 className="text-3xl font-bold mb-6 mt-4">Szczegóły Zgłoszenia</h1>
 
