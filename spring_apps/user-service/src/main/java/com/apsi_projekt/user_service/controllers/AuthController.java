@@ -1,15 +1,20 @@
 package com.apsi_projekt.user_service.controllers;
 
+import com.apsi_projekt.user_service.models.RefreshToken;
 import com.apsi_projekt.user_service.models.Role;
 import com.apsi_projekt.user_service.models.User;
 import com.apsi_projekt.user_service.models.UserRole;
+import com.apsi_projekt.user_service.payload.request.RefreshTokenRequest;
 import com.apsi_projekt.user_service.payload.request.SignInRequest;
 import com.apsi_projekt.user_service.payload.request.SignUpRequest;
 import com.apsi_projekt.user_service.payload.response.JwtResponse;
 import com.apsi_projekt.user_service.payload.response.MessageResponse;
+import com.apsi_projekt.user_service.payload.response.RefreshTokenResponse;
 import com.apsi_projekt.user_service.repositories.RoleRepository;
 import com.apsi_projekt.user_service.repositories.UserRepository;
 import com.apsi_projekt.user_service.security.jwt.JwtUtils;
+import com.apsi_projekt.user_service.security.jwt.TokenRefreshException;
+import com.apsi_projekt.user_service.security.services.RefreshTokenService;
 import com.apsi_projekt.user_service.security.services.UserDetailsImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +50,9 @@ public class AuthController {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody SignInRequest signInRequest) {
         System.out.println("Received signin request: " + signInRequest.getUsername() + " / " + signInRequest.getPassword());
@@ -52,14 +60,24 @@ public class AuthController {
                 .authenticate(new UsernamePasswordAuthenticationToken(signInRequest.getUsername(), signInRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
+
+        List<String> roles = userDetails.getAuthorities()
+                .stream().map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        return ResponseEntity
-                .ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
+        if (refreshTokenService.doesExist(userDetails.getId())) {
+            RefreshToken refreshToken = refreshTokenService.updateRefreshToken(userDetails.getId());
+            return ResponseEntity
+                    .ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
+        } else {
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+            return ResponseEntity
+                    .ok(new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
+        }
     }
 
     @PostMapping("/signup")
@@ -114,5 +132,20 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String token = jwtUtils.generateJwtTokenFromUsername(user.getUsername());
+                    return ResponseEntity.ok(new RefreshTokenResponse(token, requestRefreshToken, user.getId(), user.getUsername(), user.getEmail()));
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+                        "Refresh token is not in database!"));
     }
 }

@@ -1,11 +1,13 @@
 package com.apsi_projekt.user_service.security.jwt;
 
 import com.apsi_projekt.user_service.security.services.UserDetailsImpl;
+import com.apsi_projekt.user_service.security.services.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -20,8 +22,11 @@ public class JwtUtils {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    @Value("${jwt.expiration}")
+    @Value("${jwt.access_expiration}")
     private int jwtExpirationMs;
+
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
 
     public String generateJwtToken(Authentication authentication) {
 
@@ -34,6 +39,19 @@ public class JwtUtils {
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .claim("Roles", userPrincipal.getAuthorities())
+                .compact();
+    }
+
+    public String generateJwtTokenFromUsername(String username) {
+
+        UserDetailsImpl userDetails = userDetailsService.loadUserByUsername(username);
+        return Jwts.builder()
+                .setId(userDetails.getId().toString())
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .claim("Roles", userDetails.getAuthorities())
                 .compact();
     }
 
