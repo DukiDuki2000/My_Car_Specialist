@@ -58,7 +58,7 @@ export default function ServiceRequestDetail() {
   useEffect(() => {
     if (!isClient) return;
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     const role = localStorage.getItem('role');
 
     if (!token || !username || !role) {

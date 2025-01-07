@@ -28,7 +28,7 @@ export default function Layout({ children }: LayoutProps) {
 
     // Funkcja do aktualizacji stanu użytkownika na podstawie localStorage
     const updateUserFromLocalStorage = () => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('role');
         setUser({ username, role, token });
@@ -59,7 +59,7 @@ export default function Layout({ children }: LayoutProps) {
     }, [pathname]);
 
     const handleLogout = useCallback(() => {
-        localStorage.removeItem('token');
+        localStorage.removeItem('accessToken');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
         setUser({ username: null, role: null, token: null }); // Natychmiastowe zaktualizowanie stanu

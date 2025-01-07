@@ -10,14 +10,14 @@ const UserDashboard = () => {
     useEffect(() => {
         if (!name) return;
 
-        const token = localStorage.getItem('token');
-        if (!token) {
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
             router.push('/pages/auth/login');  
             return;
         }
 
         try {
-            const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+            const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
             const userType = tokenPayload.role;
 
             // Redirect based on user role

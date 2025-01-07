@@ -25,7 +25,7 @@ export default function WorkshopSearch() {
   // ------------------------------------------------------
   useEffect(() => {
     const role = localStorage.getItem('role');
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
 
     if (!token || role !== 'ROLE_CLIENT') {
       router.push('/');
@@ -49,7 +49,7 @@ export default function WorkshopSearch() {
   useEffect(() => {
     const fetchCars = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         const response = await fetch('/api/vehicle/search', {
           headers: {
             Authorization: `Bearer ${token}`,

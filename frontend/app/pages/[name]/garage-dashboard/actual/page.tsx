@@ -32,7 +32,7 @@ export default function GarageDashboard() {
   useEffect(() => {
     if (!isClient) return; // Zatrzymaj, jeśli nie jesteśmy po stronie klienta
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     const role = localStorage.getItem('role');
 
     if (!token || !username || !role) {

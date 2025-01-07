@@ -9,7 +9,7 @@ export default function ClientDashboard() {
 
     useEffect(() => {
         // Sprawdzanie, czy użytkownik jest zalogowany
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('role');
 

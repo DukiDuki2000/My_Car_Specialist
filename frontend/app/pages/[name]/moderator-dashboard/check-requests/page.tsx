@@ -21,7 +21,7 @@ export default function GarageRequests() {
     setLoading(true);
     setError(null);
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (!token) {
       setError('Nie znaleziono tokenu uwierzytelniającego.');
       setLoading(false);
@@ -52,7 +52,7 @@ export default function GarageRequests() {
   };
 
   const deleteRequest = async (nip: string) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (!token) {
       setError('Nie znaleziono tokenu uwierzytelniającego.');
       return;

@@ -24,7 +24,7 @@ export default function AddCarForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const token = localStorage.getItem('token'); // Pobierz token z localStorage
+    const token = localStorage.getItem('accessToken'); // Pobierz token z localStorage
     if (!token) {
       alert('Brak tokena autoryzacji!');
       return;
@@ -71,7 +71,7 @@ export default function AddCarForm() {
   // Funkcja do wypełniania formularza na podstawie odpowiedzi z API
   const handleDecodeVin = async () => {
     const vin = formData.vin; // Pobranie numeru VIN z formularza
-    const token = localStorage.getItem('token'); // Załóżmy, że token jest w localStorage
+    const token = localStorage.getItem('accessToken'); // Załóżmy, że token jest w localStorage
     if (vin) {
       try {
         const response = await fetch(`/api/vehicle/decode-info/${vin}`, {

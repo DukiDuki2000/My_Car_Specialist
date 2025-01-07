@@ -32,7 +32,7 @@ const VehicleSearchPage: React.FC = () => {
     setError(null);
     setVehicle(null);
   
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (!token) {
       setError('Brak tokena autoryzacyjnego.');
       setLoading(false);

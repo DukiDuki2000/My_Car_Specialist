@@ -30,7 +30,7 @@ const VehicleListPage: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       if (!token) {
         setError('Brak tokena autoryzacyjnego.');
         setLoading(false);

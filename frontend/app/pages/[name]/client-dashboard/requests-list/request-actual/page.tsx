@@ -34,7 +34,7 @@ export default function ServiceHistory() {
 
   useEffect(() => {
     // Sprawdzanie, czy użytkownik jest zalogowany
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
   
     if (!token) {
       router.push("/");

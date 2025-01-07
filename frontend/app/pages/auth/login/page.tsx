@@ -10,7 +10,6 @@ export default function Login() {
     const [isClient, setIsClient] = useState(false);
     const router = useRouter();
 
-    // Ensure the component is running on the client side
     useEffect(() => {
         setIsClient(true);
     }, []);
@@ -46,8 +45,9 @@ export default function Login() {
             const data = await response.json();
 
             if (isClient) {
-                if (data.token) {
-                    localStorage.setItem('token', data.token);
+                if (data.accessToken) {
+                    localStorage.setItem('accessToken', data.accessToken);
+                    localStorage.setItem('refreshToken', data.refreshToken);
                     localStorage.setItem('username', data.username);
                     localStorage.setItem('role', data.roles[0]);
 
@@ -63,7 +63,7 @@ export default function Login() {
                         throw new Error('Nieznana rola użytkownika');
                     }
                 } else {
-                    throw new Error('Brak tokena w odpowiedzi');
+                    throw new Error('Brak tokena dostępowego w odpowiedzi');
                 }
             }
         } catch (err: any) {

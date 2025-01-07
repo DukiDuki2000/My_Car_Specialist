@@ -9,7 +9,7 @@ export default function Home() {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('accessToken');
             const username = localStorage.getItem('username');
             const role = localStorage.getItem('role');
 

@@ -35,7 +35,7 @@ const GarageAddForm: React.FC = () => {
     if (!isClient) return; // Zatrzymaj, jeśli nie jesteśmy po stronie klienta
 
     // Sprawdzanie, czy użytkownik jest zalogowany
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     const username = localStorage.getItem('username');
     const role = localStorage.getItem('role');
 
@@ -76,7 +76,7 @@ const GarageAddForm: React.FC = () => {
     setError(null);
     setSuccess(null);
   
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (!token) {
       setError('Brak tokena autoryzacyjnego.');
       setLoading(false);

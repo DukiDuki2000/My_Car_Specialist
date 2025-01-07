@@ -7,7 +7,7 @@ export default function LogoutButton() {
 
     const handleLogout = () => {
         // Usunięcie danych użytkownika z localStorage
-        localStorage.removeItem('token');
+        localStorage.removeItem('accessToken');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
 
