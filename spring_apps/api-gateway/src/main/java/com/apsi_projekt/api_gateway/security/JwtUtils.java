@@ -25,26 +25,16 @@ public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
     public Claims getClaims(String token){
-        try {
-            Key key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
-            return Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (JwtException e) {
-            // Logowanie błędu lub odpowiednia obsługa
-            throw new JwtException("Token is invalid or expired: " + e.getMessage());
+        if (secret == null) {
+            throw new IllegalArgumentException("JWT secret key is empty.");
         }
-    }
-    public boolean isTokenExpired(String token) {
-        Claims claims = this.getClaims(token);
-        System.out.println(claims);
-        return claims.getExpiration().before(new Date());
-    }
 
-    public boolean isValid(String token) {
-        return !this.isTokenExpired(token);
+        Key key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public List<String> getRoles(String token) {
