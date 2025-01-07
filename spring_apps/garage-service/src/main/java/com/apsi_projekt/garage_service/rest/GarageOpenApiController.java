@@ -1,8 +1,8 @@
 package com.apsi_projekt.garage_service.rest;
 
 import com.apsi_projekt.garage_service.dto.CompanyInfo;
-import com.apsi_projekt.garage_service.model.GarageRequest;
-import com.apsi_projekt.garage_service.service.GarageRequestService;
+import com.apsi_projekt.garage_service.model.GarageAccountRequest;
+import com.apsi_projekt.garage_service.service.GarageAccountRequestService;
 import com.apsi_projekt.garage_service.service.GarageService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,12 +20,12 @@ public class GarageOpenApiController {
     String API_KEY;
 
     private final GarageService garageService;
-    private final GarageRequestService garageRequestService;
+    private final GarageAccountRequestService garageAccountRequestService;
     private final RestTemplate restTemplate;
 
-    public GarageOpenApiController(GarageService garageService,GarageRequestService garageRequestService, RestTemplateBuilder builder) {
+    public GarageOpenApiController(GarageService garageService, GarageAccountRequestService garageAccountRequestService, RestTemplateBuilder builder) {
         this.garageService = garageService;
-        this.garageRequestService = garageRequestService;
+        this.garageAccountRequestService = garageAccountRequestService;
         this.restTemplate = builder.build();
     }
 
@@ -66,8 +66,8 @@ public class GarageOpenApiController {
     }
 
     @PostMapping("/add_request")
-    public ResponseEntity<GarageRequest> addGarageRequest(@Valid @RequestBody GarageRequest garageRequest) {
-        GarageRequest savedGarageRequest=garageRequestService.addGarageRequest(garageRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedGarageRequest);
+    public ResponseEntity<GarageAccountRequest> addGarageRequest(@Valid @RequestBody GarageAccountRequest garageAccountRequest) {
+        GarageAccountRequest savedGarageAccountRequest = garageAccountRequestService.addGarageRequest(garageAccountRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedGarageAccountRequest);
     }
 }
