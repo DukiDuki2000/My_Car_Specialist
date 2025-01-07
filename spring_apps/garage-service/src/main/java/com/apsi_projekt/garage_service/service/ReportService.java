@@ -43,7 +43,7 @@ public class ReportService {
 
     @PreAuthorize("hasAnyRole('ROLE_GARAGE')")
     public List<Report> getAllGarageReports(Report report){
-        return reportRepository.findbyGarageId(report.getGarage().getId());
+        return reportRepository.findByGarageId(report.getGarage().getId());
     }
 
     @PreAuthorize("hasAnyRole('ROLE_MODERATOR','ROLE_ADMIN','ROLE_GARAGE','ROLE_USER')")
