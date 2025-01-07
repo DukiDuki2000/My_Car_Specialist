@@ -1,0 +1,68 @@
+site_name: My Car Specialist
+site_url: https://gitlab-stud.elka.pw.edu.pl/pskowron/my_car_specialist/-/tree/main/spring_apps?ref_type=heads
+theme:
+  name: material
+#  font:
+#    text: Merriweather Sans
+#    code: Red Hat Mono
+
+  logo: assets/Favicon.png
+  favicon: assets/Favicon.ico
+  palette:
+    #Dark Mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Dark mode
+      primary: pink
+      accent: deep purple
+
+    # Light Mode
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Light mode
+      primary: green
+      accent: deep orange
+
+nav:
+  - Home: index.md
+  - frontend:
+      - client side interface: frontend-md/client-side-interface.md
+#      - user login & register: frontend-md/user-login-register.md # do usunięcia
+  - backend:
+      - api gateway: backend-md/api-gateway.md
+      - garage service: backend-md/garage-service.md
+      - notification service: backend-md/notification-service.md
+      - recommendation service: backend-md/recommendation-service.md
+      - user service: backend-md/user-service.md
+      - vehicle service: backend-md/vehicle-service.md
+#      - gradle: backend-md/gradle.md
+  - main:
+      - main: main/main-md
+#    - API Gateway: main-md/api-gateway.md
+#    - Garage Service: main-md/garage-service.md
+#    - Notification Service: main-md/notification-service.md
+#    - Recommendation Service: main-md/recommendation-service.md
+#    - User Service: main-md/user-service.md
+#    - Vehicle Service: main-md/vehicle-service.md
+
+markdown_extensions:
+#  - attr_list
+#  - pymdownx.emoji:
+#      emoji_index: !!python/name:material.extensions.emoji.twemoji
+#      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+#  - pymdownx.highlight:
+#      anchor_lines: true
+#      line_spans: __span
+#      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+extra:
+  social:
+    - icon: simple/trello
+      link: https://trello.com/b/6kG5YLYH/apsi
+    - icon: simple/gitlab
+      link: https://gitlab-stud.elka.pw.edu.pl/pskowron/my_car_specialist/-/tree/backend?ref_type=heads
