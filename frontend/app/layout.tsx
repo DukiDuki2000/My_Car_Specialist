@@ -29,41 +29,57 @@ export default function Layout({ children }: LayoutProps) {
     // Funkcja do aktualizacji stanu użytkownika na podstawie localStorage
     const updateUserFromLocalStorage = () => {
         const token = localStorage.getItem('accessToken');
+        const refreshToken = localStorage.getItem('refreshToken');
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('role');
         setUser({ username, role, token });
     };
 
-    // Hook useEffect, aby pobrać dane z localStorage po stronie klienta
+    // Funkcja do odświeżania tokena
+    const refreshAccessToken = async () => {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) return;
+
+        try {
+            const response = await fetch('/api/user/auth/refresh', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ refreshToken }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const { accessToken } = data;
+
+                // Aktualizuj token w localStorage
+                localStorage.setItem('accessToken', accessToken);
+                updateUserFromLocalStorage();
+            } else {
+                console.error('Błąd podczas odświeżania tokena:', response.statusText);
+                handleLogout(); // Wyloguj użytkownika, jeśli odświeżenie nie powiodło się
+            }
+        } catch (error) {
+            console.error('Błąd sieci podczas odświeżania tokena:', error);
+            handleLogout();
+        }
+    };
+
+    // Hook useEffect do monitorowania zmiany ścieżki i odświeżenia tokena
     useEffect(() => {
-        updateUserFromLocalStorage();
-        setIsLoading(false);
-
-        // Uaktualnienie stanu po zmianie w localStorage
-        const handleStorageChange = () => {
-            updateUserFromLocalStorage();
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-        };
-    }, []);
-
-    // Hook useEffect do monitorowania zmiany ścieżki i odświeżenia stanu
-    useEffect(() => {
-        // Odświeżenie stanu użytkownika przy każdej zmianie ścieżki
-        setIsLoading(true); // Opcjonalnie ustawiamy na ładowanie, jeśli chcemy np. pokazać spinner
-        updateUserFromLocalStorage();
+        setIsLoading(true);
+        refreshAccessToken(); // Odśwież token przy każdej zmianie ścieżki
         setIsLoading(false);
     }, [pathname]);
 
     const handleLogout = useCallback(() => {
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
         setUser({ username: null, role: null, token: null }); // Natychmiastowe zaktualizowanie stanu
-        router.push('/'); 
+        router.push('/');
     }, [router]);
 
     const handleNavigation = () => {
