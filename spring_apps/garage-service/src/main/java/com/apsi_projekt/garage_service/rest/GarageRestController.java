@@ -58,7 +58,7 @@ public class GarageRestController {
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasAnyRole('ROLE_MODERATOR','ROLE_ADMIN','ROLE_GARAGE', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_MODERATOR','ROLE_ADMIN','ROLE_GARAGE', 'ROLE_CLIENT')")
     public ResponseEntity<List<Garage>> getAllGarages() {
         List<Garage> garages = garageService.getAllGarages();
         if (garages.isEmpty()) {
