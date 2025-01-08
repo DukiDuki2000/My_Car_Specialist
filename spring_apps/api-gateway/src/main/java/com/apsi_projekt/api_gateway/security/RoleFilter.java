@@ -38,10 +38,6 @@ public class RoleFilter implements GatewayFilterFactory<RoleFilter.Config> {
 
                 String token = authHeader.substring(7);
 
-                if (!jwtUtils.isValid(token)) {
-                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                    return exchange.getResponse().setComplete();
-                }
                 String id = jwtUtils.getId(token);
                 String username = jwtUtils.getUsername(token);
                 List<String> roles = jwtUtils.getRoles(token);
