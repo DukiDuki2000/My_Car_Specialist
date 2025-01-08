@@ -27,6 +27,8 @@ public class Report {
     @Column(name = "date", nullable = false)
     private List<@NotNull LocalDateTime> dateHistory = new ArrayList<>();
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name="garage_id", nullable=false)
     private Garage garage;
@@ -65,7 +67,9 @@ public class Report {
 
     @PrePersist
     protected void onCreate() {
+
         this.dateHistory.add(LocalDateTime.now());
+        this.createdAt = LocalDateTime.now();
     }
 }
 
