@@ -185,4 +185,9 @@ public class GarageService {
         int deleted = garageAccountRequestRepository.deleteByNip(nip);
         return deleted > 0;
     }
+
+    public List<Garage> getAllGarages() {
+        return garageRepository.findAll();
+    }
+
 }

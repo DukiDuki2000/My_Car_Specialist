@@ -56,4 +56,14 @@ public class GarageRestController {
         garageAccountRequestService.deleteRequestByNip(nip);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ROLE_MODERATOR','ROLE_ADMIN','ROLE_GARAGE', 'ROLE_USER')")
+    public ResponseEntity<List<Garage>> getAllGarages() {
+        List<Garage> garages = garageService.getAllGarages();
+        if (garages.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(garages);
+    }
 }
