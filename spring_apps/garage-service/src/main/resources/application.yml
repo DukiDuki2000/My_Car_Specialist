@@ -13,3 +13,4 @@ spring:
 API:
   SECRET:
     KEY: ${API_SECRET_KEY}
+  USER-SERVICE: "http://user-service:8080"

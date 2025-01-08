@@ -28,7 +28,7 @@ public class GarageService {
     private final GarageAccountRequestRepository garageAccountRequestRepository;
     @Value("${API.SECRET.KEY}")
     String API_KEY;
-    @Value("${API.user-service}")
+    @Value("${API.USER-SERVICE}")
     String USER_SERVICE;
 
     @Autowired
