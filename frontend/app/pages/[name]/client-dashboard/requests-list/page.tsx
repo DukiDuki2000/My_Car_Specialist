@@ -1,0 +1,70 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+
+import { useEffect } from 'react';
+
+export default function ClientDashboard() {
+    const router = useRouter();
+
+    useEffect(() => {
+        // Sprawdzanie, czy użytkownik jest zalogowany
+        const token = localStorage.getItem('token');
+        const username = localStorage.getItem('username');
+        const role = localStorage.getItem('role');
+
+        if (!token || !username || !role) {
+            // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
+            router.push('/');
+            return;
+        }
+
+        if (role !== 'ROLE_CLIENT') {
+            // Przekierowanie, jeśli użytkownik nie jest klientem
+            router.push('/');
+            return;
+        }
+    }, [router]);    
+
+
+  const handleNavigate = (path: string) => {
+    router.push(path); // Przekierowanie na podaną ścieżkę
+  };
+
+  return (
+    <div className="absolute bottom-0 h-100 w-full">
+      {/* Treść */}
+      <main className="flex items-center justify-center flex-col -mt-16 px-4 h-[calc(100vh-80px)]">
+        <h2 className="text-4xl font-bold text-gray-800 mb-12">Lista zleceń</h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-20">
+          {/* Nowe zgłoszenie */}
+          <div
+            onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/requests-list/request-actual`)}  // Przekierowanie na stronę "Nowe zgłoszenie"
+            className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
+          >
+            <img
+              src="/note.svg"
+              alt="Nowe zgłoszenie"
+              className="h-40 w-40 mb-8"
+            />
+            <p className="text-gray-800 font-semibold text-2xl">Aktualne zlecenia</p>
+          </div>
+
+          {/* Lista zgłoszeń */}
+          <div
+             onClick={() => handleNavigate(`/pages/${localStorage.getItem('username')}/client-dashboard/requests-list/request-history`)} // Przekierowanie na stronę "historie zgloszen"
+            className="flex flex-col items-center justify-center border-4 border-blue-400 rounded-lg p-16 shadow-md hover:shadow-lg hover:border-blue-600 transition transform hover:scale-110 cursor-pointer"
+          >
+            <img
+              src="/history.svg"
+              alt="Lista zgłoszeń"
+              className="h-40 w-40 mb-8"
+            />
+            <p className="text-gray-800 font-semibold text-2xl">Historia zleceń</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

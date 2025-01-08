@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@keyframes road {
+    from {
+        background-position: -200% 0;
+    }
+    to {
+        background-position: 0 0;
+    }
+}
+
+.bg-road {
+    background-image: url('/road3.svg');
+    background-size: cover;
+    background-repeat: repeat-x;
+}
+
+.animate-road {
+    animation: road 16s linear infinite;
+}
