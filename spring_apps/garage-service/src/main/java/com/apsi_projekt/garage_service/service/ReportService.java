@@ -104,7 +104,7 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_MODERATOR','ROLE_ADMIN','ROLE_GARAGE','ROLE_USER')")
+
     public List<Report> getCompletedReportsByVehicleId(Long vehicleId) {
         return reportRepository.findByStatusAndVehicleId(ReportStatus.COMPLETED,vehicleId);
     }
