@@ -45,23 +45,23 @@ public class GarageOpenApiController {
     }
 
     @GetMapping("/test")
-    public ResponseEntity<String> getAllCompanyInfos() {
+    public ResponseEntity<Long> getAllCompanyInfos() {
         try {
             HttpHeaders headers = new HttpHeaders();
 
             headers.set("X-API-KEY", API_KEY);
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
-            ResponseEntity<String> response = restTemplate.exchange(
-                    "http://user-service:8080/user/openApi",
+            ResponseEntity<Long> response = restTemplate.exchange(
+                    "http://user-service:8080/user/getId/supergarage",
                     HttpMethod.GET,
                     entity,
-                    String.class
+                    Long.class
             );
 
             return ResponseEntity.ok(response.getBody());
         } catch (RestClientException e) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(e.getMessage());
+            throw new RuntimeException();
         }
     }
 

@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -66,7 +67,7 @@ public class AuthController {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         List<String> roles = userDetails.getAuthorities()
-                .stream().map(item -> item.getAuthority())
+                .stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         if (refreshTokenService.doesExist(userDetails.getId())) {
@@ -120,6 +121,12 @@ public class AuthController {
                         UserRole garageRole = roleRepository.findUserRoleByName(Role.ROLE_GARAGE)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
                         roles.add(garageRole);
+                        break;
+                    case "service":
+                        UserRole serviceRole = roleRepository.findUserRoleByName(Role.ROLE_SERVICE)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(serviceRole);
+                        break;
                     default:
                         UserRole userRole = roleRepository.findUserRoleByName(Role.ROLE_CLIENT)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));

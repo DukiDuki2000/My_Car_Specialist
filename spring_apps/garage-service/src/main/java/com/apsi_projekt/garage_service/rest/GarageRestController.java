@@ -1,10 +1,10 @@
 package com.apsi_projekt.garage_service.rest;
 
+import com.apsi_projekt.garage_service.dto.AddGarageRequest;
 import com.apsi_projekt.garage_service.model.Garage;
 import com.apsi_projekt.garage_service.model.GarageAccountRequest;
 import com.apsi_projekt.garage_service.service.GarageAccountRequestService;
 import com.apsi_projekt.garage_service.service.GarageService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,19 +31,18 @@ public class GarageRestController {
         return "Hello from Garage Service";
     }
 
-    @PostMapping("/add")
+    @PostMapping("/register")
     @PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Garage> add(@Valid @RequestBody Garage newGarage, HttpServletRequest request) {
-        String usernameHeader = request.getHeader("X-Username");
-        String idHeader = request.getHeader("X-Id");
-        newGarage.setUserId(Long.parseLong(idHeader));
-        newGarage.setUserName(usernameHeader);
-        Garage savedGarage = garageService.addGarage(newGarage);
+    public ResponseEntity<?> add(@Valid @RequestBody AddGarageRequest addGarageRequest) {
+        Garage savedGarage = garageService.registerGarage(addGarageRequest);
+        System.out.println("Garage registered (8/9)");
+        garageService.deleteGarageAccountRequest(savedGarage.getNip());
+        System.out.println("Request associated with the created account has been successfully deleted. (9/9)");
         return ResponseEntity.status(HttpStatus.CREATED).body(savedGarage); // 201 - Created
     }
 
     @PreAuthorize("hasRole('ROLE_MODERATOR') or hasRole('ROLE_ADMIN')")
-    @GetMapping("/allrequest")
+    @GetMapping("/request/all")
     public ResponseEntity<List<GarageAccountRequest>> getAllRequest() {
         List<GarageAccountRequest> requests = garageAccountRequestService.getAllRequests();
         if (requests.isEmpty()) {

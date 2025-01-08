@@ -17,51 +17,55 @@ import java.util.List;
 @Entity
 @Table (name = "garages", uniqueConstraints = {
         @UniqueConstraint(columnNames = "nip"),
-        @UniqueConstraint(columnNames = "regon")
+        @UniqueConstraint(columnNames = "regon"),
+        @UniqueConstraint(columnNames = "userId"),
+        @UniqueConstraint(columnNames = "userName")
         })
 public class Garage {
 
     private @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long Id;
+    Long id;
 
     @NotBlank
     @NotNull
     @Size(min = 10, max = 10, message = "Nip length must be exactly 10")
     @Pattern(regexp = "\\d{10}")
     @Column(name = "nip", nullable = false, updatable = false, unique = true, length = 10)
-    String nip;
+    private String nip;
 
     @NotBlank
     @NotNull
     @Size(min = 7, max = 14, message = "REGON length must be 7 or 9 or 14")
     @Pattern(regexp = "^\\d{7}$|\\d{9}$|\\d{14}$")
     @Column(name = "regon", nullable = false, updatable = false, unique = true, length = 14)
-    String regon;
+    private String regon;
 
     @NotBlank
     @NotNull
-    @Column(name = "comp_name", nullable = false)
-    String companyName;
+    @Column(name = "companyName", nullable = false)
+    private String companyName;
 
-    @NotBlank
-    @NotNull
-    @Column(name = "address", nullable = false)
-    String address;
+
+    @Embedded
+    private Address address;
 
     @NotBlank
     @NotNull
     @Size(min = 9, max = 14)
-    @Column(name = "phone_number", nullable = false, length = 20)
-    String phoneNumber;
+    @Column(name = "phoneNumber", nullable = false, length = 20)
+    private String phoneNumber;
 
     @NotNull
     @ElementCollection(fetch = FetchType.LAZY)
     @Column(name = "ibans", nullable = false, length = 35)
-    List<@NotBlank
-        @Pattern(regexp = "^[A-Z]{2}\\d{2}[A-Z0-9]{4,30}$")
-        @Size(min = 15, max = 34) String> ibans;
+    private List<@NotBlank
+        @Pattern(regexp = "^[A-Z0-9]{4,30}$")
+        @Size(min = 15, max = 34)  String> ibans;
 
+    @Column(name = "userId", unique = true)
     private Long userId;
+
+    @Column(name = "userName", unique = true)
     private String userName;
 }

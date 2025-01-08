@@ -32,20 +32,17 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         String apiKey = request.getHeader(API_KEY_HEADER);
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        System.out.println("Recieved: " + apiKey + " Expected: " + EXPECTED_API_KEY);
-        if(apiKey != null && apiKey.equals(EXPECTED_API_KEY) && authHeader == null) {
-            System.out.println("JEST NAGŁÓWEK");
+        // Jeżeli klucz API jest poprawny i brak nagłówka Authorization
+        if (apiKey != null && apiKey.equals(EXPECTED_API_KEY) && authHeader == null) {
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_SERVICE"));
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    null, null, authorities
-            );
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(null, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            System.out.println("API Key authentication successful, skipping JWT filter");
             filterChain.doFilter(request, response);
-        } else if (apiKey != null && authHeader == null) {  // Jeśli klucz API jest obecny, ale brak JWT
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid API Key");
-        } else {
-            filterChain.doFilter(request, response);
+            return; // Zakończ, jeśli mamy poprawny API Key
         }
+
+        // Jeśli nie ma klucza API, przepuść dalej do filtra JWT
+        filterChain.doFilter(request, response);
     }
 }

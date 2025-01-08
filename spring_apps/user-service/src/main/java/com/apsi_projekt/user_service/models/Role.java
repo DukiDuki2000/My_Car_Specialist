@@ -4,5 +4,6 @@ public enum Role {
     ROLE_ADMIN,
     ROLE_MODERATOR,
     ROLE_GARAGE,
-    ROLE_CLIENT
+    ROLE_CLIENT,
+    ROLE_SERVICE
 }
