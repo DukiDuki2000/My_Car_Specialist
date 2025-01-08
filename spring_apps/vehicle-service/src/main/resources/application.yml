@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: vehicle-service
+  datasource:
+    username: ${POSTGRESQL_USERNAME}
+    url: jdbc:postgresql://${POSTGRESQL_CONTAINER}/${POSTGRESQL_DATABASE_VEHICLES}
+    password: ${POSTGRESQL_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+vin:
+  decoder:
+    secretKey: ${VIN_DECODER_SECRET_KEY}
+    apiKey: ${VIN_DECODER_API_KEY}
+
+API:
+  SECRET:
+    KEY: ${API_SECRET_KEY}

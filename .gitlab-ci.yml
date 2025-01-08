@@ -1,57 +1,313 @@
+
 stages:
   - build
-  - dockerize
   - test
+  - dockerize
   - deploy
   - release
-  
+  - cleanup
 
+variables:
+  DEPENDENCY_DIR: build/dependency
 
-build_frontend:
+build_api-gateway:
   stage: build
-  image: node:20-alpine
+  image: gradle:8.11
   script:
-    - cd frontend
-    # - cat package.json
-    # - export NODE_ENV=production
-    - npm ci
-    #- npm install
-    
-    #- npm install next react react-dom
-
-    # - npm install
-    # - npm install next react react-dom
-    #- npm install tailwindcss postcss autoprefixer
-    # - npx tailwindcss init
-    - ls -la node_modules/tailwindcss
-    - npm run build 
+    - cd spring_apps/api-gateway
+    - chmod +x gradlew
+    - ./gradlew bootJar
   artifacts:
     paths:
-      - frontend/public/
-      - frontend/package.json
-      - frontend/package-lock.json
+      - spring_apps/api-gateway/build/libs/*.jar
     expire_in: 1 day
+  only:
+    refs:
+      - backend
+    changes:
+     - spring_apps/api-gateway/**/*
+     - services.Dockerfile
 
+build_user-service:
+  stage: build
+  image: gradle:8.11
+  script:
+    - cd spring_apps/user-service
+    - chmod +x gradlew
+    - ./gradlew bootJar
+  artifacts:
+    paths:
+      - spring_apps/user-service/build/libs/*.jar
+    expire_in: 1 day
+  only:
+    refs:
+      - backend
+    changes:
+     - spring_apps/user-service/**/*
+     - services.Dockerfile
 
-#    changes:s
-#      - frontend/**/*
-#      - frontend/user/package.json
-#      - frontend/user/package-lock.json
+build_garage-service:
+  stage: build
+  image: gradle:8.11
+  script:
+    - cd spring_apps/garage-service
+    - chmod +x gradlew
+    - ./gradlew bootJar
+  artifacts:
+    paths:
+      - spring_apps/garage-service/build/libs/*.jar
+    expire_in: 1 day
+  only:
+    refs:
+      - backend
+    changes:
+     - spring_apps/garage-service/**/*
+     - services.Dockerfile
 
-dockerize_frontend:
+build_vehicle-service:
+  stage: build
+  image: gradle:8.11
+  script:
+    - cd spring_apps/vehicle-service
+    - chmod +x gradlew
+    - ./gradlew bootJar
+    - echo "VIN_DECODER_API_KEY=${VIN_DECODER_API_KEY}"
+  artifacts:
+    paths:
+      - spring_apps/vehicle-service/build/libs/*.jar
+    expire_in: 1 day
+  only:
+    refs:
+      - backend
+    changes:
+     - spring_apps/vehicle-service/**/*
+     - services.Dockerfile
+
+build_notification-service:
+  stage: build
+  image: gradle:8.11
+  script:
+    - cd spring_apps/notification-service
+    - chmod +x gradlew
+    - ./gradlew bootJar
+  artifacts:
+    paths:
+      - spring_apps/notification-service/build/libs/*.jar
+    expire_in: 1 day
+  only:
+    refs:
+      - backend
+    changes:
+     - spring_apps/notification-service/**/*
+
+build_recommendation-service:
+  stage: build
+  image: gradle:latest
+  script:
+    - cd spring_apps/recommendation-service
+    - chmod +x gradlew
+    - ./gradlew bootJar
+  artifacts:
+    paths:
+      - spring_apps/recommendation-service/build/libs/*.jar
+    expire_in: 1 day
+  only:
+    refs:
+      - backend
+    changes:
+     - spring_apps/recommendation-service/**/*
+     - services.Dockerfile
+
+create_api-gateway_image:
   stage: dockerize
   script:
-    - cd ./frontend
-    - VERSION=$(node -p "require('./package.json').version")
-    - docker build -f Dockerfile -t frontend_client:${VERSION}_commit_${CI_COMMIT_SHA} -t frontend_client:latest .
+    - cd spring_apps/api-gateway;
+    - mkdir -p ./${DEPENDENCY_DIR};
+    - cd ./${DEPENDENCY_DIR};
+    - jar -xf ../libs/*.jar;
+    - cd ../..
+    - chmod +x ./gradlew
+    - VERSION=$(./gradlew -q printVersion)
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - ls -a
+    - tree
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/api-gateway" --build-arg MAIN_CLASS=com.apsi_projekt.api_gateway.ApiGatewayApplication --build-arg JWT_SECRET="${JWT_SECRET_KEY}"  -t api-gateway:$VERSION_commit_${CI_COMMIT_SHA}  -t api-gateway:latest .
   needs:
-    - build_frontend
+    - build_api-gateway
+  only:
+    refs:
+      - backend
+    changes:
+      - spring_apps/api-gateway/**/*
+      - services.Dockerfile
 
+create_user-service_image:
+  stage: dockerize
+  script:
+    - cd spring_apps/user-service;
+    - mkdir -p ./${DEPENDENCY_DIR};
+    - cd ./${DEPENDENCY_DIR};
+    - jar -xf ../libs/*.jar;
+    - cd ../..
+    - chmod +x ./gradlew
+    - VERSION=$(./gradlew -q printVersion)
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - ls -a
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/user-service" --build-arg MAIN_CLASS=com.apsi_projekt.user_service.UserServiceApplication --build-arg SPRING_DATASOURCE_URL="jdbc:postgresql://${POSTGRESQL_CONTAINER}/${POSTGRESQL_DATABASE_AUTH}" --build-arg SPRING_DATASOURCE_USERNAME="${POSTGRESQL_USERNAME}" --build-arg SPRING_DATASOURCE_PASSWORD="${POSTGRESQL_PASSWORD}" --build-arg JWT_SECRET="${JWT_SECRET_KEY}" --build-arg API_SECRET_KEY="${API_SECRET_KEY}" -t user-service:${VERSION}_commit_${CI_COMMIT_SHA} -t user-service:latest .
+
+  needs:
+    - build_user-service
+  only:
+    refs:
+      - backend
+    changes:
+      - spring_apps/user-service/**/*
+      - services.Dockerfile
+
+create_garage-service_image:
+  stage: dockerize
+  script:
+    - cd spring_apps/garage-service;
+    - mkdir -p ./${DEPENDENCY_DIR};
+    - cd ./${DEPENDENCY_DIR};
+    - jar -xf ../libs/*.jar;
+    - cd ../..
+    - chmod +x ./gradlew
+    - VERSION=$(./gradlew -q printVersion)
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - ls -a
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/garage-service" --build-arg MAIN_CLASS=com.apsi_projekt.garage_service.GarageServiceApplication --build-arg SPRING_DATASOURCE_URL="jdbc:postgresql://${POSTGRESQL_CONTAINER}/${POSTGRESQL_DATABASE_GARAGES}" --build-arg SPRING_DATASOURCE_USERNAME="${POSTGRESQL_USERNAME}" --build-arg SPRING_DATASOURCE_PASSWORD="${POSTGRESQL_PASSWORD}" --build-arg API_SECRET_KEY="${API_SECRET_KEY}" -t garage-service:$VERSION_commit_${CI_COMMIT_SHA}  -t garage-service:latest .
+  needs:
+    - build_garage-service
+  only:
+    refs:
+      - backend
+    changes:
+      - spring_apps/garage-service/**/*
+      - services.Dockerfile
+
+create_vehicle-service_image:
+  stage: dockerize
+  script:
+    - cd spring_apps/vehicle-service;
+    - mkdir -p ./${DEPENDENCY_DIR};
+    - cd ./${DEPENDENCY_DIR};
+    - jar -xf ../libs/*.jar;
+    - cd ../..
+    - chmod +x ./gradlew
+    - VERSION=$(./gradlew -q printVersion)
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - ls -a
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/vehicle-service" --build-arg MAIN_CLASS=com.apsi_projekt.vehicle_service.VehicleServiceApplication --build-arg VIN_DECODER_API_KEY=${VIN_DECODER_API_KEY} --build-arg VIN_DECODER_SECRET_KEY=${VIN_DECODER_SECRET_KEY} --build-arg SPRING_DATASOURCE_URL="jdbc:postgresql://${POSTGRESQL_CONTAINER}/${POSTGRESQL_DATABASE_VEHICLES}" --build-arg SPRING_DATASOURCE_USERNAME="${POSTGRESQL_USERNAME}" --build-arg SPRING_DATASOURCE_PASSWORD="${POSTGRESQL_PASSWORD}" --build-arg API_SECRET_KEY="${API_SECRET_KEY}" -t vehicle-service:${VERSION}_commit_${CI_COMMIT_SHA}  -t vehicle-service:latest .
+    
+  needs:
+    - build_vehicle-service
+  only:
+    refs:
+      - backend
+    changes:
+      - spring_apps/vehicle-service/**/*
+      - services.Dockerfile
+
+create_notification-service_image:
+  stage: dockerize
+  script:
+    - cd spring_apps/notification-service;
+    - mkdir -p ./${DEPENDENCY_DIR};
+    - cd ./${DEPENDENCY_DIR};
+    - jar -xf ../libs/*.jar;
+    - cd ../..
+    - chmod +x ./gradlew
+    - VERSION=$(./gradlew -q printVersion)
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - ls -a
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/notification-service" --build-arg MAIN_CLASS=com.apsi_projekt.notification_service.NotificationServiceApplication -t notification-service:$VERSION_commit_${CI_COMMIT_SHA}  -t notification-service:latest .
+  needs:
+    - build_notification-service
+  only:
+    refs:
+      - backend
+    changes:
+      - spring_apps/notification-service/**/*
+      - services.Dockerfile
+
+create_recommendation-service_image:
+  stage: dockerize
+  script:
+    - cd spring_apps/recommendation-service;
+    - mkdir -p ./${DEPENDENCY_DIR};
+    - cd ./${DEPENDENCY_DIR};
+    - jar -xf ../libs/*.jar;
+    - cd ../..
+    - chmod +x ./gradlew
+    - VERSION=$(./gradlew -q printVersion)
+    - cd;
+    - cd ./**/**/**/**/my_car_specialist
+    - ls -a
+    - docker build -f services.Dockerfile --build-arg APP_DIR="/spring_apps/recommendation-service" --build-arg MAIN_CLASS=com.apsi_projekt.recommendation_service.RecommendationServiceApplication -t recommendation-service:$VERSION_commit_${CI_COMMIT_SHA}  -t recommendation-service:latest .
+  needs:
+    - build_recommendation-service
+  only:
+    refs:
+      - backend
+    changes:
+      - spring_apps/recommendation-service/**/*
+      - services.Dockerfile
 
 deploy_services:
   stage: deploy
   script:
-    - cd ./frontend
     - docker compose -f docker-compose.yml up -d
+  only:
+    refs:
+      - backend
+    changes:
+      - spring_apps/**/*
+      - services.Dockerfile
+      - docker-compose.yml
+
+cleanup_images:
+  stage: cleanup
+  script:
+    - docker image prune -a --filter "until=72h" -f
   needs:
-    - dockerize_frontend
+    - deploy_services
+# dockerize:
+#   stage: dockerize
+#   script:
+#     - tree
+#     - docker compose -f docker-compose.yml build
+#   dependencies:
+#     - unpack_api_gateway_jar
+#   only:
+#     refs:
+#       - main
+#     changes:
+#      - spring_apps/**/*
+#      - ./services.Dockerfile
+#      - ./docker-compose.yml
+
+# unpack_api_gateway_jar:
+#   stage: package
+#   script:
+#     - cd spring_apps/api-gateway;
+#     - mkdir -p ./${DEPENDENCY_DIR};
+#     - cd ./${DEPENDENCY_DIR};
+#     - jar -xf ../libs/*.jar;
+#     #- docker compose build -f docker-compose.yml
+#   artifacts:
+#     paths:
+#       - spring_apps/api-gateway/${DEPENDENCY_DIR}/  
+#     expire_in: 1 day
+#   only:
+#     refs:
+#       - main
+#     changes:
+#      - spring_apps/api-gateway/**/*
+#      - ./services.Dockerfile
+#      - ./docker-compose.yml

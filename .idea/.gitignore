@@ -6,3 +6,27 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+
+#Server port
+/spring_apps/api-gateway/src/main/resources/application.properties
+/spring_apps/garage-service/src/main/resources/application.properties
+/spring_apps/notification-service/src/main/resources/application.properties
+/spring_apps/recommendation-service/src/main/resources/application.properties
+/spring_apps/user-service/src/main/resources/application.properties
+/spring_apps/vehicle-service/src/main/resources/application.properties
+
+#gradlew.bat
+/spring_apps/api-gateway/gradlew.bat
+/spring_apps/garage-service/gradlew.bat
+/spring_apps/notification-service/gradlew.bat
+/spring_apps/recommendation-service/gradlew.bat
+/spring_apps/user-service/gradlew.bat
+/spring_apps/vehicle-service/gradlew.bat
+
+/spring_apps/vehicle-service/src/main/resources/application_local.properties
+
+/spring_apps/vehicle-service/.gitignore
+idea .gitignore
+
+**/application_local.properties
+**/gradlew.bat
