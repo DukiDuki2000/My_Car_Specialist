@@ -10,7 +10,7 @@ spring:
       ddl-auto: update
 jwt:
   secret: ${JWT_SECRET_KEY}
-  access_expiration: "60000"
+  access_expiration: "300000"
   refresh_expiration: 86400000
 
 API:
