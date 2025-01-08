@@ -97,6 +97,11 @@ const nextConfig: NextConfig = {
       {
         source: '/api/report/vehicle/:vehicleId',
         destination: 'http://MCS_API_Gateway:8080/report/vehicle/:vehicleId'
+      },
+      // Wszystkie warsztaty
+      {
+        source: '/api/garage/all',
+        destination: 'http://MCS_API_Gateway:8080/garage/all'
       }
     ];
   },

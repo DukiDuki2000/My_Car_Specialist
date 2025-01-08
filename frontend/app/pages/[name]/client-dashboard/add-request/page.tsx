@@ -11,6 +11,7 @@ interface Car {
 }
 
 interface Workshop {
+  id: number;
   name: string;
   address: string;
 }
@@ -36,7 +37,8 @@ export default function WorkshopSearch() {
   const [userCars, setUserCars] = useState<Car[]>([]);
   const [selectedCar, setSelectedCar] = useState<string>('');
   const [opis, setOpis] = useState('');
-  const [selectedWorkshop, setSelectedWorkshop] = useState('');
+  const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null); // Obiekt warsztatu
+  const [workshops, setWorkshops] = useState<Workshop[]>([]); // Lista warsztatów
   
   // ------------------------------------------------------
   // 3. Pobieranie samochodów użytkownika z API
@@ -64,23 +66,34 @@ export default function WorkshopSearch() {
   }, []);
 
   // ------------------------------------------------------
-  // 4. Warsztaty (przykładowe dane)
+  // 4. Pobieranie warsztatów z API
   // ------------------------------------------------------
-  const workshops: Workshop[] = [
-    {
-      name: 'U Pana Rysia Zawsze Śmiga',
-      address: 'Warszawa, ul. Mechaników 12',
-    },
-    {
-      name: 'Auto Naprawa Max',
-      address: 'Warszawa, ul. Długa 8',
-    },
-    {
-      name: 'Warsztat ABC',
-      address: 'Kraków, ul. Krótka 3',
-    },
-    // Dodaj więcej warsztatów tutaj, jeśli potrzebujesz
-  ];
+  useEffect(() => {
+    const fetchWorkshops = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await fetch('/api/garage/all', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Nie udało się pobrać warsztatów.');
+        }
+        const data = await response.json();
+        const formattedWorkshops: Workshop[] = data.map((workshop: any) => ({
+          id: workshop.id, // Pobieranie id warsztatu
+          name: workshop.companyName,
+          address: `${workshop.address.street}, ${workshop.address.city} ${workshop.address.postalCode}`,
+        }));
+        setWorkshops(formattedWorkshops);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchWorkshops();
+  }, []);
 
   // ------------------------------------------------------
   // 5. Event handlery
@@ -93,21 +106,47 @@ export default function WorkshopSearch() {
     setOpis(e.target.value);
   };
 
-  const handleRowClick = (workshopName: string) => {
-    setSelectedWorkshop(workshopName);
+  const handleRowClick = (workshop: Workshop) => {
+    setSelectedWorkshop(workshop);
   };
 
   const isFormComplete =
     selectedCar && opis && selectedWorkshop;
 
-  const handleSend = () => {
-    // Implementuj logikę wysyłania formularza tutaj
-    console.log('Formularz wysłany:', {
-      selectedCar,
-      opis,
-      selectedWorkshop,
-    });
-    // Przykładowo, możesz przekierować użytkownika lub pokazać powiadomienie
+  const handleSend = async () => {
+    const data = {
+      garage: {
+        id: selectedWorkshop?.id, // ID warsztatu
+      },
+      vehicleId: Number(selectedCar), // ID pojazdu
+      description: opis, // Opis usługi
+    };
+
+    console.group('Dane do wysłania');
+    console.log(JSON.stringify(data, null, 2)); // Wyświetlenie danych w konsoli w czytelnym formacie
+    console.groupEnd();
+
+    // Logika wysyłania danych do API
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch('/api/client/create-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        console.log('Dane zostały pomyślnie wysłane.');
+        router.back(); // Przekierowanie na poprzednią stronę
+      } else {
+        console.error('Wystąpił błąd podczas wysyłania danych:', response.status);
+      }
+    } catch (error) {
+      console.error('Błąd podczas wysyłania danych:', error);
+    }
   };
 
   // ------------------------------------------------------
@@ -153,7 +192,7 @@ export default function WorkshopSearch() {
             <input
               type="text"
               className="w-full border border-gray-300 rounded px-4 py-2"
-              value={selectedWorkshop}
+              value={selectedWorkshop ? `${selectedWorkshop.name} (ID: ${selectedWorkshop.id})` : ''}
               readOnly
             />
           </div>
@@ -170,11 +209,11 @@ export default function WorkshopSearch() {
             <tbody>
               {workshops.map((workshop) => (
                 <tr
-                  key={workshop.name}
+                  key={workshop.id}
                   className={`hover:bg-gray-100 cursor-pointer ${
-                    selectedWorkshop === workshop.name ? 'bg-gray-200' : ''
+                    selectedWorkshop?.id === workshop.id ? 'bg-gray-200' : ''
                   }`}
-                  onClick={() => handleRowClick(workshop.name)}
+                  onClick={() => handleRowClick(workshop)}
                 >
                   <td className="px-4 py-2">{workshop.name}</td>
                   <td className="px-4 py-2">{workshop.address}</td>
