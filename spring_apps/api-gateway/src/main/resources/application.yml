@@ -21,7 +21,7 @@ spring:
         - id: garage-service
           uri: http://garage-service:8080
           predicates:
-            - Path=/garage/**,/report/**
+            - Path=/garage/**
           filters:
             - name: RoleFilter
 
