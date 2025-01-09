@@ -6,6 +6,7 @@ import com.apsi_projekt.vehicle_service.service.VinDecoderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -71,7 +72,15 @@ public class VehicleRestController {
         }
     }
 
-
+    @GetMapping("/user/{userId}")
+    @PreAuthorize("hasAnyRole('ROLE_GARAGE','ROLE_MODERATOR','ROLE_ADMIN')")
+    public ResponseEntity<List<Vehicle>> getVehiclesByUserId(@PathVariable Long userId) {
+        List<Vehicle> vehicles = vehicleRepository.findByUserId(userId);
+        if (vehicles.isEmpty()) {
+            throw new ResourceNotFoundException("There are no vehicles for user ID " + userId);
+        }
+        return ResponseEntity.ok(vehicles);
+    }
 
 
 }
