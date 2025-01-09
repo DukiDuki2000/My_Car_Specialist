@@ -46,7 +46,7 @@ const nextConfig: NextConfig = {
       // Dodawanie warsztatu przez moderatora
       {
         source: '/api/mod/garage-add',
-        destination: 'http://MCS_API_Gateway:8080/garage/add'
+        destination: 'http://MCS_API_Gateway:8080/garage/register'
       },
       // Składanie prośby o zarejestrowanie warsztatu
       {
