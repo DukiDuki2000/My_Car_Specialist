@@ -67,25 +67,34 @@ public class ReportService {
         }
         switch (currentStatus) {
             case NEW:
-                if (newStatus != ReportStatus.IN_PROGRESS) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "From NEW status, you can only transition to IN_PROGRESS.");
+                if (newStatus == ReportStatus.IN_PROGRESS || newStatus == ReportStatus.CANCELLED) {
+
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "From NEW status, you can only transition to IN_PROGRESS or CANCELLED.");
                 }
                 break;
+
             case IN_PROGRESS:
                 if (newStatus != ReportStatus.COMPLETED) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "From IN_PROGRESS status, you can only transition to COMPLETED.");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "From IN_PROGRESS status, you can only transition to COMPLETED.");
                 }
                 break;
-            case COMPLETED:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COMPLETED status is final and cannot be changed");
-            case CANCELLED:
-                if (newStatus != ReportStatus.NEW) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can only cancel NEW reports");
 
-                }
+            case COMPLETED:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "COMPLETED status is final and cannot be changed.");
+
+            case CANCELLED:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "CANCELLED status is final and cannot be changed.");
+
             default:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid current status: " + currentStatus);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Invalid current status: " + currentStatus);
         }
+
 
         report.setStatus(newStatus);
         report.getDateHistory().add(LocalDateTime.now());
