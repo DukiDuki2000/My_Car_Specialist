@@ -75,8 +75,8 @@ const nextConfig: NextConfig = {
       },
       // Zmiana statusu zlecenia przez warsztat
       {
-        source: '/api/garage/report/status/:reportId?newStatus=:status',
-        destination: 'http://MCS_API_Gateway:8080/report/status/:reportId?newStatus=:status'
+        source: '/api/garage/report/status/:reportId',
+        destination: 'http://MCS_API_Gateway:8080/report/status/:reportId'
       },
       // Dodanie czynności do zlecenia przez warsztat
       {
