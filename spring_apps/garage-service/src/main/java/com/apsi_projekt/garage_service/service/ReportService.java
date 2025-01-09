@@ -78,6 +78,11 @@ public class ReportService {
                 break;
             case COMPLETED:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COMPLETED status is final and cannot be changed");
+            case CANCELLED:
+                if (newStatus != ReportStatus.NEW) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can only cancel NEW reports");
+
+                }
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid current status: " + currentStatus);
         }
