@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findByUserName(String userName);
-    List<Report> findByGarageId(Long id);
+    List<Report> findByGarageId(Long garageId);
     List<Report> findByVehicleId(Long vehicleId);
     List<Report> findByStatusAndUserId(ReportStatus status, Long userId);
     List<Report> findByStatusAndVehicleId(ReportStatus status, Long vehicleId);
