@@ -4,157 +4,303 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 
-// Definicje interfejsów
-interface ServiceRequest {
+// Typy
+type StatusType = 'NEW' | 'IN_PROGRESS' | 'COMPLETED';
+
+interface Garage {
   id: number;
-  clientName: string;
-  email: string;
+  nip: string;
+  regon: string;
+  companyName: string;
+  address: string;
   phoneNumber: string;
-  car: string;
-  serviceDescription: string;
-  city: string;
-  status: 'Pending' | 'Accepted' | 'Rejected' | 'Completed'; // Dodany status 'Completed'
-  createdAt: string;
+  ibans: string[];
+  userId: number;
+  userName: string;
 }
 
+interface ServiceRequest {
+  id: number;
+  dateHistory: string[];
+  garage: Garage;
+  status: StatusType;
+  operations: string[];
+  operationDates: string[];
+  vehicleId: number;
+  userId: number;
+  userName: string; // Nazwa użytkownika/klienta
+  description: string; // Opis zgłoszenia
+  car?: string;        // Nazwa pojazdu (uzupełniane we frontendzie)
+  userEmail?: string;  // Email klienta (uzupełniane we frontendzie)
+}
+
+// Pomocnicze typy
+interface Vehicle {
+  id: number;
+  brand: string;
+  model: string;
+}
+
+interface UserInfo {
+  id: number;
+  email: string;
+}
+
+/**  
+ * Reprezentuje pojedynczy wpis w tabeli historii.  
+ * W Twoim backendzie mamy pary: operations[i] oraz operationDates[i].  
+ * My i tak łączymy typ + obiekt w jednego stringa w `handleAddAction`.  
+ * Możemy zatem przechowywać to w polu `typUslugi`. 
+ */
 interface ActionHistory {
   id: number;
-  zgloszenie_id: number;
-  typUslugi: string;      // Nowe pole
-  obiektUslugi: string;   // Nowe pole
-  cenaUslugi: number;     // Nowe pole
-  data: string;
+  typUslugi: string;  // Cały napis, np. "Wymiana Opon"
+  data: string;       // Data z operationDates
 }
 
 export default function ServiceRequestDetail() {
   const router = useRouter();
   const params = useParams();
+
+  // Parametry w URL: /pages/[name]/garage-dashboard/actual/[id]
   const name = params.name as string;
-  const requestId = Number(params.id);
+  const reportId = Number(params.id);
 
   const [isClient, setIsClient] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
 
+  // Aktualnie wybrane zlecenie
   const [request, setRequest] = useState<ServiceRequest | null>(null);
+
+  // Zmapowana historia do tabeli
   const [history, setHistory] = useState<ActionHistory[]>([]);
-  const [typUslugi, setTypUslugi] = useState<string>('');        // Nowe pole
-  const [obiektUslugi, setObiektUslugi] = useState<string>('');  // Nowe pole
-  const [cenaUslugi, setCenaUslugi] = useState<number>(0);       // Nowe pole
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-  const [success, setSuccess] = useState<string>('');
 
-  // Opcje dla rozwijanych list
+  // Pola do formularza dodawania nowej operacji
+  const [typUslugi, setTypUslugi] = useState('');
+  const [obiektUslugi, setObiektUslugi] = useState('');
+
+  // Stany do obsługi
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  // Selecty
   const typUslugiOptions = ['Wymiana', 'Naprawa', 'Diagnostyka', 'Kontrola', 'Inspekcja'];
-  const obiektUslugiOptions = ['Silnika', 'Hamulców', 'Opon', 'Elektroniki', 'Skrzyni biegów', 'Układu wydechowego'];
+  const obiektUslugiOptions = [
+    'Silnika',
+    'Hamulców',
+    'Opon',
+    'Elektroniki',
+    'Skrzyni biegów',
+    'Układu wydechowego',
+  ];
 
+  // 1. Sprawdzamy, czy jesteśmy w przeglądarce
   useEffect(() => {
     setIsClient(true);
-    const storedUsername = localStorage.getItem('username');
-    setUsername(storedUsername);
+    setUsername(localStorage.getItem('username'));
   }, []);
 
-  // Autoryzacja
+  // 2. Autoryzacja
   useEffect(() => {
     if (!isClient) return;
 
     const token = localStorage.getItem('accessToken');
     const role = localStorage.getItem('role');
-
     if (!token || !username || !role) {
       router.push('/auth/login');
       return;
     }
-
     if (role !== 'ROLE_GARAGE') {
       router.push('/auth/login');
       return;
     }
   }, [router, isClient, username]);
 
-  // Używanie danych przykładowych zamiast API
+  // 3. Pobieramy wszystkie zlecenia -> wyciągamy to o `id == reportId`
   useEffect(() => {
     if (!isClient) return;
+    fetchAllServiceRequests();
+  }, [isClient, reportId]);
 
-    // Przykładowe dane zgłoszenia
-    const sampleRequest: ServiceRequest = {
-      id: requestId,
-      clientName: 'Jan Kowalski',
-      email: 'jan.kowalski@example.com',
-      phoneNumber: '+48 123 456 789',
-      car: 'BMW 3 Series – XYZ 12345',
-      serviceDescription: 'Wymiana oleju i filtrów',
-      city: 'Warszawa',
-      status: 'Pending',
-      createdAt: '2025-01-01T10:00:00Z',
-    };
+  const fetchAllServiceRequests = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      setSuccess('');
 
-    // Przykładowa historia działań
-    const sampleHistory: ActionHistory[] = [
-      {
-        id: 1,
-        zgloszenie_id: requestId,
-        typUslugi: 'Wymiana',
-        obiektUslugi: 'Silnik',
-        cenaUslugi: 500,
-        data: '2025-01-02',
-      },
-      {
-        id: 2,
-        zgloszenie_id: requestId,
-        typUslugi: 'Naprawa',
-        obiektUslugi: 'Hamulce',
-        cenaUslugi: 300,
-        data: '2025-01-03',
-      },
-    ];
+      const token = localStorage.getItem('accessToken');
+      if (!token) throw new Error('Brak tokena');
 
-    // Ustawienie stanu z przykładowymi danymi
-    setRequest(sampleRequest);
-    setHistory(sampleHistory);
-  }, [isClient, requestId]);
+      const resp = await fetch('/api/report/garage/reports', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!resp.ok) {
+        throw new Error(`Błąd pobierania zleceń. Status: ${resp.status}`);
+      }
 
-  // Obsługa dodawania nowej akcji
-  const handleAddAction = (e: React.FormEvent) => {
-    e.preventDefault();
+      const allData: ServiceRequest[] = await resp.json();
 
-    if (!typUslugi || !obiektUslugi || cenaUslugi <= 0) {
-      setError('Proszę wypełnić wszystkie pola poprawnie.');
-      return;
+      // Zbieramy unikalne userId
+      const uniqueUserIds = [...new Set(allData.map((r) => r.userId))];
+
+      // Pobranie pojazdów
+      const vehiclesMap = new Map<number, Vehicle[]>();
+      const fetchVehiclesPromises = uniqueUserIds.map(async (userId) => {
+        const vRes = await fetch(`/api/client/vehicle/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!vRes.ok) {
+          console.warn(`Błąd pobierania pojazdów userId=${userId}`);
+          vehiclesMap.set(userId, []);
+          return;
+        }
+        const userVehicles: Vehicle[] = await vRes.json();
+        vehiclesMap.set(userId, userVehicles);
+      });
+
+      // Pobranie e-maili
+      const usersMap = new Map<number, UserInfo>();
+      const fetchUserInfoPromises = uniqueUserIds.map(async (userId) => {
+        const uRes = await fetch(`/api/client/user/info/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!uRes.ok) {
+          console.warn(`Błąd pobierania userInfo userId=${userId}`);
+          usersMap.set(userId, { id: userId, email: 'brak danych' });
+          return;
+        }
+        const userInfo: UserInfo = await uRes.json();
+        usersMap.set(userId, userInfo);
+      });
+
+      await Promise.all([...fetchVehiclesPromises, ...fetchUserInfoPromises]);
+
+      // Łączenie
+      const dataWithCarAndEmail = allData.map((req) => {
+        const userVehicles = vehiclesMap.get(req.userId) || [];
+        const foundVeh = userVehicles.find((v) => v.id === req.vehicleId);
+
+        let carInfo = `vehicleId=${req.vehicleId}`;
+        if (foundVeh) {
+          carInfo = `${foundVeh.brand} ${foundVeh.model}`;
+        }
+
+        const userObj = usersMap.get(req.userId);
+        const email = userObj ? userObj.email : 'brak e-maila';
+
+        return {
+          ...req,
+          car: carInfo,
+          userEmail: email,
+        };
+      });
+
+      // Szukamy zlecenia
+      const found = dataWithCarAndEmail.find((r) => r.id === reportId);
+      if (!found) {
+        throw new Error(`Nie znaleziono zlecenia o ID=${reportId}`);
+      }
+
+      setRequest(found);
+
+      // Budujemy historię (jedna kolumna "typUslugi" + data)
+      const newHistory: ActionHistory[] = found.operations.map((op, i) => ({
+        id: i + 1,
+        typUslugi: op, // Tutaj już jest cały string, np. "Wymiana Opon"
+        data: found.operationDates[i]?.split('T')[0] || '',
+      }));
+      setHistory(newHistory);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Wystąpił błąd przy pobieraniu zleceń.');
+    } finally {
+      setLoading(false);
     }
-
-    // Automatyczna data - bieżąca data
-    const currentDate = new Date().toISOString().split('T')[0];
-
-    // Dodawanie nowej akcji do historii (bez API)
-    const newAction: ActionHistory = {
-      id: history.length + 1, // Prosty sposób na generowanie ID
-      zgloszenie_id: requestId,
-      typUslugi,
-      obiektUslugi,
-      cenaUslugi,
-      data: currentDate,
-    };
-
-    setHistory(prev => [newAction, ...prev]);
-    setTypUslugi('');
-    setObiektUslugi('');
-    setCenaUslugi(0);
-    setSuccess('Nowa akcja została dodana pomyślnie.');
-    setError('');
   };
 
-  // Obsługa zakończenia zgłoszenia
-  const handleCompleteRequest = () => {
-    // Potwierdzenie działania przez użytkownika
-    if (!confirm('Czy na pewno chcesz zakończyć to zgłoszenie?')) {
+  /** Dodawanie nowej operacji w formie tablicy stringów. */
+  const handleAddAction = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!typUslugi || !obiektUslugi) {
+      setError('Wybierz typ i obiekt usługi!');
       return;
     }
 
-    // Aktualizacja statusu zgłoszenia
-    setRequest(prev => prev ? { ...prev, status: 'Completed' } : prev);
-    setSuccess('Zgłoszenie zostało zakończone.');
-    setError('');
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      setError('Brak tokena');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Łączymy np. "Wymiana Opon"
+      const newOperation = `${typUslugi} ${obiektUslugi}`;
+      const body = [newOperation]; // ["Wymiana Opon"]
+
+      const res = await fetch(`/api/garage/report/operations/${reportId}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        throw new Error(`Błąd dodawania operacji. Status: ${res.status}`);
+      }
+
+      // Odśwież dane
+      await fetchAllServiceRequests();
+
+      // Reset pól
+      setTypUslugi('');
+      setObiektUslugi('');
+      setSuccess('Operacja została dodana.');
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Błąd przy dodawaniu akcji.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /** Zmiana statusu na COMPLETED */
+  const handleCompleteRequest = async () => {
+    if (!confirm('Czy na pewno chcesz zakończyć to zgłoszenie?')) return;
+
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      setError('Brak tokena');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      setSuccess('');
+
+      const res = await fetch(`/api/garage/report/status/${reportId}?newStatus=COMPLETED`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        throw new Error(`Błąd zmiany statusu. Status: ${res.status}`);
+      }
+
+      await fetchAllServiceRequests();
+      setSuccess('Zgłoszenie zostało zakończone.');
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Błąd przy zakończaniu zgłoszenia.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!isClient) {
@@ -163,32 +309,48 @@ export default function ServiceRequestDetail() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <Link href={`/pages/${name}/garage-dashboard`} className="text-blue-500 hover:underline">
+      {/* Powrót */}
+      <Link href={`/pages/${name}/garage-dashboard/actual`} className="text-blue-500 hover:underline">
         &larr; Powrót
       </Link>
       <h1 className="text-3xl font-bold mb-6 mt-4">Szczegóły Zgłoszenia</h1>
 
-      {/* Wyświetlanie stanu ładowania i błędów */}
+      {/* Komunikaty */}
       {loading && <p>Ładowanie...</p>}
       {error && <p className="text-red-500">{error}</p>}
       {success && <p className="text-green-500">{success}</p>}
 
+      {/* Górny segment */}
       {request && (
         <div className="bg-white shadow-md rounded p-6 mb-6">
           <p><strong>ID:</strong> {request.id}</p>
-          <p><strong>Klient:</strong> {request.clientName}</p>
-          <p><strong>Email:</strong> {request.email}</p>
-          <p><strong>Numer Telefonu:</strong> {request.phoneNumber}</p>
+          <p><strong>Klient:</strong> {request.userName}</p>
+          <p><strong>Email klienta:</strong> {request.userEmail}</p>
           <p><strong>Samochód:</strong> {request.car}</p>
-          <p><strong>Opis Usługi:</strong> {request.serviceDescription}</p>
-          <p><strong>Miejscowość:</strong> {request.city}</p>
-          <p><strong>Status:</strong> {request.status === 'Pending' ? 'Oczekuje' : request.status === 'Accepted' ? 'Przyjęte' : request.status === 'Rejected' ? 'Odrzucone' : 'Zakończone'}</p>
-          <p><strong>Data Zgłoszenia:</strong> {new Date(request.createdAt).toLocaleString()}</p>
+          <p><strong>Opis zgłoszenia:</strong> {request.description}</p>
+
+          {request.dateHistory[0] && (
+            <p>
+              <strong>Data zgłoszenia:</strong>{' '}
+              {new Date(request.dateHistory[0]).toLocaleString()}
+            </p>
+          )}
+
+          <p>
+            <strong>Status:</strong>{' '}
+            {request.status === 'NEW'
+              ? 'Oczekuje'
+              : request.status === 'IN_PROGRESS'
+              ? 'W trakcie'
+              : request.status === 'COMPLETED'
+              ? 'Zakończone'
+              : request.status}
+          </p>
         </div>
       )}
 
-      {/* Przycisk do zakończenia zgłoszenia */}
-      {request && request.status !== 'Completed' && (
+      {/* Przycisk 'Zakończ' jeśli nie jest COMPLETED */}
+      {request && request.status !== 'COMPLETED' && (
         <div className="mb-6">
           <button
             onClick={handleCompleteRequest}
@@ -199,16 +361,14 @@ export default function ServiceRequestDetail() {
         </div>
       )}
 
-      {/* Formularz dodawania nowej akcji */}
-      {request && request.status !== 'Completed' && (
+      {/* Formularz nowej akcji, jeśli nie 'COMPLETED' */}
+      {request && request.status !== 'COMPLETED' && (
         <div className="bg-white shadow-md rounded p-6 mb-6">
           <h2 className="text-2xl font-semibold mb-4">Dodaj Nową Akcję</h2>
           <form onSubmit={handleAddAction}>
-            {/* Typ usługi */}
             <div className="mb-4">
-              <label htmlFor="typUslugi" className="block text-gray-700">Typ Usługi:</label>
+              <label className="block text-gray-700">Typ Usługi:</label>
               <select
-                id="typUslugi"
                 value={typUslugi}
                 onChange={(e) => setTypUslugi(e.target.value)}
                 className="w-full border rounded px-3 py-2"
@@ -216,53 +376,28 @@ export default function ServiceRequestDetail() {
               >
                 <option value="">-- Wybierz Typ Usługi --</option>
                 {typUslugiOptions.map((typ) => (
-                  <option key={typ} value={typ}>{typ}</option>
+                  <option key={typ} value={typ}>
+                    {typ}
+                  </option>
                 ))}
               </select>
             </div>
 
-            {/* Obiekt usługi */}
             <div className="mb-4">
-              <label htmlFor="obiektUslugi" className="block text-gray-700">Obiekt Usługi:</label>
+              <label className="block text-gray-700">Obiekt Usługi:</label>
               <select
-                id="obiektUslugi"
                 value={obiektUslugi}
                 onChange={(e) => setObiektUslugi(e.target.value)}
                 className="w-full border rounded px-3 py-2"
                 required
               >
                 <option value="">-- Wybierz Obiekt Usługi --</option>
-                {obiektUslugiOptions.map((obiekt) => (
-                  <option key={obiekt} value={obiekt}>{obiekt}</option>
+                {obiektUslugiOptions.map((obj) => (
+                  <option key={obj} value={obj}>
+                    {obj}
+                  </option>
                 ))}
               </select>
-            </div>
-
-            {/* Cena usługi */}
-            <div className="mb-4">
-              <label htmlFor="cenaUslugi" className="block text-gray-700">Cena Usługi (PLN):</label>
-              <input
-                type="number"
-                id="cenaUslugi"
-                value={cenaUslugi}
-                onChange={(e) => setCenaUslugi(Number(e.target.value))}
-                className="w-full border rounded px-3 py-2"
-                required
-                min="0"
-                step="0.01"
-              />
-            </div>
-
-            {/* Data - automatyczna */}
-            <div className="mb-4 hidden"> {/* Ukrycie pola daty */}
-              <label htmlFor="data" className="block text-gray-700">Data:</label>
-              <input
-                type="date"
-                id="data"
-                value={new Date().toISOString().split('T')[0]}
-                readOnly
-                className="w-full border rounded px-3 py-2"
-              />
             </div>
 
             <button
@@ -275,7 +410,7 @@ export default function ServiceRequestDetail() {
         </div>
       )}
 
-      {/* Historia działań */}
+      {/* Tabela historii Działań (bez obiektu usługi) */}
       <div className="bg-white shadow-md rounded p-6">
         <h2 className="text-2xl font-semibold mb-4">Historia Działań</h2>
         {history.length > 0 ? (
@@ -283,18 +418,16 @@ export default function ServiceRequestDetail() {
             <thead>
               <tr>
                 <th className="px-4 py-2 border w-24">Data</th>
-                <th className="px-4 py-2 border w-32">Typ Usługi</th>
-                <th className="px-4 py-2 border w-32">Obiekt Usługi</th>
-                <th className="px-4 py-2 border w-24">Cena (PLN)</th>
+                <th className="px-4 py-2 border w-64">Usługa</th>
               </tr>
             </thead>
             <tbody>
-              {history.map(action => (
+              {history.map((action) => (
                 <tr key={action.id} className="text-center">
-                  <td className="px-4 py-2 border">{new Date(action.data).toLocaleDateString()}</td>
+                  <td className="px-4 py-2 border">
+                    {action.data ? new Date(action.data).toLocaleDateString() : '-'}
+                  </td>
                   <td className="px-4 py-2 border">{action.typUslugi}</td>
-                  <td className="px-4 py-2 border">{action.obiektUslugi}</td>
-                  <td className="px-4 py-2 border">{action.cenaUslugi.toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
