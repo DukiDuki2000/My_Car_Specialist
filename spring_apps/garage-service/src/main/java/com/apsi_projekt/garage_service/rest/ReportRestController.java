@@ -35,7 +35,7 @@ public class ReportRestController {
 
 
     @GetMapping("/garage/reports")
-    @PreAuthorize("hasAnyRole('ROLE_CLIENT','ROLE_MODERATOR','ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_GARAGE','ROLE_MODERATOR','ROLE_ADMIN')")
     public ResponseEntity<List<Report>> getAllGarageReports(HttpServletRequest request) {
         List<Report> reports = reportService.getAllGarageReports(request);
         return ResponseEntity.ok(reports);
