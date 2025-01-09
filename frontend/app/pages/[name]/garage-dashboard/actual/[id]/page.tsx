@@ -46,7 +46,7 @@ export default function ServiceRequestDetail() {
 
   // Opcje dla rozwijanych list
   const typUslugiOptions = ['Wymiana', 'Naprawa', 'Diagnostyka', 'Kontrola', 'Inspekcja'];
-  const obiektUslugiOptions = ['Silnik', 'Hamulce', 'Opony', 'Elektronika', 'Skrzynia biegów', 'Układ wydechowy'];
+  const obiektUslugiOptions = ['Silnika', 'Hamulców', 'Opon', 'Elektroniki', 'Skrzyni biegów', 'Układu wydechowego'];
 
   useEffect(() => {
     setIsClient(true);
