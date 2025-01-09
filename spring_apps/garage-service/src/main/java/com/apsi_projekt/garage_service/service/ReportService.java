@@ -45,7 +45,7 @@ public class ReportService {
 
     public List<Report> getAllGarageReports(HttpServletRequest request){
         String garageId = request.getHeader("X-Id");
-        return reportRepository.findByGarage_Id(Long.parseLong(garageId));
+        return reportRepository.findByGarage_UserId(Long.parseLong(garageId));
     }
 
     public List<Report> getAllStatusReports(HttpServletRequest request, String statusStr){
