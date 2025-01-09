@@ -3,19 +3,50 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-type StatusType = 'NEW' | 'IN_PROGRESS' | 'COMPLETED' | 'REJECTED';
+type StatusType = 'NEW' | 'IN_PROGRESS' | 'COMPLETED';
+
+interface Garage {
+  id: number;
+  nip: string;
+  regon: string;
+  companyName: string;
+  address: string;
+  phoneNumber: string;
+  ibans: string[];
+  userId: number;
+  userName: string;
+}
 
 interface ServiceRequest {
   id: number;
-  clientName: string;
-  email: string;
-  phoneNumber: string;
-  car: string;
-  serviceDescription: string;
+  dateHistory: string[];
+  garage: Garage;
   status: StatusType;
-  // Dodatkowe pola (jeśli istnieją w API)
-  // city?: string;
-  // createdAt?: string;
+  operations: string[];
+  operationDates: string[];
+  vehicleId: number;
+  userId: number;
+  userName: string;
+  description: string;
+  // Pole, w którym trzymamy dane o wybranym pojeździe
+  car?: string;
+  // Pole, w którym trzymamy e-mail użytkownika
+  userEmail?: string;
+}
+
+// Przykładowy typ pojazdu, dostosuj do tego co naprawdę zwraca API
+interface Vehicle {
+  id: number;
+  brand: string;
+  model: string;
+  // ...inne pola, np. year, vin itd.
+}
+
+// Przykładowy typ info o użytkowniku, dostosuj do tego co naprawdę zwraca API
+interface UserInfo {
+  id: number;
+  email: string;
+  // ...inne pola np. firstName, lastName itp.
 }
 
 export default function GarageDashboard() {
@@ -37,7 +68,6 @@ export default function GarageDashboard() {
     setUsername(localStorage.getItem('username'));
   }, []);
 
-  // Sprawdzanie autoryzacji i pobranie danych
   useEffect(() => {
     if (!isClient) return;
 
@@ -56,16 +86,19 @@ export default function GarageDashboard() {
     fetchServiceRequests(token);
   }, [router, isClient, username]);
 
-  // Funkcja do pobierania wszystkich zgłoszeń
+  /**
+   * Pobiera wszystkie zgłoszenia (raporty) i do każdego dociąga:
+   * 1) informacje o pojeździe (car)
+   * 2) informacje o użytkowniku (email)
+   *  - wszystko tak, aby dla każdego userId wykonać TYLKO JEDNO zapytanie.
+   */
   const fetchServiceRequests = async (token: string) => {
     try {
       setLoading(true);
       setError('');
 
       const response = await fetch('/api/report/garage/reports', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) {
@@ -73,7 +106,73 @@ export default function GarageDashboard() {
       }
 
       const data: ServiceRequest[] = await response.json();
-      setRequests(data);
+      const uniqueUserIds = [...new Set(data.map((req) => req.userId))];
+
+      // -- 1. Pobieramy pojazdy dla każdego userId (mapa userId -> Vehicle[])
+      const vehiclesMap = new Map<number, Vehicle[]>();
+
+      const fetchVehiclesPromises = uniqueUserIds.map(async (userId) => {
+        const res = await fetch(`/api/client/vehicle/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          console.warn(`Błąd pobierania pojazdów dla userId = ${userId}`);
+          vehiclesMap.set(userId, []);
+          return;
+        }
+
+        const userVehicles: Vehicle[] = await res.json();
+        vehiclesMap.set(userId, userVehicles);
+      });
+
+      // -- 2. Pobieramy dane użytkownika (np. email) – mapa userId -> UserInfo
+      const usersMap = new Map<number, UserInfo>();
+
+      const fetchUserInfoPromises = uniqueUserIds.map(async (userId) => {
+        const res = await fetch(`/api/client/user/info/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) {
+          console.warn(`Błąd pobierania info o użytkowniku o ID: ${userId}`);
+          // Możesz wstawić do mapy jakiś placeholder lub pusty obiekt
+          usersMap.set(userId, { id: userId, email: 'brak danych' });
+          return;
+        }
+
+        const userInfo: UserInfo = await res.json();
+        usersMap.set(userId, userInfo);
+      });
+
+      // -- 3. Uruchamiamy wszystkie obietnice równolegle
+      await Promise.all([...fetchVehiclesPromises, ...fetchUserInfoPromises]);
+
+      // -- 4. Łączymy wyniki: 
+      //      dla każdego requesta szukamy w vehiclesMap i usersMap
+      const requestsWithCarAndEmail = data.map((request) => {
+        // Pojazdy
+        const userVehicles = vehiclesMap.get(request.userId) || [];
+        const foundVehicle = userVehicles.find((v) => v.id === request.vehicleId);
+
+        let carInfo = 'Nie znaleziono pojazdu';
+        if (foundVehicle) {
+          carInfo = `${foundVehicle.brand} ${foundVehicle.model}`;
+        }
+
+        // Użytkownik (email)
+        const foundUser = usersMap.get(request.userId);
+        const userEmail = foundUser ? foundUser.email : 'brak e-maila';
+
+        return {
+          ...request,
+          car: carInfo,
+          userEmail: userEmail,
+        };
+      });
+
+      // -- 5. Zapisujemy w stanie
+      setRequests(requestsWithCarAndEmail);
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Wystąpił błąd podczas pobierania zleceń.');
@@ -83,7 +182,7 @@ export default function GarageDashboard() {
   };
 
   /**
-   * Zmiana statusu zlecenia (np. z NEW -> IN_PROGRESS lub NEW -> REJECTED).
+   * Zmiana statusu zlecenia (np. z NEW -> IN_PROGRESS).
    */
   const changeReportStatus = async (reportId: number, newStatus: StatusType) => {
     try {
@@ -95,12 +194,15 @@ export default function GarageDashboard() {
         throw new Error('Brak tokena uwierzytelniającego.');
       }
 
-      const response = await fetch(`/api/garage/report/status/${reportId}?newStatus=${newStatus}`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `/api/garage/report/status/${reportId}?newStatus=${newStatus}`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Błąd zmiany statusu. Status: ${response.status}`);
@@ -121,14 +223,8 @@ export default function GarageDashboard() {
     changeReportStatus(id, 'IN_PROGRESS');
   };
 
-  // Obsługa odrzucenia zlecenia (z NEW -> REJECTED)
-  const handleReject = (id: number) => {
-    changeReportStatus(id, 'REJECTED');
-  };
-
   if (!isClient) {
-    // Jeśli jeszcze nie jesteśmy po stronie klienta, nie renderujemy nic
-    return null;
+    return null; // Jeszcze nie jesteśmy po stronie klienta
   }
 
   // Filtrujemy tylko te zgłoszenia, które mają status NEW
@@ -147,8 +243,7 @@ export default function GarageDashboard() {
             <tr className="bg-gray-100">
               <th className="px-4 py-2 border">ID</th>
               <th className="px-4 py-2 border">Klient</th>
-              <th className="px-4 py-2 border">Email Klienta</th>
-              <th className="px-4 py-2 border">Numer Telefonu</th>
+              <th className="px-4 py-2 border">E-mail klienta</th>
               <th className="px-4 py-2 border">Samochód</th>
               <th className="px-4 py-2 border">Zgłoszona usługa</th>
               <th className="px-4 py-2 border">Akcje</th>
@@ -159,15 +254,14 @@ export default function GarageDashboard() {
               newRequests.map((request) => (
                 <tr key={request.id} className="text-center">
                   <td className="px-4 py-2 border">{request.id}</td>
-                  <td className="px-4 py-2 border">{request.clientName}</td>
+                  <td className="px-4 py-2 border">{request.userName}</td>
                   <td className="px-4 py-2 border">
                     <span className="whitespace-nowrap overflow-hidden text-ellipsis block">
-                      {request.email}
+                      {request.userEmail}
                     </span>
                   </td>
-                  <td className="px-4 py-2 border">{request.phoneNumber}</td>
                   <td className="px-4 py-2 border">{request.car}</td>
-                  <td className="px-4 py-2 border">{request.serviceDescription}</td>
+                  <td className="px-4 py-2 border">{request.description}</td>
                   <td className="px-4 py-2 border">
                     <div className="flex justify-center items-center space-x-2">
                       <button
@@ -176,10 +270,7 @@ export default function GarageDashboard() {
                       >
                         Akceptuj
                       </button>
-                      <button
-                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                        onClick={() => handleReject(request.id)}
-                      >
+                      <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
                         Odrzuć
                       </button>
                     </div>
@@ -188,7 +279,10 @@ export default function GarageDashboard() {
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="px-4 py-2 border text-center text-sm text-gray-500">
+                <td
+                  colSpan={6}
+                  className="px-4 py-2 border text-center text-sm text-gray-500"
+                >
                   Brak nowych zgłoszeń do wyświetlenia.
                 </td>
               </tr>
