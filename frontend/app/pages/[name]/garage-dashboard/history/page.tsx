@@ -1,154 +1,269 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
-// Define service type
-type Service = {
+type StatusType = 'NEW' | 'IN_PROGRESS' | 'COMPLETED';
+
+interface Garage {
   id: number;
-  type: string;
-  cost: number;
-  client: string; // Added client name
-  phone: string; // Client phone number
-  email: string; // Client email
-  dateReported: string;
-  dateCompleted?: string; // For history
-  status?: string; // For current services
-  pdfLink?: string; // For history
-};
+  nip: string;
+  regon: string;
+  companyName: string;
+  address: string;
+  phoneNumber: string;
+  ibans: string[];
+  userId: number;
+  userName: string;
+}
 
-// Define services
-const initialServices: Service[] = [
-  { id: 1, type: "Wymiana hamulców", cost: 800, client: "Jan Kowalski", phone: "123-456-789", email: "JanKowalski@wp.com", dateReported: "2023-06-15", dateCompleted: "2023-06-16", pdfLink: "/report1.pdf" },
-  { id: 2, type: "Diagnostyka silnika", cost: 300, client: "Anna Nowak", phone: "987-654-321", email: "Ania2010@onet.com", dateReported: "2023-06-20", dateCompleted: "2023-06-21", pdfLink: "/report2.pdf" },
-  { id: 3, type: "Wymiana oleju", cost: 150, client: "Michał Nowak", phone: "456-789-123", email: "MichalNowak@gmail.com", dateReported: "2023-07-10", dateCompleted: "2023-07-11", pdfLink: "/report3.pdf" }
-];
+interface ServiceRequest {
+  id: number;
+  dateHistory: string[];
+  garage: Garage;
+  status: StatusType;
+  operations: string[];
+  operationDates: string[];
+  vehicleId: number;
+  userId: number;
+  userName: string;
+  description: string;
+  car?: string;        // nazwa/krótki opis pojazdu
+  userEmail?: string;  // email użytkownika
+}
 
-export default function ServiceDashboard() {
-    const router = useRouter();
-    const [services, setServices] = useState<Service[]>(initialServices);
-    const [sortConfig, setSortConfig] = useState<{ key: keyof Service; direction: "ascending" | "descending" } | null>(null);
+// Przykładowy typ pojazdu
+interface Vehicle {
+  id: number;
+  brand: string;
+  model: string;
+}
 
-    useEffect(() => {
-        // Sprawdzanie, czy użytkownik jest zalogowany
-        const token = localStorage.getItem('accessToken');
-        const username = localStorage.getItem('username');
-        const role = localStorage.getItem('role');
+// Przykładowy typ informacji o użytkowniku
+interface UserInfo {
+  id: number;
+  email: string;
+}
 
-        if (!token || !username || !role) {
-            // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
-            router.push('/');
-            return;
-        }
+export default function GarageDashboardEdit() {
+  const router = useRouter();
 
-        if (role !== 'ROLE_GARAGE') {
-            // Przekierowanie, jeśli użytkownik nie jest serwisem
-            router.push('/');
-            return;
-        }
-    }, [router]);  
+  const [isClient, setIsClient] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
 
-    const sortServices = (key: keyof Service) => {
-        let direction: "ascending" | "descending" = "ascending";
-        if (sortConfig?.key === key && sortConfig.direction === "ascending") {
-            direction = "descending";
-        }
+  // Tutaj zapisujemy zgłoszenia pobrane z API
+  const [requests, setRequests] = useState<ServiceRequest[]>([]);
+  
+  // Stany do obsługi ładowania i błędów
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-        const sortedServices = [...services].sort((a, b) => {
-            if (a[key]! < b[key]!) return direction === "ascending" ? -1 : 1;
-            if (a[key]! > b[key]!) return direction === "ascending" ? 1 : -1;
-            return 0;
+  // Sprawdzamy, czy jesteśmy już po stronie klienta
+  useEffect(() => {
+    setIsClient(true);
+    setUsername(localStorage.getItem('username'));
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+
+    const token = localStorage.getItem('accessToken');
+    const role = localStorage.getItem('role');
+
+    if (!token || !username || !role) {
+      router.push('/pages/auth/login');
+      return;
+    }
+    if (role !== 'ROLE_GARAGE') {
+      router.push('/pages/auth/login');
+      return;
+    }
+
+    fetchServiceRequests(token);
+  }, [router, isClient, username]);
+
+  /**
+   * Pobiera wszystkie zgłoszenia (raporty) i do każdego dociąga:
+   * 1) informacje o pojeździe (car)
+   * 2) informacje o użytkowniku (email)
+   */
+  const fetchServiceRequests = async (token: string) => {
+    try {
+      setLoading(true);
+      setError('');
+
+      // Główne pobranie zleceń
+      const response = await fetch('/api/report/garage/reports', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Błąd pobierania zleceń. Status: ${response.status}`);
+      }
+
+      const data: ServiceRequest[] = await response.json();
+
+      // Wyciągamy unikalne userId
+      const uniqueUserIds = [...new Set(data.map((req) => req.userId))];
+
+      // -- MAPA pojazdów (userId -> Vehicle[])
+      const vehiclesMap = new Map<number, Vehicle[]>();
+      const fetchVehiclesPromises = uniqueUserIds.map(async (userId) => {
+        const res = await fetch(`/api/client/vehicle/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        setServices(sortedServices);
-        setSortConfig({ key, direction });
-    };
-
-    const renderSortArrows = (key: keyof Service) => {
-        if (sortConfig?.key === key) {
-            return sortConfig.direction === "ascending" ? "▲" : "▼";
+        if (!res.ok) {
+          console.warn(`Błąd pobierania pojazdów dla userId = ${userId}`);
+          vehiclesMap.set(userId, []);
+          return;
         }
-        return "↕";
-    };
+        const userVehicles: Vehicle[] = await res.json();
+        vehiclesMap.set(userId, userVehicles);
+      });
 
-    const renderTable = () => (
-        <table className="min-w-full border border-blue-400">
-            <thead>
-                <tr className="bg-blue-100">
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("type")}
-                    >
-                        Rodzaj usługi {renderSortArrows("type")}
-                    </th>
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("cost")}
-                    >
-                        Koszt {renderSortArrows("cost")}
-                    </th>
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("client")}
-                    >
-                        Klient {renderSortArrows("client")}
-                    </th>
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("phone")}
-                    >
-                        Telefon {renderSortArrows("phone")}
-                    </th>
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("email")}
-                    >
-                        Email {renderSortArrows("email")}
-                    </th>
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("dateReported")}
-                    >
-                        Data zgłoszenia {renderSortArrows("dateReported")}
-                    </th>
-                    <th
-                        className="px-4 py-2 border border-blue-400 text-left cursor-pointer"
-                        onClick={() => sortServices("dateCompleted")}
-                    >
-                        Data ukończenia {renderSortArrows("dateCompleted")}
-                    </th>
-                    <th className="px-4 py-2 border border-blue-400 text-center">Raport PDF</th>
-                </tr>
-            </thead>
-            <tbody>
-                {services.map((service) => (
-                    <tr key={service.id} className="hover:bg-blue-100 transition-colors">
-                        <td className="px-4 py-2 border border-blue-400">{service.type}</td>
-                        <td className="px-4 py-2 border border-blue-400">{service.cost} zł</td>
-                        <td className="px-4 py-2 border border-blue-400">{service.client}</td>
-                        <td className="px-4 py-2 border border-blue-400">{service.phone}</td>
-                        <td className="px-4 py-2 border border-blue-400">{service.email}</td>
-                        <td className="px-4 py-2 border border-blue-400">{service.dateReported}</td>
-                        <td className="px-4 py-2 border border-blue-400">{service.dateCompleted}</td>
-                        <td className="px-4 py-2 border border-blue-400 text-center">
-                            <a href={service.pdfLink} target="_blank" rel="noopener noreferrer">
-                                <img src="/PDF.png" alt="PDF Ikona" className="w-6 h-6 mx-auto" />
-                            </a>
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
+      // -- MAPA użytkowników (userId -> UserInfo)
+      const usersMap = new Map<number, UserInfo>();
+      const fetchUserInfoPromises = uniqueUserIds.map(async (userId) => {
+        const res = await fetch(`/api/client/user/info/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          console.warn(`Błąd pobierania info o userId = ${userId}`);
+          usersMap.set(userId, { id: userId, email: 'brak danych' });
+          return;
+        }
+        const userInfo: UserInfo = await res.json();
+        usersMap.set(userId, userInfo);
+      });
+
+      // Uruchamiamy wszystkie obietnice
+      await Promise.all([...fetchVehiclesPromises, ...fetchUserInfoPromises]);
+
+      // Składamy dane w jedną całość
+      const requestsWithCarAndEmail = data.map((request) => {
+        // Pojazd
+        const userVehicles = vehiclesMap.get(request.userId) || [];
+        const foundVehicle = userVehicles.find((v) => v.id === request.vehicleId);
+        let carInfo = 'Nie znaleziono pojazdu';
+        if (foundVehicle) {
+          carInfo = `${foundVehicle.brand} ${foundVehicle.model}`;
+        }
+
+        // Użytkownik
+        const foundUser = usersMap.get(request.userId);
+        const userEmail = foundUser ? foundUser.email : 'brak e-maila';
+
+        return {
+          ...request,
+          car: carInfo,
+          userEmail: userEmail,
+        };
+      });
+
+      setRequests(requestsWithCarAndEmail);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Wystąpił błąd podczas pobierania zleceń.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Funkcja wywoływana po kliknięciu ikonki PDF
+  const handlePdfReport = (requestId: number) => {
+    // Tutaj może się znaleźć logika generowania PDF
+    // Na razie sygnalizujemy wywołanie w konsoli
+    console.log('Generowanie PDF dla zlecenia o ID:', requestId);
+  };
+
+  // Pomocnicze funkcje do wyciągania najwcześniejszej i najpóźniejszej daty z dateHistory
+  const getEarliestDate = (dates: string[]): string => {
+    if (!dates || dates.length === 0) return '';
+    // Sortujemy rosnąco po czasie
+    const sorted = [...dates].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    return new Date(sorted[0]).toLocaleString('pl-PL'); 
+  };
+
+  const getLatestDate = (dates: string[]): string => {
+    if (!dates || dates.length === 0) return '';
+    // Sortujemy rosnąco po czasie
+    const sorted = [...dates].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    return new Date(sorted[sorted.length - 1]).toLocaleString('pl-PL');
+  };
+
+  if (!isClient) {
+    return null; 
+  }
+
+  // Filtrujemy tylko te zgłoszenia, które mają status COMPLETED
+  const completedRequests = requests.filter((req) => req.status === 'COMPLETED');
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-8">
+      <h1 className="text-3xl font-bold mb-6">Zakończone zlecenia</h1>
+
+      {loading && <p className="text-blue-500">Ładowanie zgłoszeń...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+
+      <div className="overflow-x-auto">
+        <table className="w-full bg-white shadow-md rounded mb-4 table-auto">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2 border">ID</th>
+              <th className="px-4 py-2 border">Klient</th>
+              <th className="px-4 py-2 border">E-mail klienta</th>
+              <th className="px-4 py-2 border">Samochód</th>
+              <th className="px-4 py-2 border">Zgłoszona usługa</th>
+              {/* Nowe kolumny przed kolumną Akcje */}
+              <th className="px-4 py-2 border">Data rozpoczęcia</th>
+              <th className="px-4 py-2 border">Data zakończenia</th>
+              <th className="px-4 py-2 border">Akcje</th>
+            </tr>
+          </thead>
+          <tbody>
+            {completedRequests.length > 0 ? (
+              completedRequests.map((request) => {
+                const earliestDate = getEarliestDate(request.dateHistory);
+                const latestDate = getLatestDate(request.dateHistory);
+
+                return (
+                  <tr key={request.id} className="text-center">
+                    <td className="px-4 py-2 border">{request.id}</td>
+                    <td className="px-4 py-2 border">{request.userName}</td>
+                    <td className="px-4 py-2 border">
+                      <span className="whitespace-nowrap overflow-hidden text-ellipsis block">
+                        {request.userEmail}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 border">{request.car}</td>
+                    <td className="px-4 py-2 border">{request.description}</td>
+                    {/* Wstawiamy wartości obliczone wyżej */}
+                    <td className="px-4 py-2 border">{earliestDate}</td>
+                    <td className="px-4 py-2 border">{latestDate}</td>
+                    <td className="px-4 py-2 border">
+                      <img
+                        src="/PDF.png"
+                        alt="PDF icon"
+                        className="w-6 h-6 inline-block cursor-pointer"
+                        onClick={() => handlePdfReport(request.id)}
+                      />
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td
+                  colSpan={8}
+                  className="px-4 py-2 border text-center text-sm text-gray-500"
+                >
+                  Brak zakończonych zgłoszeń do wyświetlenia.
+                </td>
+              </tr>
+            )}
+          </tbody>
         </table>
-    );
-
-    return (
-        <div className="min-h-screen bg-gray-100 p-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Historia zleceń serwisowych</h1>
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">Tabela historii zleceń</h2>
-                {renderTable()}
-            </div>
-        </div>
-    );
+      </div>
+    </div>
+  );
 }
