@@ -56,7 +56,7 @@ const nextConfig: NextConfig = {
       // Wyświetlanie wszystkich prośb o rejestrację przez moderatora
       {
         source: '/api/mod/garage/requests',
-        destination: "http://MCS_API_Gateway:8080/garage/allrequest"
+        destination: "http://MCS_API_Gateway:8080/garage/request/all"
       },
       // 
       {
