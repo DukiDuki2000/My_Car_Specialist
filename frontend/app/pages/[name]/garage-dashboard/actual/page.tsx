@@ -3,131 +3,223 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-// Definicje interfejsów
-interface ServiceRequest {
+type StatusType = 'NEW' | 'IN_PROGRESS' | 'COMPLETED';
+
+interface Garage {
   id: number;
-  clientName: string;
-  email: string; // Nowe pole
-  phoneNumber: string; // Nowe pole
-  car: string;
-  serviceDescription: string;
-  createdAt: string;
+  nip: string;
+  regon: string;
+  companyName: string;
+  address: string;
+  phoneNumber: string;
+  ibans: string[];
+  userId: number;
+  userName: string;
 }
 
-export default function GarageDashboard() {
-  const router = useRouter();
-  const [isClient, setIsClient] = useState(false); // Stan do sprawdzenia, czy działamy po stronie klienta
-  const [username, setUsername] = useState<string | null>(null); // Dodany stan dla [name]
+interface ServiceRequest {
+  id: number;
+  dateHistory: string[];
+  garage: Garage;
+  status: StatusType;
+  operations: string[];
+  operationDates: string[];
+  vehicleId: number;
+  userId: number;
+  userName: string;
+  description: string;
+  car?: string;        // nazwa/krótki opis pojazdu
+  userEmail?: string;  // email użytkownika
+}
 
-  // Ustawienie stanu isClient po zamontowaniu komponentu
+// Przykładowy typ pojazdu
+interface Vehicle {
+  id: number;
+  brand: string;
+  model: string;
+}
+
+// Przykładowy typ informacji o użytkowniku
+interface UserInfo {
+  id: number;
+  email: string;
+}
+
+export default function GarageDashboardEdit() {
+  const router = useRouter();
+
+  const [isClient, setIsClient] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
+
+  // Tutaj zapisujemy zgłoszenia pobrane z API
+  const [requests, setRequests] = useState<ServiceRequest[]>([]);
+  
+  // Stany do obsługi ładowania i błędów
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Sprawdzamy, czy jesteśmy już po stronie klienta
   useEffect(() => {
     setIsClient(true);
-    
-    // Pobieranie username z localStorage
-    const storedUsername = localStorage.getItem('username');
-    setUsername(storedUsername);
+    setUsername(localStorage.getItem('username'));
   }, []);
 
-  // Logika autoryzacji
   useEffect(() => {
-    if (!isClient) return; // Zatrzymaj, jeśli nie jesteśmy po stronie klienta
+    if (!isClient) return;
 
     const token = localStorage.getItem('accessToken');
     const role = localStorage.getItem('role');
 
     if (!token || !username || !role) {
-      // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
+      router.push('/pages/auth/login');
+      return;
+    }
+    if (role !== 'ROLE_GARAGE') {
       router.push('/pages/auth/login');
       return;
     }
 
-    if (role !== 'ROLE_GARAGE') {
-      // Przekierowanie, jeśli użytkownik nie jest garażem
-      router.push('/pages/auth/login');
-      return;
-    }
+    fetchServiceRequests(token);
   }, [router, isClient, username]);
 
-  // Inicjalizacja stanu z initialRequests
-  const [requests, setRequests] = useState<ServiceRequest[]>([
-    {
-      id: 1,
-      clientName: 'Jan Kowalski',
-      email: 'jan.kowalski@example.com',
-      phoneNumber: '+48 123 456 789',
-      car: 'BMW 3 Series ',
-      serviceDescription: 'Wymiana oleju i filtrów',
-      createdAt: '2025-01-01T10:00:00Z',
-    },
-    {
-      id: 2,
-      clientName: 'Anna Nowak',
-      email: 'anna.nowak@example.com',
-      phoneNumber: '+48 987 654 321',
-      car: 'Audi A4 ',
-      serviceDescription: 'Naprawa hamulców',
-      createdAt: '2025-01-02T12:30:00Z',
-    },
-    {
-      id: 3,
-      clientName: 'Piotr Wiśniewski',
-      email: 'piotr.wisniewski@example.com',
-      phoneNumber: '+48 555 666 777',
-      car: 'Toyota Corolla ',
-      serviceDescription: 'Diagnostyka komputerowa',
-      createdAt: '2025-01-03T09:15:00Z',
-    },
-    {
-      id: 4,
-      clientName: 'Maria Zielińska',
-      email: 'maria.zielinska@example.com',
-      phoneNumber: '+48 444 333 222',
-      car: 'Honda Civic ',
-      serviceDescription: 'Wymiana opon',
-      createdAt: '2025-01-04T14:45:00Z',
-    },
-    // Dodaj więcej przykładowych zgłoszeń według potrzeb
-  ]);
+  /**
+   * Pobiera wszystkie zgłoszenia (raporty) i do każdego dociąga:
+   * 1) informacje o pojeździe (car)
+   * 2) informacje o użytkowniku (email)
+   */
+  const fetchServiceRequests = async (token: string) => {
+    try {
+      setLoading(true);
+      setError('');
 
-  // Jeśli nie jesteśmy po stronie klienta, zwróć null
+      // Główne pobranie zleceń
+      const response = await fetch('/api/report/garage/reports', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Błąd pobierania zleceń. Status: ${response.status}`);
+      }
+
+      const data: ServiceRequest[] = await response.json();
+
+      // Wyciągamy unikalne userId
+      const uniqueUserIds = [...new Set(data.map((req) => req.userId))];
+
+      // -- MAPA pojazdów (userId -> Vehicle[])
+      const vehiclesMap = new Map<number, Vehicle[]>();
+      const fetchVehiclesPromises = uniqueUserIds.map(async (userId) => {
+        const res = await fetch(`/api/client/vehicle/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          console.warn(`Błąd pobierania pojazdów dla userId = ${userId}`);
+          vehiclesMap.set(userId, []);
+          return;
+        }
+        const userVehicles: Vehicle[] = await res.json();
+        vehiclesMap.set(userId, userVehicles);
+      });
+
+      // -- MAPA użytkowników (userId -> UserInfo)
+      const usersMap = new Map<number, UserInfo>();
+      const fetchUserInfoPromises = uniqueUserIds.map(async (userId) => {
+        const res = await fetch(`/api/client/user/info/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          console.warn(`Błąd pobierania info o userId = ${userId}`);
+          usersMap.set(userId, { id: userId, email: 'brak danych' });
+          return;
+        }
+        const userInfo: UserInfo = await res.json();
+        usersMap.set(userId, userInfo);
+      });
+
+      // Uruchamiamy wszystkie obietnice
+      await Promise.all([...fetchVehiclesPromises, ...fetchUserInfoPromises]);
+
+      // Składamy dane w jedną całość
+      const requestsWithCarAndEmail = data.map((request) => {
+        // Pojazd
+        const userVehicles = vehiclesMap.get(request.userId) || [];
+        const foundVehicle = userVehicles.find((v) => v.id === request.vehicleId);
+        let carInfo = 'Nie znaleziono pojazdu';
+        if (foundVehicle) {
+          carInfo = `${foundVehicle.brand} ${foundVehicle.model}`;
+        }
+
+        // Użytkownik
+        const foundUser = usersMap.get(request.userId);
+        const userEmail = foundUser ? foundUser.email : 'brak e-maila';
+
+        return {
+          ...request,
+          car: carInfo,
+          userEmail: userEmail,
+        };
+      });
+
+      setRequests(requestsWithCarAndEmail);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Wystąpił błąd podczas pobierania zleceń.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Nowa opcja: kliknięcie w "Edytuj" przenosi do innej ścieżki
+  const handleEdit = (requestId: number) => {
+    if (!username) return;  // Na wszelki wypadek
+    router.push(`/pages/${username}/garage-dashboard/actual/${requestId}`);
+  };
+
   if (!isClient) {
-    return null;
+    return null; 
   }
+
+  // Filtrujemy tylko te zgłoszenia, które mają status NEW (jeśli tak ma być)
+  const newRequests = requests.filter((req) => req.status === 'IN_PROGRESS');
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold mb-6">Aktualne zgłoszenia</h1>
+      <h1 className="text-3xl font-bold mb-6">Aktualne zlecenia</h1>
 
-      {/* Tabela zgłoszeń */}
+      {loading && <p className="text-blue-500">Ładowanie zgłoszeń...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+
       <div className="overflow-x-auto">
-        <table className="w-full bg-white shadow-md rounded mb-4 table-fixed">
+        <table className="w-full bg-white shadow-md rounded mb-4 table-auto">
           <thead>
-            <tr>
-              <th className="px-4 py-2 border w-12">ID</th>
-              <th className="px-4 py-2 border w-32">Klient</th>
-              <th className="px-4 py-2 border w-48">Email Klienta</th>
-              <th className="px-4 py-2 border w-40">Numer Telefonu</th>
-              <th className="px-4 py-2 border w-40">Samochód</th>
-              <th className="px-4 py-2 border w-56">Zgłoszona usługa</th>
-              <th className="px-4 py-2 border w-32">Akcje</th>
+            <tr className="bg-gray-100">
+              <th className="px-4 py-2 border">ID</th>
+              <th className="px-4 py-2 border">Klient</th>
+              <th className="px-4 py-2 border">E-mail klienta</th>
+              <th className="px-4 py-2 border">Samochód</th>
+              <th className="px-4 py-2 border">Zgłoszona usługa</th>
+              <th className="px-4 py-2 border">Akcje</th>
             </tr>
           </thead>
           <tbody>
-            {requests.length > 0 ? (
-              requests.map(request => (
+            {newRequests.length > 0 ? (
+              newRequests.map((request) => (
                 <tr key={request.id} className="text-center">
                   <td className="px-4 py-2 border">{request.id}</td>
-                  <td className="px-4 py-2 border">{request.clientName}</td>
-                  <td className="px-4 py-2 border">{request.email}</td>
-                  <td className="px-4 py-2 border">{request.phoneNumber}</td>
+                  <td className="px-4 py-2 border">{request.userName}</td>
+                  <td className="px-4 py-2 border">
+                    <span className="whitespace-nowrap overflow-hidden text-ellipsis block">
+                      {request.userEmail}
+                    </span>
+                  </td>
                   <td className="px-4 py-2 border">{request.car}</td>
-                  <td className="px-4 py-2 border">{request.serviceDescription}</td>
-                  <td className="px-4 py-2 border w-32">
+                  <td className="px-4 py-2 border">{request.description}</td>
+                  <td className="px-4 py-2 border">
                     <button
                       className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                      onClick={() => router.push(`/pages/${username}/garage-dashboard/actual/${request.id}`)}
+                      onClick={() => handleEdit(request.id)}
                     >
-                      Modyfikuj
+                      Edytuj
                     </button>
                   </td>
                 </tr>
@@ -135,10 +227,10 @@ export default function GarageDashboard() {
             ) : (
               <tr>
                 <td
-                  colSpan={7} // Zmniejszono colSpan, ponieważ mamy teraz 7 kolumn
+                  colSpan={6}
                   className="px-4 py-2 border text-center text-sm text-gray-500"
                 >
-                  Brak zgłoszeń do wyświetlenia.
+                  Brak nowych zgłoszeń do wyświetlenia.
                 </td>
               </tr>
             )}
