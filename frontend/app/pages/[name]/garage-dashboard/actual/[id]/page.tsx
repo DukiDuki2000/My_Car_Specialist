@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 
 // Typy
-type StatusType = 'NEW' | 'IN_PROGRESS' | 'COMPLETED';
+type StatusType = 'NEW' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 
 interface Garage {
   id: number;

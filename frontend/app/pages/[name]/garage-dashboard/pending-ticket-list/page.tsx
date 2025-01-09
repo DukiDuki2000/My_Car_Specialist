@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-type StatusType = 'NEW' | 'IN_PROGRESS' | 'COMPLETED';
+type StatusType = 'NEW' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 
 interface Garage {
   id: number;
@@ -223,6 +223,10 @@ export default function GarageDashboard() {
     changeReportStatus(id, 'IN_PROGRESS');
   };
 
+  const handleCancel = (id: number) => {
+    changeReportStatus(id, 'CANCELLED');
+  };
+
   if (!isClient) {
     return null; // Jeszcze nie jesteśmy po stronie klienta
   }
@@ -270,7 +274,8 @@ export default function GarageDashboard() {
                       >
                         Akceptuj
                       </button>
-                      <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                      <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                      onClick={() => handleCancel(request.id)}>
                         Odrzuć
                       </button>
                     </div>
