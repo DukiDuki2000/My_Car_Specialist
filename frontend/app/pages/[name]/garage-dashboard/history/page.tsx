@@ -272,7 +272,7 @@ export default function GarageDashboardEdit() {
     y += 10;
 
     // Dane nabywcy
-    doc.text(replacePolishCharacters('Klient:'), 14, y);
+    doc.text(replacePolishCharacters('Nabywca:'), 14, y);
     y += 6;
     doc.text(clientName, 14, y);
     y += 6;
