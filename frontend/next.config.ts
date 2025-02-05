@@ -125,8 +125,8 @@ const nextConfig: NextConfig = {
       },
       // Nowe api do zamówień
       {
-        source: '/api/garage/report/reports/:reportId',
-        destination: 'http://MCS_API_Gateway:8080/garage/report/reports/:reportId'
+        source: '/api/report/reports/:reportId',
+        destination: 'http://MCS_API_Gateway:8080/report/reports/:reportId'
       }
     ];
   },
