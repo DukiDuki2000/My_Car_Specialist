@@ -24,7 +24,8 @@ interface ServiceRequest {
   dateHistory: string[];
   garage: Garage;
   status: StatusType;
-  operations: string[];
+  operations: string[];       // <-- tablica nazw operacji
+  amounts?: number[];         // <-- nowa tablica cen (opcjonalnie)
   operationDates: string[];
   vehicleId: number;
   userId: number;
@@ -34,7 +35,6 @@ interface ServiceRequest {
   userEmail?: string;  // Email klienta (uzupełniane we frontendzie)
 }
 
-// Pomocnicze typy
 interface Vehicle {
   id: number;
   brand: string;
@@ -47,22 +47,20 @@ interface UserInfo {
 }
 
 /**  
- * Reprezentuje pojedynczy wpis w tabeli historii.  
- * W Twoim backendzie mamy pary: operations[i] oraz operationDates[i].  
- * My i tak łączymy typ + obiekt w jednego stringa w `handleAddAction`.  
- * Możemy zatem przechowywać to w polu `typUslugi`. 
+ * Rozszerzamy ActionHistory o pole amount, 
+ * aby móc wyświetlić cenę operacji.
  */
 interface ActionHistory {
   id: number;
-  typUslugi: string;  // Cały napis, np. "Wymiana Opon"
+  typUslugi: string;  // np. "Wymiana Opon"
   data: string;       // Data z operationDates
+  amount: number;     // Cena
 }
 
 export default function ServiceRequestDetail() {
   const router = useRouter();
   const params = useParams();
 
-  // Parametry w URL: /pages/[name]/garage-dashboard/actual/[id]
   const name = params.name as string;
   const reportId = Number(params.id);
 
@@ -78,6 +76,9 @@ export default function ServiceRequestDetail() {
   // Pola do formularza dodawania nowej operacji
   const [typUslugi, setTypUslugi] = useState('');
   const [obiektUslugi, setObiektUslugi] = useState('');
+
+  // (opcjonalnie) pole do wpisania ceny nowej operacji:
+  const [amount, setAmount] = useState('');
 
   // Stany do obsługi
   const [loading, setLoading] = useState(false);
@@ -204,11 +205,13 @@ export default function ServiceRequestDetail() {
 
       setRequest(found);
 
-      // Budujemy historię (jedna kolumna "typUslugi" + data)
+      // Budujemy historię
+      // Teraz oprócz nazwy usługi i daty, pobieramy też cenę z amounts
       const newHistory: ActionHistory[] = found.operations.map((op, i) => ({
         id: i + 1,
-        typUslugi: op, // Tutaj już jest cały string, np. "Wymiana Opon"
+        typUslugi: op,
         data: found.operationDates[i]?.split('T')[0] || '',
+        amount: found.amounts ? found.amounts[i] ?? 0 : 0, // zabezpieczenie na wypadek braku amounts
       }));
       setHistory(newHistory);
     } catch (err: any) {
@@ -219,7 +222,7 @@ export default function ServiceRequestDetail() {
     }
   };
 
-  /** Dodawanie nowej operacji w formie tablicy stringów. */
+  /** Dodawanie nowej operacji + (opcjonalnie) ceny. */
   const handleAddAction = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -227,6 +230,12 @@ export default function ServiceRequestDetail() {
 
     if (!typUslugi || !obiektUslugi) {
       setError('Wybierz typ i obiekt usługi!');
+      return;
+    }
+
+    // (opcjonalnie) sprawdź czy podano cenę
+    if (!amount) {
+      setError('Podaj cenę usługi!');
       return;
     }
 
@@ -241,8 +250,19 @@ export default function ServiceRequestDetail() {
 
       // Łączymy np. "Wymiana Opon"
       const newOperation = `${typUslugi} ${obiektUslugi}`;
-      const body = [newOperation]; // ["Wymiana Opon"]
 
+      // Struktura zgodna z Twoim screenem:
+      // {
+      //   "operations": ["Wymiana oleju", "Przegląd hamulców"],
+      //   "amounts": [230.0, 2440.0]
+      // }
+      const body = {
+        operations: [newOperation],
+        amounts: [Number(amount)],
+      };
+
+      // Zakładam, że Twój endpoint na backendzie jest zmieniony, 
+      // by przyjmował taką strukturę (POST /api/garage/report/operations/:reportId).
       const res = await fetch(`/api/garage/report/operations/${reportId}`, {
         method: 'POST',
         headers: {
@@ -261,6 +281,7 @@ export default function ServiceRequestDetail() {
       // Reset pól
       setTypUslugi('');
       setObiektUslugi('');
+      setAmount('');
       setSuccess('Operacja została dodana.');
     } catch (err: any) {
       console.error(err);
@@ -400,6 +421,20 @@ export default function ServiceRequestDetail() {
               </select>
             </div>
 
+            {/* Pole na cenę usługi (opcjonalnie) */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Cena (zł):</label>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="w-full border rounded px-3 py-2"
+                required
+                min="0"
+                step="0.01"
+              />
+            </div>
+
             <button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -410,7 +445,7 @@ export default function ServiceRequestDetail() {
         </div>
       )}
 
-      {/* Tabela historii Działań (bez obiektu usługi) */}
+      {/* Tabela historii Działań (teraz z ceną) */}
       <div className="bg-white shadow-md rounded p-6">
         <h2 className="text-2xl font-semibold mb-4">Historia Działań</h2>
         {history.length > 0 ? (
@@ -419,6 +454,7 @@ export default function ServiceRequestDetail() {
               <tr>
                 <th className="px-4 py-2 border w-24">Data</th>
                 <th className="px-4 py-2 border w-64">Usługa</th>
+                <th className="px-4 py-2 border w-24">Cena (zł)</th>
               </tr>
             </thead>
             <tbody>
@@ -428,6 +464,7 @@ export default function ServiceRequestDetail() {
                     {action.data ? new Date(action.data).toLocaleDateString() : '-'}
                   </td>
                   <td className="px-4 py-2 border">{action.typUslugi}</td>
+                  <td className="px-4 py-2 border">{action.amount}</td>
                 </tr>
               ))}
             </tbody>
