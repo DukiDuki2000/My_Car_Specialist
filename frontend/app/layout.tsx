@@ -1,5 +1,5 @@
 'use client'; // Layout jako komponent kliencki
-
+import React from 'react';
 import { useCallback, ReactNode, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation'; // Hooki do nawigacji Next.js
 import './globals.css';

@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import React from 'react';
 
 export default function Register() {
     const [formData, setFormData] = useState({
