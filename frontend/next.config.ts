@@ -112,6 +112,21 @@ const nextConfig: NextConfig = {
       {
         source: '/api/client/user/info/:userId',
         destination: 'http://MCS_API_Gateway:8080/user/info/:userId'
+      },
+      // Zwraca dane zalogowanego użytkownika
+      {
+        source: '/api/client/user/account',
+        destination: 'http://MCS_API_Gateway:8080/user/account'
+      },
+      // Zwraca przefiltrowane garaże na podstawie miejscowości
+      {
+        source: '/api/garage/all/byCity/:city',
+        destination: 'http://MCS_API_Gateway:8080/garage/all/byCity/:city'
+      },
+      // Nowe api do zamówień
+      {
+        source: '/api/report/reports/:reportId',
+        destination: 'http://MCS_API_Gateway:8080/report/reports/:reportId'
       }
     ];
   },
