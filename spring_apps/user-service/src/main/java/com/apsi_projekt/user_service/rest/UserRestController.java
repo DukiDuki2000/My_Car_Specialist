@@ -49,7 +49,7 @@ public class UserRestController {
     }
 
     @GetMapping("/account")
-    @PreAuthorize("hasAnyRole('ROLE_USER ', 'ROLE_GARAGE')")
+    @PreAuthorize("hasAnyRole('ROLE_CLIENT', 'ROLE_GARAGE')")
     public ResponseEntity<Map<String, Object>> getUserInfo( HttpServletRequest request) {
         String idHeader = request.getHeader("X-Id");
             User user = userRepository.findById(Long.parseLong(idHeader))
@@ -64,7 +64,7 @@ public class UserRestController {
         }
 
     @GetMapping("/info/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_MODERATOR','ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_SERVICE','ROLE_MODERATOR','ROLE_ADMIN')")
     public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));

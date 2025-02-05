@@ -27,6 +27,11 @@ public class ReportRestController {
         return ResponseEntity.ok(reportService.createReport(report, request));
     }
 
+    @GetMapping("/reports/{id}")
+    public ResponseEntity<Map<String, Object>> getReportById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(reportService.getReportWithUserById(id));
+    }
+
 
     @GetMapping("/user/reports")
     @PreAuthorize("hasAnyRole('ROLE_CLIENT','ROLE_MODERATOR','ROLE_ADMIN')")

@@ -1,5 +1,6 @@
 package com.apsi_projekt.garage_service.service;
 
+import com.apsi_projekt.garage_service.dto.UserInfo;
 import com.apsi_projekt.garage_service.model.Report;
 import com.apsi_projekt.garage_service.model.ReportStatus;
 import com.apsi_projekt.garage_service.repositories.ReportRepository;
@@ -12,13 +13,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ReportService {
 
     @Autowired
     private ReportRepository reportRepository;
+    @Autowired
+    private  GarageService garageService;
 
     public Report createReport(Report report,HttpServletRequest request) {
         String usernameHeader = request.getHeader("X-Username");
@@ -119,5 +124,14 @@ public class ReportService {
 
     public List<Report> getCompletedReportsByVehicleId(Long vehicleId) {
         return reportRepository.findByStatusAndVehicleId(ReportStatus.COMPLETED,vehicleId);
+    }
+    public Map<String, Object> getReportWithUserById(Long reportId) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new ResourceNotFoundException("Report not found with ID: " + reportId));
+        UserInfo user = garageService.getUserInfo(report.getUserId());
+        Map<String, Object> result = new HashMap<>();
+        result.put("report", report);
+        result.put("user", user);
+        return result;
     }
 }

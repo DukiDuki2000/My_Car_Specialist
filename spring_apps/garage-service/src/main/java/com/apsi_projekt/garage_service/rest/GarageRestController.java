@@ -1,6 +1,7 @@
 package com.apsi_projekt.garage_service.rest;
 
 import com.apsi_projekt.garage_service.dto.AddGarageRequest;
+import com.apsi_projekt.garage_service.dto.UserInfo;
 import com.apsi_projekt.garage_service.model.Garage;
 import com.apsi_projekt.garage_service.model.GarageAccountRequest;
 import com.apsi_projekt.garage_service.service.GarageAccountRequestService;
@@ -71,5 +72,4 @@ public class GarageRestController {
     public List<Garage> getAllByGivenCityAndSortByStreet(@PathVariable String city) {
         return garageService.getAllByGivenCityAndSortByStreet(city);
     }
-
 }
