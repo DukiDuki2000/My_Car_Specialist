@@ -67,34 +67,25 @@ public class ReportService {
         }
         switch (currentStatus) {
             case NEW:
-                if (newStatus == ReportStatus.IN_PROGRESS || newStatus == ReportStatus.CANCELLED) {
-
-                } else {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "From NEW status, you can only transition to IN_PROGRESS or CANCELLED.");
+                if (newStatus != ReportStatus.IN_PROGRESS) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "From NEW status, you can only transition to IN_PROGRESS.");
                 }
                 break;
-
             case IN_PROGRESS:
                 if (newStatus != ReportStatus.COMPLETED) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                            "From IN_PROGRESS status, you can only transition to COMPLETED.");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "From IN_PROGRESS status, you can only transition to COMPLETED.");
                 }
                 break;
-
             case COMPLETED:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "COMPLETED status is final and cannot be changed.");
-
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COMPLETED status is final and cannot be changed");
             case CANCELLED:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "CANCELLED status is final and cannot be changed.");
+                if (newStatus != ReportStatus.NEW) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can only cancel NEW reports");
 
+                }
             default:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Invalid current status: " + currentStatus);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid current status: " + currentStatus);
         }
-
 
         report.setStatus(newStatus);
         report.getDateHistory().add(LocalDateTime.now());
@@ -102,15 +93,22 @@ public class ReportService {
     }
 
 
-    public Report addOperationsToReport(Long reportId, List<String> operations) {
+    public Report addOperationsToReport(Long reportId, List<String> operations, List<Double> amounts) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new ResourceNotFoundException("\n" +
                         "Service report not found with ID: " + reportId));
 
         LocalDateTime now = LocalDateTime.now();
-        for (String operation : operations) {
-            report.getOperations().add(operation);
+//        for (String operation : operations) {
+//            report.getOperations().add(operation);
+//            report.getOperationDates().add(now);
+//        }
+
+        for (int i = 0; i < operations.size(); i++) {
+            report.getOperations().add(operations.get(i));
             report.getOperationDates().add(now);
+            report.getAmounts().add(amounts.get(i));
+
         }
 
         report.getDateHistory().add(now);

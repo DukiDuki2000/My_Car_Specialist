@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("report")
@@ -93,9 +94,19 @@ public class ReportRestController {
     @PreAuthorize("hasAnyRole('ROLE_GARAGE','ROLE_MODERATOR','ROLE_ADMIN')")
     public ResponseEntity<Report> addOperationsToReport(
             @PathVariable("id") Long reportId,
-            @RequestBody List<String> operations) {
-        Report updatedReport = reportService.addOperationsToReport(reportId, operations);
+            @RequestBody Map<String, Object> operations_and_amount)
+
+    {
+        List<String> operations = (List<String>) operations_and_amount.get("operations");
+        List<Double> amounts = ((List<?>) operations_and_amount.get("amounts"))
+                .stream()
+                .map(val -> val instanceof Number ? ((Number) val).doubleValue() : 0.0)
+                .toList();
+
+        Report updatedReport = reportService.addOperationsToReport(reportId, operations, amounts);
+
         return ResponseEntity.ok(updatedReport);
+
     }
 
 

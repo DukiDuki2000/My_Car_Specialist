@@ -190,4 +190,8 @@ public class GarageService {
         return garageRepository.findAll();
     }
 
+    public List<Garage> getAllByGivenCityAndSortByStreet(String city) {
+        return garageRepository.findAllByAddressCityOrderByAddressStreetAsc(city);
+    }
+
 }

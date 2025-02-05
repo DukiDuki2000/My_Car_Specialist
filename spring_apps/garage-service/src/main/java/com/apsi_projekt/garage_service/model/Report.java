@@ -71,6 +71,17 @@ public class Report {
         this.dateHistory.add(LocalDateTime.now());
         this.createdAt = LocalDateTime.now();
     }
+
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "report_service_amount",
+            joinColumns = @JoinColumn(name = "service_report_id")
+    )
+    @Column(name="amount", nullable = false)
+    private List<Double> amounts = new ArrayList<>();
+
+
 }
 
 

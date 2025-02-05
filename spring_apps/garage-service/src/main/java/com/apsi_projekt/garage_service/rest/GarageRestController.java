@@ -66,4 +66,10 @@ public class GarageRestController {
         }
         return ResponseEntity.ok(garages);
     }
+
+    @GetMapping("/all/byCity/{city}")
+    public List<Garage> getAllByGivenCityAndSortByStreet(@PathVariable String city) {
+        return garageService.getAllByGivenCityAndSortByStreet(city);
+    }
+
 }
