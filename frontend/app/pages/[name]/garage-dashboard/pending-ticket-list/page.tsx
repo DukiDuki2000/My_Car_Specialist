@@ -273,12 +273,12 @@ export default function GarageDashboard() {
                       >
                         Akceptuj
                       </button>
-                      <button
+                      {/* <button
                         className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                         onClick={() => handleCancel(request.id)}
                       >
                         Odrzuć
-                      </button>
+                      </button> */}
                     </div>
                   </td>
                 </tr>
