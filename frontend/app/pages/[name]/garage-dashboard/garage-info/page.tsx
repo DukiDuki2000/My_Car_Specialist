@@ -38,13 +38,11 @@ export default function UserProfile() {
     const username = localStorage.getItem('username');
 
     if (!token || !username || !role) {
-      // Jeśli brakuje tokena, username lub roli, przekierowanie na stronę logowania
       router.push('/');
       return;
     }
 
     if (role !== 'ROLE_GARAGE') {
-      // Przekierowanie, jeśli użytkownik nie jest klientem
       router.push('/');
       return;
     }
@@ -57,6 +55,10 @@ export default function UserProfile() {
   const [garage, setGarage] = useState<GarageInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Stany do edycji numeru telefonu
+  const [isEditingPhone, setIsEditingPhone] = useState<boolean>(false);
+  const [phoneNumberInput, setPhoneNumberInput] = useState<string>('');
 
   // ------------------------------------------------------
   // 3. Zapytanie do API o dane zalogowanego użytkownika
@@ -120,6 +122,7 @@ export default function UserProfile() {
 
         const data: GarageInfo = await response.json();
         setGarage(data);
+        setPhoneNumberInput(data.phoneNumber); // ustawienie aktualnego numeru w stanie
       } catch (err) {
         console.error(err);
         setError('Nie udało się pobrać danych garażu.');
@@ -130,7 +133,48 @@ export default function UserProfile() {
   }, []);
 
   // ------------------------------------------------------
-  // 5. Renderowanie zawartości
+  // 5. Funkcja obsługująca zmianę numeru telefonu
+  // ------------------------------------------------------
+  const handlePhoneChange = async () => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      setError('Brak tokena w localStorage.');
+      return;
+    }
+
+    // Jeśli nie jesteśmy w trybie edycji, włącz go
+    if (!isEditingPhone) {
+      setIsEditingPhone(true);
+      return;
+    }
+
+    // Jeśli jesteśmy w trybie edycji, zatwierdź zmiany
+    try {
+      const response = await fetch(`/api/garage/change/${phoneNumberInput}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Błąd: ${response.status}`);
+      }
+
+      // Jeśli zmiana się powiedzie, aktualizujemy stan garażu
+      if (garage) {
+        setGarage({ ...garage, phoneNumber: phoneNumberInput });
+      }
+      setIsEditingPhone(false);
+    } catch (err) {
+      console.error(err);
+      setError('Nie udało się zmienić numeru telefonu.');
+    }
+  };
+
+  // ------------------------------------------------------
+  // 6. Renderowanie zawartości
   // ------------------------------------------------------
   if (loading) {
     return (
@@ -149,7 +193,7 @@ export default function UserProfile() {
   }
 
   if (!user) {
-    return null; // lub można wyświetlić jakiś komunikat, że nie znaleziono użytkownika
+    return null;
   }
 
   return (
@@ -178,7 +222,7 @@ export default function UserProfile() {
         </div>
       </div>
 
-      {/* Karta z danymi warsztatu (jeśli załadowane) */}
+      {/* Karta z danymi warsztatu */}
       {garage && (
         <div className="bg-white rounded shadow-md p-6 w-full max-w-md">
           <h2 className="text-xl font-semibold mb-4">Dane warsztatu</h2>
@@ -211,12 +255,21 @@ export default function UserProfile() {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-bold mb-1">Numer telefonu</label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 rounded px-4 py-2"
-              readOnly
-              value={garage.phoneNumber}
-            />
+            <div className="flex">
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded px-4 py-2"
+                readOnly={!isEditingPhone}
+                value={phoneNumberInput}
+                onChange={(e) => setPhoneNumberInput(e.target.value)}
+              />
+              <button
+                onClick={handlePhoneChange}
+                className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                {isEditingPhone ? 'Zatwierdź' : 'Zmień'}
+              </button>
+            </div>
           </div>
         </div>
       )}
