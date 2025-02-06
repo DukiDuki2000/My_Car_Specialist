@@ -9,6 +9,23 @@ interface User {
   username: string;
 }
 
+// Dostosuj interfejs poniżej tak, aby odpowiadał zwrotce z /api/garage/info
+interface GarageInfo {
+  id: number;
+  nip: string;
+  regon: string;
+  companyName: string;
+  address: {
+    street: string;
+    postalCode: string;
+    city: string;
+  };
+  phoneNumber: string;
+  ibans: string[];
+  userId: number;
+  userName: string;
+}
+
 export default function UserProfile() {
   const router = useRouter();
 
@@ -34,9 +51,10 @@ export default function UserProfile() {
   }, [router]);
 
   // ------------------------------------------------------
-  // 2. Stan aplikacji (dane użytkownika, błąd, czy się ładuje)
+  // 2. Stan aplikacji (dane użytkownika, dane garażu, błąd, ładowanie)
   // ------------------------------------------------------
   const [user, setUser] = useState<User | null>(null);
+  const [garage, setGarage] = useState<GarageInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,7 +96,41 @@ export default function UserProfile() {
   }, []);
 
   // ------------------------------------------------------
-  // 4. Renderowanie zawartości
+  // 4. Zapytanie do API o dane warsztatu
+  // ------------------------------------------------------
+  useEffect(() => {
+    const fetchGarageData = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          setError('Brak tokena w localStorage.');
+          return;
+        }
+
+        const response = await fetch('/api/garage/info', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Błąd: ${response.status}`);
+        }
+
+        const data: GarageInfo = await response.json();
+        setGarage(data);
+      } catch (err) {
+        console.error(err);
+        setError('Nie udało się pobrać danych garażu.');
+      }
+    };
+
+    fetchGarageData();
+  }, []);
+
+  // ------------------------------------------------------
+  // 5. Renderowanie zawartości
   // ------------------------------------------------------
   if (loading) {
     return (
@@ -105,7 +157,7 @@ export default function UserProfile() {
       <h1 className="text-3xl font-bold mb-8">Dane użytkownika</h1>
 
       {/* Karta z danymi użytkownika */}
-      <div className="bg-white rounded shadow-md p-6 w-full max-w-md">
+      <div className="bg-white rounded shadow-md p-6 w-full max-w-md mb-8">
         <div className="mb-4">
           <label className="block text-sm font-bold mb-1">Email</label>
           <input
@@ -125,6 +177,49 @@ export default function UserProfile() {
           />
         </div>
       </div>
+
+      {/* Karta z danymi warsztatu (jeśli załadowane) */}
+      {garage && (
+        <div className="bg-white rounded shadow-md p-6 w-full max-w-md">
+          <h2 className="text-xl font-semibold mb-4">Dane warsztatu</h2>
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-1">NIP</label>
+            <input
+              type="text"
+              className="w-full border border-gray-300 rounded px-4 py-2"
+              readOnly
+              value={garage.nip}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-1">Nazwa firmy</label>
+            <input
+              type="text"
+              className="w-full border border-gray-300 rounded px-4 py-2"
+              readOnly
+              value={garage.companyName}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-1">Adres</label>
+            <input
+              type="text"
+              className="w-full border border-gray-300 rounded px-4 py-2"
+              readOnly
+              value={`${garage.address.street}, ${garage.address.postalCode} ${garage.address.city}`}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-bold mb-1">Numer telefonu</label>
+            <input
+              type="text"
+              className="w-full border border-gray-300 rounded px-4 py-2"
+              readOnly
+              value={garage.phoneNumber}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
