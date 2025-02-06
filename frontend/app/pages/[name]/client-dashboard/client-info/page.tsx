@@ -107,15 +107,6 @@ export default function UserProfile() {
       {/* Karta z danymi użytkownika */}
       <div className="bg-white rounded shadow-md p-6 w-full max-w-md">
         <div className="mb-4">
-          <label className="block text-sm font-bold mb-1">ID</label>
-          <input
-            type="text"
-            className="w-full border border-gray-300 rounded px-4 py-2"
-            readOnly
-            value={user.id}
-          />
-        </div>
-        <div className="mb-4">
           <label className="block text-sm font-bold mb-1">Email</label>
           <input
             type="text"
