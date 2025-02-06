@@ -127,6 +127,16 @@ const nextConfig: NextConfig = {
       {
         source: '/api/report/reports/:reportId',
         destination: 'http://MCS_API_Gateway:8080/report/reports/:reportId'
+      },
+      // Zmiana numeru telefonu
+      {
+        source: '/api/garage/change/:phoneNumber',
+        destination: 'http://MCS_API_Gateway:8080/garage/change/phone?phoneNumber=:phoneNumber',
+      },
+      // Pobranie danych garażu
+      {
+        source: '/api/garage/info',
+        destination: 'http://MCS_API_Gateway:8080/garage/info'
       }
     ];
   },
