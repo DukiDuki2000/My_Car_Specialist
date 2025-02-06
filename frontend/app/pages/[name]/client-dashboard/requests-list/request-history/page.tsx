@@ -6,6 +6,19 @@ import Image from 'next/image';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+// ***** Nowy INTERFEJS do odbioru danych z nowego API *****
+interface SingleReportResponse {
+  report: {
+    id: number;
+    // ... inne pola, które Cię interesują
+  };
+  user: {
+    id: number;
+    username: string;
+    email: string;
+  };
+}
+
 // Definicja statusu
 export type StatusType = 'NEW' | 'IN_PROGRESS' | 'COMPLETED';
 
@@ -26,18 +39,19 @@ export interface Garage {
 // Definicja pojedynczego zgłoszenia serwisowego
 export interface Service {
   id: number;
-  dateHistory: string[];     // historia dat (np. data przyjęcia, zakończenia itp.)
-  garage: Garage;            // informacje o warsztacie
-  status: StatusType;        
-  operations: any[];         // tablica stringów lub obiektów (np. opis działań)
-  amounts: number[];         // ceny netto dla operacji
-  operationDates: string[];  
+  dateHistory: string[];
+  garage: Garage;
+  status: StatusType;
+  operations: any[];
+  amounts: number[];
+  operationDates: string[];
   vehicleId: number;
   userId: number;
-  userName: string;          // nazwa/użytkownik
-  description: string;       // krótki opis
-  car?: string;              // nazwa/krótki opis pojazdu
-  userEmail?: string;        // email użytkownika
+  userName: string;
+  description: string;
+  car?: string;
+  // <-- Pole na email, które uzupełnimy z nowego API:
+  userEmail?: string;
 }
 
 // Funkcja pomocnicza – usuwa polskie znaki (opcjonalne)
@@ -46,25 +60,20 @@ function replacePolishCharacters(text: string): string {
     'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l', 'ń': 'n', 'ó': 'o', 'ś': 's', 'ź': 'z', 'ż': 'z',
     'Ą': 'A', 'Ć': 'C', 'Ę': 'E', 'Ł': 'L', 'Ń': 'N', 'Ó': 'O', 'Ś': 'S', 'Ź': 'Z', 'Ż': 'Z'
   };
-  return text.replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, char => map[char] || char);
+  return text.replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, (char) => map[char] || char);
 }
 
-// Formatowanie daty do dd.mm.yyyy (lub innego układu) w języku polskim
+// Formatowanie daty do dd.mm.yyyy (lub innego układu)
 function formatDatePl(date: Date) {
   return date.toLocaleDateString('pl-PL', {
     year: 'numeric',
     month: '2-digit',
-    day: '2-digit'
+    day: '2-digit',
   });
 }
 
 /**
- * Generuje PDF w układzie podobnym do Twojego zrzutu ekranu:
- * - Raport z usług
- * - Informacje o warsztacie (wykonawcy)
- * - Informacje o kliencie
- * - Tabela z usługami i cenami (netto, VAT, brutto)
- * - Podsumowanie kwot
+ * Generuje PDF z danymi jednego zgłoszenia.
  */
 function generateServicePdf(service: Service) {
   const doc = new jsPDF();
@@ -92,7 +101,7 @@ function generateServicePdf(service: Service) {
   const clientEmail = replacePolishCharacters(service.userEmail || 'brak danych');
 
   // Przygotowujemy wiersze do tabeli
-  const vatRate = 0.23;  // 23% VAT
+  const vatRate = 0.23; // 23% VAT
   let totalNet = 0;
   let totalVAT = 0;
   let totalGross = 0;
@@ -101,13 +110,12 @@ function generateServicePdf(service: Service) {
 
   if (service.operations && service.operations.length > 0) {
     service.operations.forEach((op, i) => {
-      // Jeśli 'op' jest obiektem i posiada nazwę, używamy jej; jeśli to string, bierzemy wartość
       const opName =
         typeof op === 'object' && op.name
           ? replacePolishCharacters(op.name)
           : replacePolishCharacters(String(op));
 
-      const net = service.amounts[i] || 0;  // kwota netto
+      const net = service.amounts[i] || 0;
       const vat = net * vatRate;
       const gross = net + vat;
       totalNet += net;
@@ -119,7 +127,7 @@ function generateServicePdf(service: Service) {
         net.toFixed(2),
         '23%',
         vat.toFixed(2),
-        gross.toFixed(2)
+        gross.toFixed(2),
       ]);
     });
   } else {
@@ -129,7 +137,7 @@ function generateServicePdf(service: Service) {
       '0.00',
       '23%',
       '0.00',
-      '0.00'
+      '0.00',
     ]);
   }
 
@@ -173,7 +181,7 @@ function generateServicePdf(service: Service) {
     body: tableBody,
     theme: 'grid',
     headStyles: {
-      fillColor: [220, 220, 220], // jasnoszare tło w nagłówku
+      fillColor: [220, 220, 220],
       textColor: [0, 0, 0],
       lineColor: [200, 200, 200],
       lineWidth: 0.1,
@@ -217,7 +225,7 @@ export default function ServiceHistory() {
     direction: 'ascending' | 'descending';
   } | null>(null);
 
-  // Pobieramy listę samochodów (pierwszy useEffect)
+  // Pobieramy listę samochodów
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (!token) {
@@ -232,7 +240,6 @@ export default function ServiceHistory() {
             Authorization: `Bearer ${token}`,
           },
         });
-
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -253,7 +260,7 @@ export default function ServiceHistory() {
         }));
         setCars(carList);
 
-        // Ustawiamy domyślnie pierwszy samochód, jeśli istnieje
+        // Ustaw domyślnie pierwszy samochód, jeśli istnieje
         if (carList.length > 0 && !selectedCar) {
           setSelectedCar(carList[0].registrationNumber);
         }
@@ -266,8 +273,7 @@ export default function ServiceHistory() {
     fetchUserCars();
   }, [router]);
 
-  // Pobieramy zakończone zgłoszenia serwisowe (drugi useEffect)
-  // i filtrujemy je wg. wybranego pojazdu
+  // Pobieramy zakończone zgłoszenia serwisowe i filtrujemy wg wybranego pojazdu
   useEffect(() => {
     if (!selectedCar) return;
 
@@ -276,27 +282,50 @@ export default function ServiceHistory() {
       if (!token) return;
 
       try {
+        // 1) Pobierz wszystkie ZAKOŃCZONE zgłoszenia
         const response = await fetch('/api/client/report/all/completed', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        const dataNew: Service[] = await response.json();
+        const allServices: Service[] = await response.json();
+
+        // Znajdź ID wybranego pojazdu na podstawie selectedCar
         const selectedCarObj = cars.find(
           (car) => car.registrationNumber === selectedCar
         );
+        if (!selectedCarObj) return;
 
-        if (selectedCarObj) {
-          const filteredServices = dataNew.filter(
-            (service) => service.vehicleId === selectedCarObj.id
-          );
-          setCurrentServices(filteredServices);
-        }
+        // Filtrowanie po vehicleId
+        const filteredServices = allServices.filter(
+          (service) => service.vehicleId === selectedCarObj.id
+        );
+
+        // 2) Dla każdego zgłoszenia wywołujemy NOWE API, aby pobrać e-mail:
+        const enrichedServices = await Promise.all(
+          filteredServices.map(async (svc) => {
+            try {
+              const resp = await fetch(`/api/report/reports/${svc.id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              if (resp.ok) {
+                const singleData: SingleReportResponse = await resp.json();
+                // Przepisujemy email do obiektu Service:
+                svc.userEmail = singleData.user.email;
+              }
+            } catch (err) {
+              console.error('Błąd przy pobieraniu maila:', err);
+            }
+            return svc;
+          })
+        );
+
+        // Ustawiamy zaktualizowaną listę w stanie
+        setCurrentServices(enrichedServices);
       } catch (error) {
         console.error('Error fetching services for car:', error);
       }
@@ -311,7 +340,7 @@ export default function ServiceHistory() {
     setCurrentSortConfig(null);
   };
 
-  // Sortowanie wg. wybranej kolumny
+  // Sortowanie
   const sortServices = (services: Service[], key: keyof Service) => {
     let direction: 'ascending' | 'descending' = 'ascending';
     if (
@@ -322,7 +351,7 @@ export default function ServiceHistory() {
     }
 
     const sortedServices = [...services].sort((a, b) => {
-      // Jeśli sortujemy po polu "garage", to bierzemy "garage.companyName"
+      // 1) Specjalny case, jeśli sortujemy np. po "garage" (po companyName)
       if (key === 'garage') {
         const nameA = a.garage.companyName.toLowerCase();
         const nameB = b.garage.companyName.toLowerCase();
@@ -330,8 +359,24 @@ export default function ServiceHistory() {
         if (nameA > nameB) return direction === 'ascending' ? 1 : -1;
         return 0;
       }
+      // 2) Specjalny case, jeśli sortujemy po tablicy dateHistory
+      if (key === 'dateHistory') {
+        const firstDateA = a.dateHistory[0] || '';
+        const firstDateB = b.dateHistory[0] || '';
+        if (firstDateA < firstDateB) return direction === 'ascending' ? -1 : 1;
+        if (firstDateA > firstDateB) return direction === 'ascending' ? 1 : -1;
+        return 0;
+      }
+      // 3) Jeśli chcemy sortować po userEmail
+      if (key === 'userEmail') {
+        const emailA = (a.userEmail || '').toLowerCase();
+        const emailB = (b.userEmail || '').toLowerCase();
+        if (emailA < emailB) return direction === 'ascending' ? -1 : 1;
+        if (emailA > emailB) return direction === 'ascending' ? 1 : -1;
+        return 0;
+      }
 
-      // W innych przypadkach sortujemy na podstawie a[key], b[key]
+      // 4) W innych przypadkach sortujemy standardowo (np. opis, id itd.)
       if (a[key]! < b[key]!) return direction === 'ascending' ? -1 : 1;
       if (a[key]! > b[key]!) return direction === 'ascending' ? 1 : -1;
       return 0;
@@ -341,7 +386,7 @@ export default function ServiceHistory() {
     setCurrentSortConfig({ key, direction });
   };
 
-  // Render strzałek sortujących w nagłówku tabeli
+  // Render strzałek sortujących
   const renderSortArrows = (key: keyof Service) => {
     if (currentSortConfig?.key === key) {
       return currentSortConfig.direction === 'ascending' ? '▲' : '▼';
@@ -349,17 +394,19 @@ export default function ServiceHistory() {
     return '↕';
   };
 
-  // Formatowanie daty (na potrzeby wyświetlenia w tabeli)
+  // Formatowanie daty w tabeli
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString('pl-PL', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }).replace(',', '');
+    return date
+      .toLocaleString('pl-PL', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+      .replace(',', '');
   };
 
   // Tłumaczenie statusu na j. polski
@@ -379,7 +426,9 @@ export default function ServiceHistory() {
   // Render tabeli
   const renderTable = () => (
     <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Zgłoszenia serwisowe (ukończone)</h2>
+      <h2 className="text-xl font-bold text-gray-800 mb-4">
+        Zgłoszenia serwisowe (ukończone)
+      </h2>
       <table className="min-w-full border border-blue-400">
         <thead>
           <tr className="bg-blue-100">
@@ -403,6 +452,7 @@ export default function ServiceHistory() {
               Data zgłoszenia {renderSortArrows('dateHistory')}
             </th>
             <th className="px-4 py-2 border border-blue-400 text-left">Status</th>
+
             <th className="px-4 py-2 border border-blue-400 text-center">PDF</th>
           </tr>
         </thead>
@@ -410,11 +460,12 @@ export default function ServiceHistory() {
           {currentServices.map((service) => (
             <tr key={service.id} className="hover:bg-blue-100 transition-colors">
               <td className="px-4 py-2 border border-blue-400">{service.id}</td>
-              <td className="px-4 py-2 border border-blue-400">{service.description}</td>
+              <td className="px-4 py-2 border border-blue-400">
+                {service.description}
+              </td>
               <td className="px-4 py-2 border border-blue-400">
                 {service.garage.companyName}
               </td>
-              {/* Zakładam, że dateHistory[0] to data rozpoczęcia/zgłoszenia */}
               <td className="px-4 py-2 border border-blue-400">
                 {service.dateHistory.length > 0
                   ? formatDate(service.dateHistory[0])
@@ -423,8 +474,8 @@ export default function ServiceHistory() {
               <td className="px-4 py-2 border border-blue-400">
                 {translateStatus(service.status)}
               </td>
+
               <td className="px-4 py-2 border border-blue-400 text-center">
-                {/* Kliknięcie w ikonę PDF generuje nowy raport */}
                 <Image
                   src="/PDF.png"
                   alt="Generuj PDF"

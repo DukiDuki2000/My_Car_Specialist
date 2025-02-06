@@ -26,7 +26,7 @@ export default function UserProfile() {
       return;
     }
 
-    if (role !== 'ROLE_CLIENT') {
+    if (role !== 'ROLE_GARAGE') {
       // Przekierowanie, jeśli użytkownik nie jest klientem
       router.push('/');
       return;

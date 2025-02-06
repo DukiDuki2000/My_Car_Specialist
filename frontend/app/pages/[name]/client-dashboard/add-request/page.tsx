@@ -224,7 +224,11 @@ export default function WorkshopSearch() {
             />
             <button
               onClick={handleSearchWorkshops}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+              disabled={!city.trim()} // jeśli city jest puste (po przycięciu spacji), blokujemy przycisk
+              className={`px-4 py-2 rounded
+                ${!city.trim() 
+                  ? 'bg-gray-300 text-gray-700 cursor-not-allowed'
+                  : 'bg-blue-500 text-white hover:bg-blue-600'}`}
             >
               Szukaj
             </button>

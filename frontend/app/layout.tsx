@@ -1,9 +1,8 @@
 'use client'; // Layout jako komponent kliencki
-import React from 'react';
-import { useCallback, ReactNode, useEffect, useState } from 'react';
+import React, { useCallback, ReactNode, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation'; // Hooki do nawigacji Next.js
 import './globals.css';
-import Link from 'next/link'; // Import komponentu Link
+import Link from 'next/link';
 
 type LayoutProps = {
     children: ReactNode;
@@ -24,12 +23,11 @@ export default function Layout({ children }: LayoutProps) {
         token: null,
     });
 
-    const [isLoading, setIsLoading] = useState<boolean>(true); // Stan do kontroli załadowania danych
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     // Funkcja do aktualizacji stanu użytkownika na podstawie localStorage
     const updateUserFromLocalStorage = () => {
         const token = localStorage.getItem('accessToken');
-        const refreshToken = localStorage.getItem('refreshToken');
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('role');
         setUser({ username, role, token });
@@ -52,13 +50,11 @@ export default function Layout({ children }: LayoutProps) {
             if (response.ok) {
                 const data = await response.json();
                 const { accessToken } = data;
-
-                // Aktualizuj token w localStorage
                 localStorage.setItem('accessToken', accessToken);
                 updateUserFromLocalStorage();
             } else {
                 console.error('Błąd podczas odświeżania tokena:', response.statusText);
-                handleLogout(); // Wyloguj użytkownika, jeśli odświeżenie nie powiodło się
+                handleLogout(); 
             }
         } catch (error) {
             console.error('Błąd sieci podczas odświeżania tokena:', error);
@@ -69,7 +65,7 @@ export default function Layout({ children }: LayoutProps) {
     // Hook useEffect do monitorowania zmiany ścieżki i odświeżenia tokena
     useEffect(() => {
         setIsLoading(true);
-        refreshAccessToken(); // Odśwież token przy każdej zmianie ścieżki
+        refreshAccessToken();
         setIsLoading(false);
     }, [pathname]);
 
@@ -79,11 +75,12 @@ export default function Layout({ children }: LayoutProps) {
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
-        setUser({ username: null, role: null, token: null }); // Natychmiastowe zaktualizowanie stanu
+        setUser({ username: null, role: null, token: null });
         router.push('/');
     }, [router]);
 
-    const handleNavigation = () => {
+    // 1) Obsługa kliknięcia w logo:
+    const handleLogoNavigation = useCallback(() => {
         if (user.role === 'ROLE_ADMIN') {
             router.push(`/pages/${user.username}/admin-dashboard`);
         } else if (user.role === 'ROLE_MODERATOR') {
@@ -93,11 +90,25 @@ export default function Layout({ children }: LayoutProps) {
         } else if (user.role === 'ROLE_CLIENT') {
             router.push(`/pages/${user.username}/client-dashboard`);
         } else {
-            router.push('/'); // Jeśli brak roli, przekieruj do logowania
+            router.push('/'); // Jeśli brak roli, przekieruj do strony głównej
         }
-    };
+    }, [user, router]);
 
-    // Zmienna kontrolująca treść w headerze
+    // 2) Obsługa kliknięcia w nazwę użytkownika (tutaj możesz wstawić, gdzie ma prowadzić):
+    const handleUserNavigation = useCallback(() => {
+        if (user.role === 'ROLE_ADMIN') {
+            router.push(`/pages/${user.username}/admin-dashboard`);
+        } else if (user.role === 'ROLE_MODERATOR') {
+            router.push(`/pages/${user.username}/moderator-dashboard`);
+        } else if (user.role === 'ROLE_GARAGE') {
+            router.push(`/pages/${user.username}/garage-dashboard/garage-info`);
+        } else if (user.role === 'ROLE_CLIENT') {
+            router.push(`/pages/${user.username}/client-dashboard/client-info`);
+        } else {
+            router.push('/'); // Jeśli brak roli, przekieruj do strony głównej
+        }
+    }, [user, router]);
+
     let headerContent;
     if (pathname.startsWith('/pages/auth/login')) {
         headerContent = (
@@ -120,14 +131,17 @@ export default function Layout({ children }: LayoutProps) {
             </div>
         );
     } else {
+        // Header dla pozostałych stron
         headerContent = (
             <div className="w-full bg-transparent flex items-center">
+                {/* Kliknięcie w logo -> "stara" logika (role -> dashboard) */}
                 <a
-                    onClick={handleNavigation}
+                    onClick={handleLogoNavigation}
                     className="text-2xl font-bold text-gray-800 hover:text-blue-500 cursor-pointer"
                 >
                     MyCarSpecialist
                 </a>
+
                 {!isLoading && user.token && user.token !== 'null' && user.token !== '' && (
                     <div className="ml-auto flex items-center space-x-4">
                         <button
@@ -136,9 +150,15 @@ export default function Layout({ children }: LayoutProps) {
                         >
                             Wyloguj się
                         </button>
-                        <span className="text-sm text-gray-800 font-semibold">
+                        
+                        {/* Kliknięcie w nazwę użytkownika -> nowa funkcja handleUserNavigation */}
+                        <span
+                            className="text-sm text-gray-800 font-semibold cursor-pointer"
+                            onClick={handleUserNavigation}
+                        >
                             {user.username || 'Nieznany Użytkownik'}
                         </span>
+
                     </div>
                 )}
             </div>
@@ -157,7 +177,6 @@ export default function Layout({ children }: LayoutProps) {
                 />
             </head>
             <body className="font-poppins bg-gray-50 min-h-screen">
-                {/* Renderuj nagłówek, a treść zależy od strony */}
                 <header className="bg-gray-100 p-4 shadow-md">
                     <nav className="container mx-auto flex items-center justify-between">
                         {headerContent}
