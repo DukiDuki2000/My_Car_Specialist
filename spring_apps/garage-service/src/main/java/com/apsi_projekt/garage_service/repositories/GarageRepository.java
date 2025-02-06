@@ -8,4 +8,5 @@ import java.util.List;
 public interface GarageRepository extends JpaRepository<Garage, Long> {
     Garage findByNip(String nip);
     List<Garage> findAllByAddressCityOrderByAddressStreetAsc(String city);
+    Garage findByUserId(Long userId);
 }

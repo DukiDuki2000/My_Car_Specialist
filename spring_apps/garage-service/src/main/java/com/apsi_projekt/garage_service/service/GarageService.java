@@ -214,5 +214,17 @@ public class GarageService {
     public List<Garage> getAllByGivenCityAndSortByStreet(String city) {
         return garageRepository.findAllByAddressCityOrderByAddressStreetAsc(city);
     }
+    public Garage getGarageByUserId(Long userId) {
+        Garage garage = garageRepository.findByUserId(userId);
+        if (garage == null) {
+            throw new RuntimeException("Could not fetch for userId: " + userId);
+        }
+        return garage;
+    }
+    public Garage updatePhoneNumber(Long userId, String newPhoneNumber) {
+        Garage garage = getGarageByUserId(userId);
+        garage.setPhoneNumber(newPhoneNumber);
+        return garageRepository.save(garage);
+    }
 
 }
