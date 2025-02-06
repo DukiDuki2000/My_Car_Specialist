@@ -148,7 +148,13 @@ export default function UserProfile() {
       return;
     }
 
-    // Jeśli jesteśmy w trybie edycji, zatwierdź zmiany
+    // Jeśli jesteśmy w trybie edycji, sprawdź czy numer składa się z dokładnie 9 cyfr
+    if (phoneNumberInput.length !== 9) {
+      setError('Numer telefonu musi składać się z dokładnie 9 cyfr.');
+      return;
+    }
+
+    // Jeśli zmiana się powiedzie, aktualizujemy stan garażu
     try {
       const response = await fetch(`/api/garage/change/${phoneNumberInput}`, {
         method: 'PUT',
@@ -162,11 +168,11 @@ export default function UserProfile() {
         throw new Error(`Błąd: ${response.status}`);
       }
 
-      // Jeśli zmiana się powiedzie, aktualizujemy stan garażu
       if (garage) {
         setGarage({ ...garage, phoneNumber: phoneNumberInput });
       }
       setIsEditingPhone(false);
+      setError(null);
     } catch (err) {
       console.error(err);
       setError('Nie udało się zmienić numeru telefonu.');
@@ -255,20 +261,33 @@ export default function UserProfile() {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-bold mb-1">Numer telefonu</label>
-            <div className="flex">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded px-4 py-2"
-                readOnly={!isEditingPhone}
-                value={phoneNumberInput}
-                onChange={(e) => setPhoneNumberInput(e.target.value)}
-              />
-              <button
-                onClick={handlePhoneChange}
-                className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                {isEditingPhone ? 'Zatwierdź' : 'Zmień'}
-              </button>
+            <div className="flex flex-col">
+              <div className="flex">
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 rounded px-4 py-2"
+                  readOnly={!isEditingPhone}
+                  value={phoneNumberInput}
+                  maxLength={9}
+                  onChange={(e) => {
+                    // Pozostawiamy tylko cyfry
+                    const value = e.target.value.replace(/\D/g, '');
+                    setPhoneNumberInput(value);
+                  }}
+                />
+                <button
+                  onClick={handlePhoneChange}
+                  className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  disabled={isEditingPhone && phoneNumberInput.length !== 9}
+                >
+                  {isEditingPhone ? 'Zatwierdź' : 'Zmień'}
+                </button>
+              </div>
+              {isEditingPhone && phoneNumberInput.length !== 9 && (
+                <p className="text-red-500 text-sm mt-1">
+                  Numer telefonu musi składać się z dokładnie 9 cyfr
+                </p>
+              )}
             </div>
           </div>
         </div>
