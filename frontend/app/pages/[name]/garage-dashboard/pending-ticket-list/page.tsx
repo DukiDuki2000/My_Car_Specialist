@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 type StatusType = 'NEW' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 
+/** Struktura "garage" */
 interface Garage {
   id: number;
   nip: string;
@@ -17,6 +18,10 @@ interface Garage {
   userName: string;
 }
 
+/** 
+ * Struktura Twojego pojedynczego zlecenia (raportu).
+ * Dodajemy opcjonalne pola `car?` i `userEmail?`
+ */
 interface ServiceRequest {
   id: number;
   dateHistory: string[];
@@ -28,25 +33,37 @@ interface ServiceRequest {
   userId: number;
   userName: string;
   description: string;
-  // Pole, w którym trzymamy dane o wybranym pojeździe
   car?: string;
-  // Pole, w którym trzymamy e-mail użytkownika
-  userEmail?: string;
+  userEmail?: string;   // <-- Tutaj będziemy dopisywać e‑mail pobrany z nowego API
 }
 
-// Przykładowy typ pojazdu, dostosuj do tego co naprawdę zwraca API
+/** Struktura pojazdu */
 interface Vehicle {
   id: number;
   brand: string;
   model: string;
-  // ...inne pola, np. year, vin itd.
+  // ...inne pola, np. year, vin
 }
 
-// Przykładowy typ info o użytkowniku, dostosuj do tego co naprawdę zwraca API
-interface UserInfo {
+/** Struktura "user" z nowego API (SingleReportResponse.user) */
+interface SingleUser {
   id: number;
+  username: string;
   email: string;
-  // ...inne pola np. firstName, lastName itp.
+}
+
+/** Struktura "report" z nowego API (SingleReportResponse.report) */
+interface SingleReport {
+  id: number;
+  // ...inne pola, np. dateHistory, status, operations...
+  userId: number;
+  userName: string;
+}
+
+/** Struktura odpowiedzi z nowego API */
+interface SingleReportResponse {
+  report: SingleReport;
+  user: SingleUser;
 }
 
 export default function GarageDashboard() {
@@ -87,92 +104,73 @@ export default function GarageDashboard() {
   }, [router, isClient, username]);
 
   /**
-   * Pobiera wszystkie zgłoszenia (raporty) i do każdego dociąga:
-   * 1) informacje o pojeździe (car)
-   * 2) informacje o użytkowniku (email)
-   *  - wszystko tak, aby dla każdego userId wykonać TYLKO JEDNO zapytanie.
+   * Pobiera wszystkie zgłoszenia (raporty) i:
+   * 1) Dla każdego zlecenia pobiera e-mail użytkownika z nowego API `/api/report/reports/:reportId`
+   * 2) Pobiera pojazdy dla userId, aby wypełnić pole `car`.
    */
   const fetchServiceRequests = async (token: string) => {
     try {
       setLoading(true);
       setError('');
 
+      // 1. Pobranie listy zleceń (raportów)
       const response = await fetch('/api/report/garage/reports', {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (!response.ok) {
         throw new Error(`Błąd pobierania zleceń. Status: ${response.status}`);
       }
 
       const data: ServiceRequest[] = await response.json();
-      const uniqueUserIds = [...new Set(data.map((req) => req.userId))];
 
-      // -- 1. Pobieramy pojazdy dla każdego userId (mapa userId -> Vehicle[])
-      const vehiclesMap = new Map<number, Vehicle[]>();
+      // 2. Dla każdego zlecenia pobieramy maila z nowego API
+      //    oraz pobieramy pojazdy z /api/client/vehicle/user/{userId}.
+      const requestsWithEmailAndCar = await Promise.all(
+        data.map(async (request) => {
+          try {
+            // ---- Pobranie maila z nowego API: /api/report/reports/{reportId}
+            const singleRes = await fetch(`/api/report/reports/${request.id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            if (singleRes.ok) {
+              const singleData: SingleReportResponse = await singleRes.json();
+              // Ustawiamy e‑mail
+              request.userEmail = singleData.user.email;
+            } else {
+              console.warn(
+                `Nie udało się pobrać e-maila dla reportId=${request.id}. Status: ${singleRes.status}`
+              );
+            }
 
-      const fetchVehiclesPromises = uniqueUserIds.map(async (userId) => {
-        const res = await fetch(`/api/client/vehicle/user/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+            // ---- Pobranie pojazdów (brand, model) użytkownika
+            const vehicleRes = await fetch(`/api/client/vehicle/user/${request.userId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            if (vehicleRes.ok) {
+              const userVehicles: Vehicle[] = await vehicleRes.json();
+              // Znajdujemy pojazd pasujący do request.vehicleId
+              const foundVehicle = userVehicles.find((v) => v.id === request.vehicleId);
+              if (foundVehicle) {
+                request.car = `${foundVehicle.brand} ${foundVehicle.model}`;
+              } else {
+                request.car = 'Nieznany pojazd';
+              }
+            } else {
+              console.warn(
+                `Błąd pobierania pojazdów dla userId=${request.userId}. Status: ${vehicleRes.status}`
+              );
+              request.car = 'Nie udało się pobrać pojazdu';
+            }
+          } catch (innerErr) {
+            console.error('Błąd przy dociąganiu maila/pojazdów:', innerErr);
+          }
 
-        if (!res.ok) {
-          console.warn(`Błąd pobierania pojazdów dla userId = ${userId}`);
-          vehiclesMap.set(userId, []);
-          return;
-        }
+          return request;
+        })
+      );
 
-        const userVehicles: Vehicle[] = await res.json();
-        vehiclesMap.set(userId, userVehicles);
-      });
-
-      // -- 2. Pobieramy dane użytkownika (np. email) – mapa userId -> UserInfo
-      const usersMap = new Map<number, UserInfo>();
-
-      const fetchUserInfoPromises = uniqueUserIds.map(async (userId) => {
-        const res = await fetch(`/api/client/user/info/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!res.ok) {
-          console.warn(`Błąd pobierania info o użytkowniku o ID: ${userId}`);
-          // Możesz wstawić do mapy jakiś placeholder lub pusty obiekt
-          usersMap.set(userId, { id: userId, email: 'brak danych' });
-          return;
-        }
-
-        const userInfo: UserInfo = await res.json();
-        usersMap.set(userId, userInfo);
-      });
-
-      // -- 3. Uruchamiamy wszystkie obietnice równolegle
-      await Promise.all([...fetchVehiclesPromises, ...fetchUserInfoPromises]);
-
-      // -- 4. Łączymy wyniki: 
-      //      dla każdego requesta szukamy w vehiclesMap i usersMap
-      const requestsWithCarAndEmail = data.map((request) => {
-        // Pojazdy
-        const userVehicles = vehiclesMap.get(request.userId) || [];
-        const foundVehicle = userVehicles.find((v) => v.id === request.vehicleId);
-
-        let carInfo = 'Nie znaleziono pojazdu';
-        if (foundVehicle) {
-          carInfo = `${foundVehicle.brand} ${foundVehicle.model}`;
-        }
-
-        // Użytkownik (email)
-        const foundUser = usersMap.get(request.userId);
-        const userEmail = foundUser ? foundUser.email : 'brak e-maila';
-
-        return {
-          ...request,
-          car: carInfo,
-          userEmail: userEmail,
-        };
-      });
-
-      // -- 5. Zapisujemy w stanie
-      setRequests(requestsWithCarAndEmail);
+      // 3. Zapisujemy w stanie
+      setRequests(requestsWithEmailAndCar);
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Wystąpił błąd podczas pobierania zleceń.');
@@ -208,7 +206,7 @@ export default function GarageDashboard() {
         throw new Error(`Błąd zmiany statusu. Status: ${response.status}`);
       }
 
-      // Po udanej zmianie statusu pobieramy na nowo listę zleceń
+      // Po udanej zmianie statusu ponownie pobierz listę zleceń (zaktualizuje się widok)
       await fetchServiceRequests(token);
     } catch (err: any) {
       console.error(err);
@@ -223,6 +221,7 @@ export default function GarageDashboard() {
     changeReportStatus(id, 'IN_PROGRESS');
   };
 
+  // Obsługa odrzucenia (z NEW -> CANCELLED)
   const handleCancel = (id: number) => {
     changeReportStatus(id, 'CANCELLED');
   };
@@ -261,10 +260,10 @@ export default function GarageDashboard() {
                   <td className="px-4 py-2 border">{request.userName}</td>
                   <td className="px-4 py-2 border">
                     <span className="whitespace-nowrap overflow-hidden text-ellipsis block">
-                      {request.userEmail}
+                      {request.userEmail || '—'}
                     </span>
                   </td>
-                  <td className="px-4 py-2 border">{request.car}</td>
+                  <td className="px-4 py-2 border">{request.car || '—'}</td>
                   <td className="px-4 py-2 border">{request.description}</td>
                   <td className="px-4 py-2 border">
                     <div className="flex justify-center items-center space-x-2">
@@ -274,8 +273,10 @@ export default function GarageDashboard() {
                       >
                         Akceptuj
                       </button>
-                      <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                      onClick={() => handleCancel(request.id)}>
+                      <button
+                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                        onClick={() => handleCancel(request.id)}
+                      >
                         Odrzuć
                       </button>
                     </div>
