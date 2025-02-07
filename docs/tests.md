@@ -1,6 +1,213 @@
 ## Frontend
 
 
+### 1. Testy automatyczne
+
+#### 1.1. Testowanie formularza logowania
+
+- Sprawdzenie poprawności działania formularza logowania.
+
+- Dla poprawnych danych użytkownik zostaje przekierowany na panel użytkownika.
+
+- Dla niepoprawnych danych system wyświetla komunikat o błędzie.
+
+#### 1.2. Test przycisku wylogowania
+
+- Sprawdzenie, czy kliknięcie przycisku usuwa dane użytkownika z `localStorage`, powodując wylogowanie.
+
+
+### 2. Testy manualne (scenariusze)
+
+#### 2.1. Test użytkownika - klienta
+
+2.1.1. Sprawdzenie funkcjonowania formularza rejestracji
+
+**Poprawne dane:**
+
+- Wprowadzenie poprawnych danych i potwierdzenie rejestracji powoduje utworzenie konta.
+
+**Niepoprawne dane:**
+
+- Dla błędnie skonstruowanego e-maila system wyświetla komunikat o błędzie.
+
+2.1.2. Sprawdzenie funkcjonowania logowania
+
+**Poprawne dane:**
+
+- Dla poprawnych danych logowania użytkownik zostaje przekierowany na panel klienta.
+
+**Niepoprawne dane:**
+
+- Dla niepoprawnych danych system wyświetla komunikat o błędzie.
+
+2.1.3. Sprawdzenie poprawności działania przycisków panelu
+
+- **Pojazdy**
+
+    - Przycisk przekierowuje na panel do zarządzania pojazdami.
+
+    - **Dodaj pojazd** – przenosi do formularza dodawania pojazdu.
+
+    - **Twoje pojazdy** – przenosi do listy przypisanych pojazdów.
+
+- **Nowe zlecenie**
+
+    - Przycisk przekierowuje do formularza dodawania nowego zgłoszenia.
+
+- **Lista zleceń**
+
+    - Przycisk przekierowuje do wyboru aktualnych i archiwalnych zleceń.
+
+    - **Aktualne zlecenia** – wyświetla stronę z otwartymi zleceniami.
+
+    - **Historia zleceń** – pokazuje zamknięte zgłoszenia.
+
+2.1.4. Sprawdzenie dodawania auta do użytkownika
+
+A. Przejście z głównego menu klienta do strony **Pojazdy**.
+
+B. Przejście do formularza **Dodaj pojazd**.
+
+C. Wypełnienie formularza:
+
+   **Case 1:**
+
+    - Wprowadzenie poprawnego numeru VIN.
+
+    - Sprawdzenie działania dekodowania VIN.
+
+    - Dodanie pojazdu.
+
+   **Case 2:**
+
+    - Wprowadzenie niepoprawnego numeru VIN.
+
+    - Sprawdzenie, czy system zgłasza błąd.
+
+2.1.5. Sprawdzenie, czy auto zostało przypisane do użytkownika
+
+1. Przejście do strony **Pojazdy**.
+
+2. Sprawdzenie, czy pojazd pojawił się w bazie danych i jest przypisany do użytkownika.
+
+2.1.6. Sprawdzenie funkcjonowania dodawania nowego zgłoszenia serwisowego
+
+   **Case 1:**
+    
+    - Wybranie pojazdu i miasta.
+    
+    - Sprawdzenie, czy wyświetlany jest odpowiedni warsztat.
+    
+    - Uzupełnienie pola "Opis usługi".
+    
+    - Wysłanie zgłoszenia.
+    
+   **Case 2:**
+    
+    - Wybranie pojazdu i uzupełnienie opisu bez wyboru warsztatu.
+    
+    - Sprawdzenie, czy przycisk "Wyślij" jest zablokowany.
+    
+   **Case 3:**
+    
+    - Wybranie warsztatu i uzupełnienie opisu bez wyboru pojazdu.
+    
+    - Sprawdzenie, czy przycisk "Wyślij" jest zablokowany.
+
+
+### 3. Test użytkownika - warsztatu
+
+#### 3.1. Sprawdzenie formularza rejestracji warsztatu
+
+   **Case 1:**
+
+    - Wprowadzenie poprawnego NIP-u.
+
+    - Sprawdzenie automatycznego uzupełniania danych.
+
+    - Wysłanie zgłoszenia.
+
+   **Case 2:**
+
+    - Wprowadzenie niepoprawnego NIP-u.
+    
+    - Sprawdzenie, czy pola nie zostały uzupełnione.
+
+#### 3.2. Sprawdzenie funkcjonowania logowania
+
+- **Poprawne dane** – przekierowanie do panelu warsztatu.
+
+- **Niepoprawne dane** – komunikat o błędzie.
+
+#### 3.3. Sprawdzenie poprawności działania przycisków panelu
+
+- **Sprawdzanie zgłoszeń** – przekierowanie do listy nowych zgłoszeń.
+
+- **Aktualne zlecenia** – lista aktywnych zgłoszeń.
+
+- **Historia zleceń** – przegląd zamkniętych zgłoszeń.
+
+#### 3.4. Sprawdzenie panelu "Sprawdzanie zgłoszeń"
+
+- Sprawdzenie, czy istnieje zgłoszenie od klienta.
+
+- Kliknięcie **"Akceptuj"** przenosi zgłoszenie do aktualnych zleceń.
+
+#### 3.5. Sprawdzenie funkcjonalności panelu "Aktualne zlecenia"
+
+- Sprawdzenie danych klienta i pojazdu.
+
+- Dodanie działań do zgłoszenia.
+
+- Kliknięcie **"Zakończ zgłoszenie"** przenosi je do historii.
+
+#### 3.6. Sprawdzenie panelu "Historia zleceń"
+
+- Ukończone zgłoszenie jest widoczne z poprawnymi danymi.
+
+- Kliknięcie **"PDF"** pobiera raport zgłoszenia.
+
+
+### 4. Test użytkownika - moderatora
+
+#### 4.1. Sprawdzenie funkcjonalności rejestracji warsztatu
+
+- Wprowadzenie NIP-u i automatyczne uzupełnienie danych.
+
+- Sprawdzenie poprawności danych.
+
+#### 4.2. Sprawdzenie funkcjonowania logowania
+
+- **Poprawne dane** – przekierowanie do panelu moderatora.
+
+- **Niepoprawne dane** – komunikat o błędzie.
+
+#### 4.3. Sprawdzenie poprawności działania przycisków panelu
+
+- **Dane pojazdów** – wyszukiwanie pojazdów po VIN/tablicy.
+
+- **Sprawdź prośby** – przegląd zgłoszeń warsztatów.
+
+#### 4.4. Sprawdzenie panelu wyszukiwania pojazdu
+
+- **Poprawny VIN/tablica** – wyświetlenie danych pojazdu.
+
+- **Niepoprawny VIN/tablica** – komunikat "Nie znaleziono".
+
+#### 4.5. Sprawdzenie panelu "Sprawdź prośby"
+
+- Rozwijanie/zamykanie zgłoszeń warsztatów.
+
+- Uzupełnianie danych i akceptacja zgłoszenia.
+
+#### 4.6. Sprawdzenie poprawności rejestracji warsztatu
+
+- Wylogowanie się.
+
+- Próba logowania nowego warsztatu.
+
+- Przekierowanie do panelu warsztatu.
+
 
 ## Backend
 

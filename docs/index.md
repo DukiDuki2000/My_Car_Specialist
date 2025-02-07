@@ -12,10 +12,6 @@
 
 </div>
 
-## 
-
-
-
 ## Skład zespołu
 
 <div style="display: flex; flex-wrap: wrap;">
@@ -39,6 +35,67 @@
     </ul>
   </div>
 </div>
+
+
+## Dokumentacja analityczna `My Car Specialist`
+
+### Projekt: System dla warsztatów samochodowych
+
+#### Opis projektu
+
+System będzie miał za zadanie umożliwić komunikację między klientem, a warsztatem samochodowym w zakresie obsługi i napraw pojazdów. Za jego pomocą klient będzie mógł sprawdzić historię napraw swojego auta wraz z poniesionymi z ich tytułu kosztami. Oprogramowanie będzie również oferowało funkcjonalność pozwalającą na sprawdzenie informacji o pojezdzie po jego numerze VIN. Dodatkowo zostanie zaimplementowana możliwość komunikacji mailowej z klientem w celu przypomnienia o nadchodzącym terminie wizyty oraz o zakończeniu serwisu.
+
+System umożliwi pracownikom warsztatu rejestrację wykonanych prac serwisowych. Każda czynność wykonana przy pojeździe będzie posiadać opis przyjętego pojazdu (nr VIN, przebieg, zauważone uszkodzenia), wykorzystane części, kosztorys i dodatkowy opis, w którym w zależności od potrzeb, zostaną zawarte wszystkie informacje kluczowe w dalszej poprawnej eksploatacji pojazdu, lub przyszłych napraw.
+
+### Funkcje systemu dostępne dla klienta:
+-   system logowania i rejestracji użytkownika,
+-   przypisanie pojazdu do swojego konta (podanie poprawnej kombinacji numeru rejestracyjnego i numeru VIN),
+-   sprawdzenie pojazdu po numerze VIN,
+-   przeglądanie historii serwisowej,
+-   tworzenie zgłoszenia serwisowego,
+-   kontakt mailowy z warsztatem,
+-   generowanie raportów PDF z napraw.
+
+### Funkcje systemu dostępne dla pracowników warsztatu:
+-   panel administracyjny,
+-   tworzenie historii serwisowej,
+-   kontakt z klientem (wiadomości E-mail),
+-   zmiana statusu naprawy,
+-   generowanie zgłoszenia serwisowego dla serwisanta na podstawie odebranego zgłoszenia online, lub wypełnionego ręcznie (do wydruku),
+-   generowanie raportów PDF z napraw,
+-   automatyczna archiwizacja napraw.
+
+### Przewidywana struktura aplikacji będzie się składać z:
+-   Frontend SPA (Single-Page-Application) z systemem autoryzacji użytkownika, gdzie w zależności od uprawnień będzie miał dostęp do odpowiednich funkcjonalności.
+-   Backend zarządzający logiką operacji wewnątrz aplikacji.
+-   Baza danych klientów, pojazdów, czynności serwisowych ze szczegółami i kosztorysami, faktur.
+
+
+## Schemat struktury
+
+<img src="assets/schemat.png" alt="Zakładana struktura projektu" width="150%" height="400px"/>
+
+### Strona główna
+
+<img src="assets/F_strona-główna.png" alt="Strona główna" width="150%" height="400px"/>
+
+### Panel użytkownika
+
+<img src="assets/F_panel-użytkownika.png" alt="Panel użytkownika" width="150%" height="400px"/>
+
+### Panel warsztatu
+
+<img src="assets/F_panel-warsztatu.png" alt="Panel warsztatu" width="150%" height="400px"/>
+
+### Panel moderatora
+
+<img src="assets/F_panel-moderatora.png" alt="Panel moderatora" width="150%" height="400px"/>
+
+## Poradnik użytkownika
+
+<iframe src="assets/Poradnik_użytkowania.pdf" width="150%" height="800px">
+    Twoja
+</iframe>
 
 ## Schemat projektu
 
