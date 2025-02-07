@@ -2,6 +2,7 @@ package com.apsi_projekt.garage_service.service;
 
 import com.apsi_projekt.garage_service.dto.AddGarageRequest;
 import com.apsi_projekt.garage_service.dto.CompanyInfo;
+import com.apsi_projekt.garage_service.dto.UserInfo;
 import com.apsi_projekt.garage_service.dto.UserRequest;
 import com.apsi_projekt.garage_service.model.Address;
 import com.apsi_projekt.garage_service.model.Garage;
@@ -179,10 +180,51 @@ public class GarageService {
             throw new RuntimeException("Could not fetch userId for username: " + username, e);
         }
     }
+    public UserInfo getUserInfo(Long id) {
+        System.out.println("Getting user Info (5/9)");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-API-KEY", API_KEY);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<UserInfo> response = restTemplate.exchange(
+                    USER_SERVICE + "/user/info/" + id,
+                    HttpMethod.GET,
+                    entity,
+                    UserInfo.class
+            );
+            System.out.println(response.getBody());
+            return response.getBody();
+        } catch (Exception e) {
+            System.err.println("Error fetching userId: " + e.getMessage());
+            throw new RuntimeException("Could not fetch userId for username: " + id, e);
+        }
+    }
 
     @Transactional
     public boolean deleteGarageAccountRequest(String nip) {
         int deleted = garageAccountRequestRepository.deleteByNip(nip);
         return deleted > 0;
     }
+
+    public List<Garage> getAllGarages() {
+        return garageRepository.findAll();
+    }
+
+    public List<Garage> getAllByGivenCityAndSortByStreet(String city) {
+        return garageRepository.findAllByAddressCityOrderByAddressStreetAsc(city);
+    }
+    public Garage getGarageByUserId(Long userId) {
+        Garage garage = garageRepository.findByUserId(userId);
+        if (garage == null) {
+            throw new RuntimeException("Could not fetch for userId: " + userId);
+        }
+        return garage;
+    }
+    public Garage updatePhoneNumber(Long userId, String newPhoneNumber) {
+        Garage garage = getGarageByUserId(userId);
+        garage.setPhoneNumber(newPhoneNumber);
+        return garageRepository.save(garage);
+    }
+
 }

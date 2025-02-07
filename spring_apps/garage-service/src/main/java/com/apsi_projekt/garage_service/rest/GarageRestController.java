@@ -1,10 +1,12 @@
 package com.apsi_projekt.garage_service.rest;
 
 import com.apsi_projekt.garage_service.dto.AddGarageRequest;
+import com.apsi_projekt.garage_service.dto.UserInfo;
 import com.apsi_projekt.garage_service.model.Garage;
 import com.apsi_projekt.garage_service.model.GarageAccountRequest;
 import com.apsi_projekt.garage_service.service.GarageAccountRequestService;
 import com.apsi_projekt.garage_service.service.GarageService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,5 +57,36 @@ public class GarageRestController {
     public ResponseEntity<Void> deleteRequestByNip(@PathVariable String nip) {
         garageAccountRequestService.deleteRequestByNip(nip);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ROLE_MODERATOR','ROLE_ADMIN','ROLE_GARAGE', 'ROLE_CLIENT')")
+    public ResponseEntity<List<Garage>> getAllGarages() {
+        List<Garage> garages = garageService.getAllGarages();
+        if (garages.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(garages);
+    }
+
+    @GetMapping("/all/byCity/{city}")
+    public List<Garage> getAllByGivenCityAndSortByStreet(@PathVariable String city) {
+        return garageService.getAllByGivenCityAndSortByStreet(city);
+    }
+
+    @GetMapping("/info")
+    @PreAuthorize("hasAnyRole('ROLE_GARAGE','ROLE_MODERATOR','ROLE_ADMIN')")
+    public ResponseEntity<Garage> getGarageByUserId(HttpServletRequest request) {
+        String idHeader = request.getHeader("X-Id");
+        Garage garage = garageService.getGarageByUserId(Long.parseLong(idHeader));
+        return ResponseEntity.ok(garage);
+    }
+    @PutMapping("/change/phone")
+    @PreAuthorize("hasAnyRole('ROLE_GARAGE','ROLE_MODERATOR','ROLE_ADMIN')")
+    public ResponseEntity<Garage> updatePhoneNumber(HttpServletRequest request,
+                                                    @RequestParam String phoneNumber) {
+        String idHeader = request.getHeader("X-Id");
+        Garage updatedGarage = garageService.updatePhoneNumber(Long.parseLong(idHeader), phoneNumber);
+        return ResponseEntity.ok(updatedGarage);
     }
 }

@@ -3,8 +3,10 @@ package com.apsi_projekt.user_service.rest;
 import com.apsi_projekt.user_service.models.User;
 import com.apsi_projekt.user_service.repositories.UserRepository;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -43,4 +47,37 @@ public class UserRestController {
         }
 
     }
-}
+
+    @GetMapping("/account")
+    @PreAuthorize("hasAnyRole('ROLE_CLIENT', 'ROLE_GARAGE')")
+    public ResponseEntity<Map<String, Object>> getUserInfo( HttpServletRequest request) {
+        String idHeader = request.getHeader("X-Id");
+            User user = userRepository.findById(Long.parseLong(idHeader))
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", user.getId());
+            response.put("username", user.getUsername());
+            response.put("email", user.getEmail());
+
+            return ResponseEntity.ok(response);
+        }
+
+    @GetMapping("/info/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_SERVICE','ROLE_MODERATOR','ROLE_ADMIN')")
+    public ResponseEntity<Map<String, Object>> getUserById(@PathVariable Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", user.getId());
+        response.put("username", user.getUsername());
+        response.put("email", user.getEmail());
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    }
+
+

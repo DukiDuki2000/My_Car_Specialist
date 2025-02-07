@@ -1,5 +1,6 @@
 package com.apsi_projekt.garage_service.service;
 
+import com.apsi_projekt.garage_service.dto.UserInfo;
 import com.apsi_projekt.garage_service.model.Report;
 import com.apsi_projekt.garage_service.model.ReportStatus;
 import com.apsi_projekt.garage_service.repositories.ReportRepository;
@@ -12,13 +13,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ReportService {
 
     @Autowired
     private ReportRepository reportRepository;
+    @Autowired
+    private  GarageService garageService;
 
     public Report createReport(Report report,HttpServletRequest request) {
         String usernameHeader = request.getHeader("X-Username");
@@ -45,7 +50,7 @@ public class ReportService {
 
     public List<Report> getAllGarageReports(HttpServletRequest request){
         String garageId = request.getHeader("X-Id");
-        return reportRepository.findByGarageId(Long.parseLong(garageId));
+        return reportRepository.findByGarage_UserId(Long.parseLong(garageId));
     }
 
     public List<Report> getAllStatusReports(HttpServletRequest request, String statusStr){
@@ -78,6 +83,11 @@ public class ReportService {
                 break;
             case COMPLETED:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "COMPLETED status is final and cannot be changed");
+            case CANCELLED:
+                if (newStatus != ReportStatus.NEW) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can only cancel NEW reports");
+
+                }
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid current status: " + currentStatus);
         }
@@ -88,15 +98,22 @@ public class ReportService {
     }
 
 
-    public Report addOperationsToReport(Long reportId, List<String> operations) {
+    public Report addOperationsToReport(Long reportId, List<String> operations, List<Double> amounts) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new ResourceNotFoundException("\n" +
                         "Service report not found with ID: " + reportId));
 
         LocalDateTime now = LocalDateTime.now();
-        for (String operation : operations) {
-            report.getOperations().add(operation);
+//        for (String operation : operations) {
+//            report.getOperations().add(operation);
+//            report.getOperationDates().add(now);
+//        }
+
+        for (int i = 0; i < operations.size(); i++) {
+            report.getOperations().add(operations.get(i));
             report.getOperationDates().add(now);
+            report.getAmounts().add(amounts.get(i));
+
         }
 
         report.getDateHistory().add(now);
@@ -104,8 +121,17 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_MODERATOR','ROLE_ADMIN','ROLE_GARAGE','ROLE_USER')")
+
     public List<Report> getCompletedReportsByVehicleId(Long vehicleId) {
         return reportRepository.findByStatusAndVehicleId(ReportStatus.COMPLETED,vehicleId);
+    }
+    public Map<String, Object> getReportWithUserById(Long reportId) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new ResourceNotFoundException("Report not found with ID: " + reportId));
+        UserInfo user = garageService.getUserInfo(report.getUserId());
+        Map<String, Object> result = new HashMap<>();
+        result.put("report", report);
+        result.put("user", user);
+        return result;
     }
 }
