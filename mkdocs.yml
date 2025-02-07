@@ -28,8 +28,9 @@ theme:
 nav:
   - Home: index.md
   - frontend:
-      - client side interface: frontend-md/client-side-interface.md
-#      - user login & register: frontend-md/user-login-register.md # do usunięcia
+      - client dashboard: frontend-md/client-dashboard.md
+      - garage dashboard: frontend-md/garage-dashboard.md
+      - moderator dashboard: frontend-md/moderator-dashboard.md
   - backend:
       - api gateway: backend-md/api-gateway.md
       - garage service: backend-md/garage-service.md
@@ -38,8 +39,9 @@ nav:
       - user service: backend-md/user-service.md
       - vehicle service: backend-md/vehicle-service.md
 #      - gradle: backend-md/gradle.md
-  - main:
-      - main: main/main-md
+  - testy: tests.md
+#  - main:
+#      - main: main/main-md
 #    - API Gateway: main-md/api-gateway.md
 #    - Garage Service: main-md/garage-service.md
 #    - Notification Service: main-md/notification-service.md

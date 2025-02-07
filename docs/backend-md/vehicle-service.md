@@ -4,7 +4,7 @@ odpowiednich punktów dostępu (API) do tych danych. Usługa ta używa technolog
 Security, co umożliwia integrację z innymi mikroserwisami, takimi jak API Gateway, oraz zapewnia odpowiednie
 mechanizmy bezpieczeństwa.
 
-## Struktura Vehicle Service~~~~
+## Struktura Vehicle Service
 
 ### 1. Podstawowa konfiguracja i uruchamianie aplikacji
 
