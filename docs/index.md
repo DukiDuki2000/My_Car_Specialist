@@ -12,6 +12,10 @@
 
 </div>
 
+## 
+
+
+
 ## Skład zespołu
 
 <div style="display: flex; flex-wrap: wrap;">
