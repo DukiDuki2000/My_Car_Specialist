@@ -69,6 +69,7 @@ public class WebSecurityConf {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/user/auth/**").permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
+                                .requestMatchers("/actuator/health").permitAll()
                                 //.requestMatchers("/**").access((authentication, context) -> new AuthorizationDecision(hasIpAddress.matches(context.getRequest())))
                                 .anyRequest().authenticated()
                 );
