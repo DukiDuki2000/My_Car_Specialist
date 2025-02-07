@@ -36,7 +36,7 @@ public class HealthAggregatorController {
         Map<String, Object> healthStatuses = new HashMap<>();
 
         HealthComponent gatewayHealth = healthEndpoint.health();
-        healthStatuses.put("api-gateway", gatewayHealth);
+        healthStatuses.put("api-gateway", gatewayHealth.getStatus());
 
         services.forEach((serviceName, url) -> {
             try {
