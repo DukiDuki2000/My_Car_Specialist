@@ -28,7 +28,8 @@ public class HealthAggregatorController {
             "user-service", "http://user-service:8080/actuator/health",
             "garage-service", "http://garage-service:8080/actuator/health",
             "vehicle-service", "http://vehicle-service:8080/actuator/health",
-            "notification-service", "http://notification-service:8080/actuator/health"
+            "notification-service", "http://notification-service:8080/actuator/health",
+            "recommendation-service", "http://recommendation-service:8080/actuator/health"
     );
 
     @GetMapping
